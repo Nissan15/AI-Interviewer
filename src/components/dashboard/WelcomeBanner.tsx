@@ -2,9 +2,21 @@ import React from 'react';
 import { Sparkles, ArrowRight, ShieldCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '../common/Button/Button';
+import { useAuth } from '../../hooks/useAuth';
 import './WelcomeBanner.css';
 
 export const WelcomeBanner: React.FC = () => {
+  const { profile, user } = useAuth();
+
+  const candidateName =
+    profile?.full_name ||
+    (user?.user_metadata?.full_name as string | undefined) ||
+    '';
+
+  const headingText = candidateName
+    ? `Welcome back, ${candidateName}`
+    : 'Welcome back';
+
   return (
     <div className="welcome-banner">
       <div className="welcome-banner-glow" />
@@ -13,7 +25,7 @@ export const WelcomeBanner: React.FC = () => {
           <Sparkles size={14} />
           <span>Next-Gen Placement Preparation</span>
         </div>
-        <h2 className="welcome-title">Welcome to AI Mock Interviewer</h2>
+        <h2 className="welcome-title">{headingText}</h2>
         <p className="welcome-subtitle">
           Practice technical quiz assessments, interactive coding challenges, aptitude tests, and
           live AI-driven HR voice interviews in a realistic enterprise environment.

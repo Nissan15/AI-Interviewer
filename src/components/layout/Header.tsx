@@ -1,6 +1,7 @@
 import React from 'react';
-import { Menu, ShieldCheck, Cpu } from 'lucide-react';
-import { useLocation } from 'react-router-dom';
+import { Menu, ShieldCheck, Cpu, LogOut, User as UserIcon } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
 import './Header.css';
 
 interface HeaderProps {
@@ -9,6 +10,13 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, profile, logout } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/login', { replace: true });
+  };
 
   const getPageTitle = () => {
     const path = location.pathname;
@@ -23,6 +31,12 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
     if (path === '/settings') return 'Platform & Provider Settings';
     return 'AI Mock Interviewer';
   };
+
+  const displayName =
+    profile?.full_name ||
+    (user?.user_metadata?.full_name as string | undefined) ||
+    user?.email?.split('@')[0] ||
+    'Candidate';
 
   return (
     <header className="app-header">
@@ -49,6 +63,28 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
           <ShieldCheck size={14} />
           <span>Zero Sample Data Mode</span>
         </div>
+
+        {/* Candidate User Pill & Logout Button */}
+        {user && (
+          <div className="header-user-section">
+            <div className="header-user-badge" title={user.email || undefined}>
+              <div className="user-avatar-mini">
+                <UserIcon size={14} />
+              </div>
+              <span className="user-display-name">{displayName}</span>
+            </div>
+            <button
+              type="button"
+              className="header-logout-btn"
+              onClick={handleLogout}
+              title="Sign Out"
+              aria-label="Sign Out of session"
+            >
+              <LogOut size={16} />
+              <span className="logout-text">Sign Out</span>
+            </button>
+          </div>
+        )}
       </div>
     </header>
   );

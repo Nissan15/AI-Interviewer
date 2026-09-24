@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
   Code2,
@@ -10,8 +10,11 @@ import {
   ChevronRight,
   Bot,
   Sparkles,
+  LogOut,
+  User as UserIcon,
 } from 'lucide-react';
 import { NAV_ITEMS, NavItemConfig } from '../../constants/navigation';
+import { useAuth } from '../../hooks/useAuth';
 import './Sidebar.css';
 
 interface SidebarProps {
@@ -20,9 +23,23 @@ interface SidebarProps {
 
 export const Sidebar: React.FC<SidebarProps> = ({ onNavClick }) => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, profile, logout } = useAuth();
   const [technicalExpanded, setTechnicalExpanded] = useState<boolean>(
     location.pathname.startsWith('/technical')
   );
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/login', { replace: true });
+    if (onNavClick) onNavClick();
+  };
+
+  const displayName =
+    profile?.full_name ||
+    (user?.user_metadata?.full_name as string | undefined) ||
+    user?.email?.split('@')[0] ||
+    'Candidate';
 
   const renderIcon = (name: NavItemConfig['iconName']) => {
     switch (name) {
@@ -124,8 +141,35 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNavClick }) => {
         })}
       </nav>
 
-      {/* System Status Footer */}
+      {/* Candidate Profile & Sign Out Footer */}
       <div className="sidebar-footer">
+        {user && (
+          <div className="sidebar-user-card">
+            <div className="sidebar-user-info">
+              <div className="sidebar-user-avatar">
+                <UserIcon size={16} />
+              </div>
+              <div className="sidebar-user-text">
+                <span className="sidebar-user-name" title={displayName}>
+                  {displayName}
+                </span>
+                <span className="sidebar-user-email" title={user.email || ''}>
+                  {user.email}
+                </span>
+              </div>
+            </div>
+            <button
+              type="button"
+              className="sidebar-logout-btn"
+              onClick={handleLogout}
+              title="Sign Out"
+              aria-label="Sign Out"
+            >
+              <LogOut size={16} />
+            </button>
+          </div>
+        )}
+
         <div className="system-status-indicator">
           <span className="status-dot-pulse" />
           <div className="status-text-group">
