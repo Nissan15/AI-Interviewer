@@ -1,0 +1,113 @@
+.prep-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-6);
+  margin-bottom: var(--space-8);
+}
+
+.prep-module-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.card-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+
+.module-icon-box {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg-elevated);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border-subtle);
+}
+
+.module-icon.technical {
+  color: #38bdf8;
+}
+
+.module-icon.aptitude {
+  color: #f59e0b;
+}
+
+.module-icon.hr {
+  color: #818cf8;
+}
+
+.module-category-tag {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  letter-spacing: 0.05em;
+}
+
+.module-title {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-2);
+}
+
+.module-desc {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  margin-bottom: var(--space-6);
+  flex: 1;
+}
+
+.module-status-box {
+  background-color: var(--color-bg-elevated);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-4);
+  border: 1px solid var(--color-border-subtle);
+}
+
+.status-label-sub {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.status-value-text {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.card-action-row {
+  display: flex;
+  align-items: center;
+}
+
+.prep-action-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-accent);
+  transition: gap var(--transition-fast);
+}
+
+.prep-action-link:hover {
+  color: var(--color-accent-hover);
+  gap: var(--space-3);
+}
+
+@media (max-width: 1024px) {
+  .prep-overview-grid {
+    grid-template-columns: 1fr;
+  }
+}

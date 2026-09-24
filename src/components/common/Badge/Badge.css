@@ -1,0 +1,61 @@
+.app-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-weight: 500;
+  border-radius: var(--radius-full);
+  line-height: 1;
+  letter-spacing: 0.02em;
+}
+
+.app-badge.badge-size-sm {
+  padding: 3px 8px;
+  font-size: var(--font-size-xs);
+}
+
+.app-badge.badge-size-md {
+  padding: 5px 12px;
+  font-size: var(--font-size-sm);
+}
+
+.badge-icon {
+  display: flex;
+  align-items: center;
+}
+
+/* Variants */
+.app-badge.badge-primary {
+  background-color: var(--color-accent-subtle);
+  color: #a5b4fc;
+  border: 1px solid var(--color-accent-border);
+}
+
+.app-badge.badge-secondary {
+  background-color: var(--color-bg-elevated);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border-default);
+}
+
+.app-badge.badge-success {
+  background-color: var(--color-success-subtle);
+  color: #6ee7b7;
+  border: 1px solid var(--color-success-border);
+}
+
+.app-badge.badge-warning {
+  background-color: var(--color-warning-subtle);
+  color: #fcd34d;
+  border: 1px solid var(--color-warning-border);
+}
+
+.app-badge.badge-error {
+  background-color: var(--color-error-subtle);
+  color: #fca5a5;
+  border: 1px solid var(--color-error-border);
+}
+
+.app-badge.badge-info {
+  background-color: var(--color-info-subtle);
+  color: #7dd3fc;
+  border: 1px solid var(--color-info-border);
+}

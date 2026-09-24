@@ -1,0 +1,41 @@
+.section-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.section-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.header-icon {
+  color: var(--color-accent);
+}
+
+.section-title {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.analytics-notice {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  font-family: var(--font-family-mono);
+}
+
+.performance-card,
+.activity-card {
+  margin-bottom: var(--space-6);
+}
+
+.performance-empty,
+.activity-empty {
+  border: none;
+  background: transparent;
+  padding: var(--space-6) var(--space-4);
+  margin: 0;
+}

@@ -1,0 +1,38 @@
+.dashboard-page {
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard-section {
+  margin-bottom: var(--space-4);
+}
+
+.section-title-bar {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+
+.dashboard-h2 {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.section-hint {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.dashboard-grid-dual {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-6);
+}
+
+@media (max-width: 900px) {
+  .dashboard-grid-dual {
+    grid-template-columns: 1fr;
+  }
+}
