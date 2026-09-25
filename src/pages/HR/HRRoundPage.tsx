@@ -1,20 +1,17 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { Users, AlertTriangle, ArrowRight, Settings as SettingsIcon } from 'lucide-react';
+import { Users, AlertTriangle, Sparkles, BrainCircuit } from 'lucide-react';
 import { useResume } from '../../context/ResumeContext';
 import { useInterview } from '../../context/InterviewContext';
-import { useSettings } from '../../context/SettingsContext';
 import { InterviewConfig } from '../../types/interview';
 import { ResumeUploader } from '../../components/hr/ResumeUploader';
 import { ResumeParsedPreview } from '../../components/hr/ResumeParsedPreview';
 import { InterviewConfigForm } from '../../components/hr/InterviewConfigForm';
 import { LiveInterviewRoom } from '../../components/interview/LiveInterviewRoom';
 import { InterviewReportView } from '../../components/interview/InterviewReportView';
-import { Button } from '../../components/common/Button/Button';
 import './HRRoundPage.css';
 
 export const HRRoundPage: React.FC = () => {
-  const { resume, clearResume } = useResume();
+  const { resume, candidateProfile, clearResume } = useResume();
   const {
     session,
     status,
@@ -22,7 +19,6 @@ export const HRRoundPage: React.FC = () => {
     startInterview,
     clearSession,
   } = useInterview();
-  const { isAiConfigured } = useSettings();
 
   const [isStarting, setIsStarting] = useState<boolean>(false);
   const [startError, setStartError] = useState<string | null>(null);
@@ -69,33 +65,18 @@ export const HRRoundPage: React.FC = () => {
             <Users size={24} />
           </div>
           <div>
-            <h2 className="hr-page-title">AI HR Voice Interview</h2>
+            <h2 className="hr-page-title">AI Mock Interview Room</h2>
             <p className="hr-page-subtitle">
-              Simulate realistic placement and corporate HR rounds with continuous speech-to-speech interaction.
+              Interactive placement interviews powered by continuous conversational speech, dynamic follow-ups, and adaptive difficulty.
             </p>
           </div>
         </div>
-      </div>
 
-      {/* AI Provider Configuration Warning Banner if unconfigured */}
-      {!isAiConfigured && (
-        <div className="ai-unconfigured-banner">
-          <div className="unconfigured-left">
-            <AlertTriangle size={20} className="banner-alert-icon" />
-            <div>
-              <span className="banner-title">AI Provider Not Configured</span>
-              <p className="banner-desc">
-                To activate AI resume analysis, voice questions, and evaluation scoring, configure your API key in Settings.
-              </p>
-            </div>
-          </div>
-          <Link to="/settings">
-            <Button variant="secondary" size="sm" leftIcon={<SettingsIcon size={14} />}>
-              Configure Provider
-            </Button>
-          </Link>
+        <div className="ai-active-pill">
+          <Sparkles size={14} className="text-accent" />
+          <span>Internal AI Interview Engine Ready</span>
         </div>
-      )}
+      </div>
 
       {startError && (
         <div className="start-error-alert">
@@ -106,9 +87,9 @@ export const HRRoundPage: React.FC = () => {
 
       {/* Preparation Steps Grid */}
       <div className="hr-steps-layout">
-        {/* Step 1: Resume Upload / Preview */}
+        {/* Step 1: Candidate Resumé & AI Profile */}
         <div className="step-column">
-          <div className="step-badge-label">Step 1: Candidate Resumé</div>
+          <div className="step-badge-label">Step 1: Candidate Profile & Resume</div>
           {resume ? (
             <ResumeParsedPreview resume={resume} onClear={clearResume} />
           ) : (
@@ -118,10 +99,11 @@ export const HRRoundPage: React.FC = () => {
 
         {/* Step 2: Interview Configuration */}
         <div className="step-column">
+          <div className="step-badge-label">Step 2: Session Parameters</div>
           <InterviewConfigForm
             onStart={handleStartInterview}
             isStarting={isStarting}
-            hasResume={Boolean(resume)}
+            hasResume={Boolean(resume || candidateProfile)}
           />
         </div>
       </div>

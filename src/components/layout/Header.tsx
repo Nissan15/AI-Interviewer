@@ -21,7 +21,7 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
   const getPageTitle = () => {
     const path = location.pathname;
     if (path === '/' || path === '/dashboard') return 'Candidate Dashboard';
-    if (path === '/technical') return 'Technical Test Hub';
+    if (path === '/technical') return 'Technical Assessment Hub';
     if (path === '/technical/quiz') return 'Technical Quiz Assessment';
     if (path === '/technical/coding') return 'Coding Assessment Sandbox';
     if (path === '/aptitude') return 'Aptitude & Reasoning Assessment';
@@ -47,7 +47,7 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
           onClick={onToggleMobileMenu}
           aria-label="Toggle navigation drawer"
         >
-          <Menu size={20} />
+          <Menu size={18} />
         </button>
         <div className="header-title-container">
           <h1 className="header-page-title">{getPageTitle()}</h1>
@@ -55,33 +55,37 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
       </div>
 
       <div className="header-right">
-        <div className="engine-status-pill">
-          <Cpu size={14} className="engine-icon" />
-          <span className="engine-text">Voice & AI Pipeline: Ready</span>
-        </div>
-        <div className="data-policy-tag">
-          <ShieldCheck size={14} />
-          <span>Zero Sample Data Mode</span>
+        {/* Voice & AI Pipeline status pill: Green dot for ready, cyan AI indicator */}
+        <div className="tech-status-pill pill-ai-ready" title="Continuous Speech & Internal AI Inference Active">
+          <span className="status-dot green-dot" />
+          <Cpu size={13} className="pill-cyan-icon" />
+          <span className="pill-text">Voice & AI Pipeline: Ready</span>
         </div>
 
-        {/* Candidate User Pill & Logout Button */}
+        {/* Zero Sample Data Mode pill */}
+        <div className="tech-status-pill pill-zero-data" title="Zero Hardcoded Mock Data Mode Active">
+          <ShieldCheck size={13} className="pill-green-icon" />
+          <span className="pill-text">Zero Sample Data Mode</span>
+        </div>
+
+        {/* User profile pill & Sign Out */}
         {user && (
           <div className="header-user-section">
-            <div className="header-user-badge" title={user.email || undefined}>
+            <div className="tech-status-pill pill-user" title={user.email || undefined}>
               <div className="user-avatar-mini">
-                <UserIcon size={14} />
+                <UserIcon size={12} />
               </div>
-              <span className="user-display-name">{displayName}</span>
+              <span className="user-display-name">{displayName.toUpperCase()}</span>
             </div>
             <button
               type="button"
-              className="header-logout-btn"
+              className="header-signout-btn"
               onClick={handleLogout}
               title="Sign Out"
               aria-label="Sign Out of session"
             >
-              <LogOut size={16} />
-              <span className="logout-text">Sign Out</span>
+              <LogOut size={13} />
+              <span className="signout-label">Sign Out</span>
             </button>
           </div>
         )}

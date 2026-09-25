@@ -3,10 +3,7 @@ import {
   Award,
   CheckCircle2,
   TrendingUp,
-  AlertCircle,
   BookOpen,
-  MessageSquare,
-  Clock,
   RotateCcw,
 } from 'lucide-react';
 import { InterviewEvaluation } from '../../types/evaluation';

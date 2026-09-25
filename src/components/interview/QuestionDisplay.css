@@ -1,12 +1,12 @@
 .interview-question-display {
-  background-color: var(--color-bg-card);
-  border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-xl);
-  padding: var(--space-6) var(--space-8);
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5) var(--space-6);
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-3);
   box-shadow: var(--shadow-sm);
 }
 
@@ -23,13 +23,14 @@
 }
 
 .q-number-pill {
-  font-size: var(--font-size-xs);
+  font-family: var(--font-family-display);
+  font-size: 11px;
   font-weight: 700;
-  color: var(--color-accent);
-  background-color: var(--color-accent-subtle);
-  border: 1px solid var(--color-accent-border);
-  padding: 3px 10px;
-  border-radius: var(--radius-full);
+  color: var(--accent);
+  background-color: var(--accent-subtle);
+  border: 1px solid var(--accent-border);
+  padding: 2px 8px;
+  border-radius: var(--radius-xs);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -38,23 +39,25 @@
   display: inline-flex;
   align-items: center;
   gap: 3px;
+  font-family: var(--font-family-display);
   font-size: 11px;
   font-weight: 600;
-  color: #fcd34d;
-  background-color: var(--color-warning-subtle);
-  border: 1px solid var(--color-warning-border);
-  padding: 3px 10px;
-  border-radius: var(--radius-full);
+  color: var(--warning);
+  background-color: var(--warning-subtle);
+  border: 1px solid var(--warning-border);
+  padding: 2px 8px;
+  border-radius: var(--radius-xs);
 }
 
 .q-speech-box {
-  padding: var(--space-2) 0;
+  padding: 4px 0;
 }
 
 .q-speech-text {
-  font-size: var(--font-size-xl);
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-lg);
   font-weight: 600;
-  color: var(--color-text-primary);
+  color: var(--text-primary);
   line-height: 1.5;
   font-style: normal;
   border: none;

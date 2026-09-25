@@ -8,11 +8,12 @@ import {
 import { InterviewEvaluation } from '../types/evaluation';
 import { textToSpeechService } from '../services/speech/textToSpeech';
 import { speechToTextService } from '../services/speech/speechToText';
-import { generateInterviewQuestion } from '../services/ai/questionGenerator';
-import { processInterviewTurn } from '../services/ai/interviewEngine';
-import { evaluateInterviewSession } from '../services/ai/answerEvaluator';
+import { generateInterviewQuestion, processInterviewTurn } from '../services/ai/interviewEngine';
+import { evaluateInterviewSession } from '../services/ai/evaluationEngine';
 import { useResume } from './ResumeContext';
 import { useSettings } from './SettingsContext';
+import { useAuth } from '../hooks/useAuth';
+import { interviewService } from '../services/interviews/interviewService';
 
 interface InterviewContextValue {
   session: InterviewSession | null;
@@ -37,8 +38,9 @@ interface InterviewContextValue {
 const InterviewContext = createContext<InterviewContextValue | undefined>(undefined);
 
 export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { resume } = useResume();
-  const { isAiConfigured, autoSpeakQuestions, speechRate, voiceUri } = useSettings();
+  const { resume, candidateProfile, setLearningPath } = useResume();
+  const { autoSpeakQuestions, speechRate, voiceUri } = useSettings();
+  const { user } = useAuth();
 
   const [session, setSession] = useState<InterviewSession | null>(null);
   const [status, setStatus] = useState<InterviewStatus>('idle');
@@ -56,6 +58,8 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const exchangesRef = useRef<InterviewExchange[]>([]);
   const timerRef = useRef<any>(null);
   const transcriptRef = useRef<string>('');
+  const currentQuestionIdRef = useRef<string | null>(null);
+  const dbSessionIdRef = useRef<string | null>(null);
 
   // Keep transcriptRef synchronized
   useEffect(() => {
@@ -139,7 +143,6 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       },
       onError: (err) => {
         console.warn('STT Error:', err);
-        setError(err);
         setIsListening(false);
       },
       onEnd: () => {
@@ -150,13 +153,8 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   const startInterview = async (config: InterviewConfig) => {
     setError(null);
-    if (!isAiConfigured) {
-      throw new Error(
-        'AI service is not configured. Please configure your API key in Settings before launching an interview.'
-      );
-    }
-
     const sessionId = `session_${Date.now()}`;
+
     const initialSession: InterviewSession = {
       id: sessionId,
       resumeId: resume?.id,
@@ -176,15 +174,52 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setCurrentQuestionNumber(1);
     exchangesRef.current = [];
 
+    // Create session in Supabase if authenticated
+    if (user) {
+      try {
+        const { data: dbSession } = await interviewService.createSession({
+          user_id: user.id,
+          resume_id: resume?.id && !resume.id.startsWith('res_') ? resume.id : null,
+          interview_type: config.type,
+          difficulty: config.difficulty,
+          duration: config.durationMinutes,
+        });
+        dbSessionIdRef.current = dbSession?.id || sessionId;
+      } catch (err) {
+        dbSessionIdRef.current = sessionId;
+      }
+    } else {
+      dbSessionIdRef.current = sessionId;
+    }
+
     try {
       setIsProcessing(true);
-      const firstQ = await generateInterviewQuestion(config, resume, 1, []);
+      const firstQ = await generateInterviewQuestion(
+        config,
+        candidateProfile,
+        1,
+        []
+      );
       setIsProcessing(false);
 
       setCurrentQuestion(firstQ.questionText);
       setStatus('speaking');
 
-      // Speak aloud and transition to listening
+      // Record question to Supabase if authenticated
+      if (user && dbSessionIdRef.current) {
+        const qId = await interviewService.recordQuestion({
+          session_id: dbSessionIdRef.current,
+          user_id: user.id,
+          question_number: 1,
+          question_text: firstQ.questionText,
+          question_type: firstQ.category,
+          topic: firstQ.topic,
+          difficulty: firstQ.difficulty,
+        });
+        currentQuestionIdRef.current = qId;
+      }
+
+      // Speak aloud and transition to candidate turn
       speakCurrentQuestion(firstQ.questionText);
     } catch (err: any) {
       setIsProcessing(false);
@@ -204,13 +239,13 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setIsProcessing(true);
     setStatus('evaluating');
 
-    // Record exchange
+    // Record exchange in memory
     const newExchange: InterviewExchange = {
       id: `ex_${Date.now()}`,
       questionNumber: currentQuestionNumber,
       questionText: currentQuestion,
       questionTimestamp: new Date().toISOString(),
-      userAnswerText: answerToProcess || '(Candidate did not answer)',
+      userAnswerText: answerToProcess || '(Candidate gave no response)',
       answerTimestamp: new Date().toISOString(),
     };
 
@@ -223,19 +258,59 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         answer: ex.userAnswerText || '',
       }));
 
-      // Call AI turn engine
-      const turnResult = await processInterviewTurn(currentQuestion, answerToProcess, historyForTurn);
+      // Call Central AI turn engine with candidate profile context
+      const turnResult = await processInterviewTurn(
+        currentQuestion,
+        answerToProcess,
+        historyForTurn,
+        candidateProfile,
+        session?.config?.type || 'technical'
+      );
 
       newExchange.isFollowUp = turnResult.isFollowUp;
       newExchange.followUpReason = turnResult.followUpReason;
       newExchange.aiQuickFeedback = turnResult.quickFeedback;
 
+      // Save answer to Supabase if authenticated
+      if (user && dbSessionIdRef.current && currentQuestionIdRef.current) {
+        await interviewService.recordAnswer({
+          question_id: currentQuestionIdRef.current,
+          session_id: dbSessionIdRef.current,
+          user_id: user.id,
+          answer_text: answerToProcess,
+          technical_accuracy: turnResult.evaluation?.technicalAccuracy,
+          communication: turnResult.evaluation?.communication,
+          clarity: turnResult.evaluation?.clarity,
+          depth: turnResult.evaluation?.depth,
+          problem_solving: turnResult.evaluation?.problemSolving,
+          confidence: turnResult.evaluation?.confidence,
+          quick_feedback: turnResult.quickFeedback,
+        });
+      }
+
+      const nextQNumber = currentQuestionNumber + 1;
       setCurrentQuestion(turnResult.nextQuestionText);
-      setCurrentQuestionNumber((prev) => prev + 1);
+      setCurrentQuestionNumber(nextQNumber);
       setCurrentTranscript('');
       setIsProcessing(false);
 
-      // Speak the next question
+      // Record next question to Supabase
+      if (user && dbSessionIdRef.current) {
+        const qId = await interviewService.recordQuestion({
+          session_id: dbSessionIdRef.current,
+          user_id: user.id,
+          question_number: nextQNumber,
+          question_text: turnResult.nextQuestionText,
+          question_type: turnResult.category,
+          topic: turnResult.topic,
+          difficulty: turnResult.difficulty,
+          is_follow_up: turnResult.isFollowUp,
+          follow_up_reason: turnResult.followUpReason,
+        });
+        currentQuestionIdRef.current = qId;
+      }
+
+      // Speak next question
       speakCurrentQuestion(turnResult.nextQuestionText);
     } catch (err: any) {
       setIsProcessing(false);
@@ -261,13 +336,43 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
     try {
       const evaluation = await evaluateInterviewSession(
-        activeSession?.id || `sess_${Date.now()}`,
+        dbSessionIdRef.current || activeSession?.id || `sess_${Date.now()}`,
         durationSeconds,
-        exchangesRef.current
+        exchangesRef.current,
+        candidateProfile
       );
 
       setLatestEvaluation(evaluation);
       setIsProcessing(false);
+
+      // Save evaluation and learning recommendations to Supabase
+      if (user && dbSessionIdRef.current) {
+        await interviewService.saveEvaluation({
+          session_id: dbSessionIdRef.current,
+          user_id: user.id,
+          communication_score: evaluation.communicationScore,
+          technical_score: evaluation.technicalScore,
+          relevance_score: evaluation.relevanceScore,
+          clarity_score: evaluation.clarityScore,
+          confidence_score: evaluation.confidenceScore,
+          depth_score: (evaluation as any).depthScore || 75,
+          problem_solving_score: (evaluation as any).problemSolvingScore || 75,
+          overall_score: evaluation.overallScore,
+          strengths: evaluation.strengths,
+          improvements: evaluation.improvements,
+          feedback: evaluation.overallFeedback,
+        });
+
+        if ((evaluation as any).learningPathSuggestions) {
+          await interviewService.saveLearningRecommendations(
+            user.id,
+            dbSessionIdRef.current,
+            (evaluation as any).learningPathSuggestions
+          );
+          setLearningPath((evaluation as any).learningPathSuggestions);
+        }
+      }
+
       return evaluation;
     } catch (err: any) {
       setIsProcessing(false);
@@ -301,6 +406,7 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setCurrentQuestionNumber(1);
     exchangesRef.current = [];
     setError(null);
+    setLatestEvaluation(null);
   };
 
   return (

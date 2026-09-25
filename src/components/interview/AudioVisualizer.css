@@ -4,64 +4,64 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: var(--space-8) 0;
+  padding: var(--space-6) 0 var(--space-4);
   width: 100%;
 }
 
 .visualizer-aura {
   position: absolute;
-  width: 140px;
-  height: 140px;
+  width: 110px;
+  height: 110px;
   border-radius: var(--radius-full);
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.2) 0%, rgba(99, 102, 241, 0) 70%);
+  background: radial-gradient(circle, rgba(36, 222, 251, 0.1) 0%, transparent 70%);
   pointer-events: none;
   transition: all var(--transition-normal);
 }
 
 .visualizer-aura.aura-pulsing {
-  animation: pulseListening 2s infinite ease-in-out;
+  animation: pulseCyanListening 2.4s infinite ease-in-out;
 }
 
 .ai-active .visualizer-aura {
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.4) 0%, rgba(99, 102, 241, 0) 70%);
+  background: radial-gradient(circle, rgba(36, 222, 251, 0.2) 0%, transparent 70%);
 }
 
 .mic-active .visualizer-aura {
-  background: radial-gradient(circle, rgba(16, 185, 129, 0.4) 0%, rgba(16, 185, 129, 0) 70%);
+  background: radial-gradient(circle, rgba(57, 217, 138, 0.2) 0%, transparent 70%);
 }
 
 .visualizer-center-orb {
-  width: 96px;
-  height: 96px;
+  width: 76px;
+  height: 76px;
   border-radius: var(--radius-full);
-  background: linear-gradient(135deg, #131b2e 0%, #1e293b 100%);
-  border: 2px solid var(--color-border-default);
+  background: var(--surface-elevated);
+  border: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--shadow-sm);
   position: relative;
   z-index: 2;
   transition: all var(--transition-normal);
 }
 
 .ai-active .visualizer-center-orb {
-  border-color: var(--color-accent);
-  box-shadow: 0 0 24px rgba(99, 102, 241, 0.5);
+  border-color: var(--accent);
+  box-shadow: 0 0 14px rgba(36, 222, 251, 0.2);
 }
 
 .mic-active .visualizer-center-orb {
-  border-color: var(--color-success);
-  box-shadow: 0 0 24px rgba(16, 185, 129, 0.5);
+  border-color: var(--success);
+  box-shadow: 0 0 14px rgba(57, 217, 138, 0.2);
 }
 
 .orb-icon {
   transition: all var(--transition-fast);
 }
 
-.bot-idle-icon { color: var(--color-text-muted); }
-.ai-voice-icon { color: var(--color-accent); }
-.candidate-mic-icon { color: var(--color-success); }
+.bot-idle-icon { color: var(--text-muted); }
+.ai-voice-icon { color: var(--accent); }
+.candidate-mic-icon { color: var(--success); }
 
 /* Waveform Bars */
 .waveform-bars-cluster {
@@ -69,29 +69,29 @@
   align-items: center;
   justify-content: center;
   gap: 4px;
-  height: 36px;
-  margin-top: var(--space-5);
+  height: 28px;
+  margin-top: var(--space-4);
   z-index: 2;
 }
 
 .wave-bar {
-  width: 4px;
+  width: 3px;
   border-radius: var(--radius-full);
-  background-color: var(--color-border-hover);
+  background-color: var(--border);
   transition: all var(--transition-fast);
 }
 
 .bars-static .wave-bar {
-  height: 6px;
+  height: 4px;
 }
 
 .bars-animating .wave-bar {
-  background-color: var(--color-accent);
+  background-color: var(--accent);
   animation: waveform 1.2s infinite ease-in-out;
 }
 
 .mic-active .bars-animating .wave-bar {
-  background-color: var(--color-success);
+  background-color: var(--success);
 }
 
 .bar-1 { animation-delay: 0.1s; }
@@ -107,13 +107,14 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  margin-top: var(--space-4);
-  padding: 4px 14px;
-  background-color: var(--color-bg-elevated);
-  border: 1px solid var(--color-border-subtle);
+  margin-top: var(--space-3);
+  padding: 3px 12px;
+  background-color: var(--surface-elevated);
+  border: 1px solid var(--border);
   border-radius: var(--radius-full);
+  font-family: var(--font-family-display);
   font-size: var(--font-size-xs);
-  color: var(--color-text-secondary);
+  color: var(--text-secondary);
   font-weight: 500;
   z-index: 2;
 }
@@ -122,15 +123,15 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background-color: var(--color-text-muted);
+  background-color: var(--text-muted);
 }
 
 .status-led.led-live {
-  background-color: var(--color-success);
-  box-shadow: 0 0 8px var(--color-success);
+  background-color: var(--success);
+  box-shadow: 0 0 6px var(--success);
 }
 
 .ai-active .status-led.led-live {
-  background-color: var(--color-accent);
-  box-shadow: 0 0 8px var(--color-accent);
+  background-color: var(--accent);
+  box-shadow: 0 0 6px var(--accent);
 }

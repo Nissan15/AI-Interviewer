@@ -4,100 +4,118 @@
 }
 
 .tech-header {
-  margin-bottom: var(--space-8);
+  margin-bottom: var(--space-6);
 }
 
 .tech-title {
+  font-family: var(--font-family-display);
   font-size: var(--font-size-2xl);
   font-weight: 700;
-  color: var(--color-text-primary);
+  color: var(--text-primary);
   margin-bottom: var(--space-2);
+  letter-spacing: -0.02em;
 }
 
 .tech-subtitle {
+  font-family: var(--font-family-sans);
   font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
+  color: var(--text-secondary);
 }
 
 .tech-options-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--space-6);
-  margin-bottom: var(--space-8);
+  gap: var(--space-5);
+  margin-bottom: var(--space-6);
 }
 
 .tech-card {
-  padding: var(--space-8);
+  padding: var(--space-6);
   display: flex;
   flex-direction: column;
   height: 100%;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  transition: all var(--transition-fast);
+}
+
+.tech-card:hover {
+  border-color: var(--accent-border);
+  background-color: var(--surface-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 .tech-card-icon-box {
-  width: 56px;
-  height: 56px;
-  border-radius: var(--radius-lg);
+  width: 46px;
+  height: 46px;
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: var(--space-5);
+  margin-bottom: var(--space-4);
 }
 
 .tech-card-icon-box.quiz-theme {
-  background-color: var(--color-accent-subtle);
-  color: var(--color-accent);
-  border: 1px solid var(--color-accent-border);
+  background-color: var(--accent-subtle);
+  color: var(--accent);
+  border: 1px solid var(--accent-border);
 }
 
 .tech-card-icon-box.coding-theme {
-  background-color: rgba(56, 189, 248, 0.12);
-  color: #38bdf8;
-  border: 1px solid rgba(56, 189, 248, 0.28);
+  background-color: #0b0e13;
+  color: var(--accent);
+  border: 1px solid var(--border);
 }
 
 .tech-card-tag {
+  font-family: var(--font-family-display);
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
-  color: var(--color-text-muted);
+  color: var(--text-muted);
   letter-spacing: 0.05em;
-  margin-bottom: var(--space-2);
+  margin-bottom: var(--space-1);
   display: inline-block;
 }
 
 .tech-card-title {
-  font-size: var(--font-size-xl);
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-lg);
   font-weight: 600;
-  color: var(--color-text-primary);
+  color: var(--text-primary);
   margin-bottom: var(--space-2);
 }
 
 .tech-card-description {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
   line-height: 1.6;
-  margin-bottom: var(--space-6);
+  margin-bottom: var(--space-5);
 }
 
 .tech-feature-list {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
-  margin-bottom: var(--space-8);
+  gap: var(--space-2);
+  margin-bottom: var(--space-6);
   flex: 1;
 }
 
 .tech-feature-list li {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--space-2);
+  font-family: var(--font-family-display);
   font-size: var(--font-size-xs);
-  color: var(--color-text-secondary);
+  color: var(--text-secondary);
 }
 
 .feature-icon {
-  color: var(--color-success);
+  color: var(--success);
   flex-shrink: 0;
 }
 
@@ -108,15 +126,15 @@
 .tech-status-banner {
   display: flex;
   align-items: center;
-  gap: var(--space-4);
-  padding: var(--space-4) var(--space-6);
-  background-color: var(--color-bg-elevated);
-  border: 1px solid var(--color-border-subtle);
-  border-radius: var(--radius-lg);
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-5);
+  background-color: var(--surface-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
 }
 
 .status-banner-icon {
-  color: var(--color-accent);
+  color: var(--accent);
   flex-shrink: 0;
 }
 
@@ -126,18 +144,24 @@
 }
 
 .banner-bold {
+  font-family: var(--font-family-display);
   font-size: var(--font-size-xs);
   font-weight: 600;
-  color: var(--color-text-primary);
+  color: var(--text-primary);
 }
 
 .banner-sub {
+  font-family: var(--font-family-sans);
   font-size: 11px;
-  color: var(--color-text-muted);
+  color: var(--text-muted);
 }
 
 .banner-sub code {
-  color: #a5b4fc;
+  color: var(--accent);
+  background-color: #0b0e13;
+  padding: 1px 4px;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--border-subtle);
   font-family: var(--font-family-mono);
 }
 

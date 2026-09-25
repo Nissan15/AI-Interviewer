@@ -4,143 +4,165 @@
 }
 
 .aptitude-header {
-  margin-bottom: var(--space-6);
+  margin-bottom: var(--space-5);
 }
 
 .aptitude-title {
+  font-family: var(--font-family-display);
   font-size: var(--font-size-2xl);
   font-weight: 700;
-  color: var(--color-text-primary);
-  margin-bottom: var(--space-1);
+  color: var(--text-primary);
+  margin-bottom: 4px;
+  letter-spacing: -0.02em;
 }
 
 .aptitude-subtitle {
+  font-family: var(--font-family-sans);
   font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
+  color: var(--text-secondary);
 }
 
+/* Compact pill navigation */
 .aptitude-category-nav {
   display: flex;
-  gap: var(--space-2);
-  margin-bottom: var(--space-8);
+  gap: 6px;
+  margin-bottom: var(--space-6);
   flex-wrap: wrap;
 }
 
 .aptitude-cat-pill {
-  padding: 8px 16px;
+  padding: 6px 14px;
   border-radius: var(--radius-full);
-  background-color: var(--color-bg-card);
-  border: 1px solid var(--color-border-subtle);
-  color: var(--color-text-secondary);
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-family: var(--font-family-display);
   font-size: var(--font-size-xs);
   font-weight: 500;
   cursor: pointer;
   transition: all var(--transition-fast);
+  line-height: 1.2;
 }
 
 .aptitude-cat-pill:hover {
-  background-color: var(--color-bg-elevated);
-  color: var(--color-text-primary);
+  background-color: var(--surface-hover);
+  color: var(--text-primary);
+  border-color: var(--border-hover);
 }
 
+/* Selected category uses cyan */
 .aptitude-cat-pill.cat-active {
-  background-color: var(--color-accent-subtle);
-  border-color: var(--color-accent);
-  color: #a5b4fc;
+  background-color: var(--accent-subtle);
+  border-color: var(--accent);
+  color: var(--accent);
   font-weight: 600;
 }
 
 .aptitude-test-layout {
-  max-width: 800px;
+  max-width: 760px;
   margin: 0 auto;
   width: 100%;
+}
+
+.aptitude-left-pane {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
 }
 
 .test-meta-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: var(--space-3);
+  margin-bottom: 2px;
 }
 
 .question-index-label {
-  font-size: var(--font-size-sm);
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-xs);
   font-weight: 600;
-  color: var(--color-text-secondary);
+  color: var(--text-secondary);
 }
 
 .aptitude-question-card {
-  background-color: var(--color-bg-card);
-  border: 1px solid var(--color-border-default);
+  background-color: var(--surface);
+  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: var(--space-8);
-  margin-top: var(--space-4);
+  padding: var(--space-6);
+  margin-top: var(--space-2);
   display: flex;
   flex-direction: column;
 }
 
 .aptitude-question-prompt {
-  font-size: var(--font-size-lg);
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-base);
   font-weight: 600;
-  color: var(--color-text-primary);
+  color: var(--text-primary);
   line-height: 1.5;
-  margin-bottom: var(--space-6);
+  margin-bottom: var(--space-5);
 }
 
 .aptitude-options-list {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
-  margin-bottom: var(--space-8);
+  gap: var(--space-2);
+  margin-bottom: var(--space-6);
 }
 
 .aptitude-option-btn {
   display: flex;
   align-items: center;
-  gap: var(--space-4);
-  padding: var(--space-4) var(--space-5);
-  background-color: var(--color-bg-elevated);
-  border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-md);
-  color: var(--color-text-primary);
+  gap: var(--space-3);
+  padding: 10px 14px;
+  background-color: var(--surface-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
   cursor: pointer;
   text-align: left;
   transition: all var(--transition-fast);
 }
 
 .aptitude-option-btn:hover {
-  background-color: var(--color-bg-card-hover);
+  background-color: var(--surface-hover);
+  border-color: var(--border-hover);
 }
 
+/* Selected option: Cyan */
 .aptitude-option-btn.opt-selected {
-  background-color: var(--color-accent-subtle);
-  border-color: var(--color-accent);
+  background-color: var(--accent-subtle);
+  border-color: var(--accent);
 }
 
 .opt-letter {
-  width: 28px;
-  height: 28px;
-  border-radius: var(--radius-full);
-  background-color: var(--color-bg-card);
-  border: 1px solid var(--color-border-default);
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-xs);
+  background-color: #0b0e13;
+  border: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: var(--font-size-xs);
+  font-family: var(--font-family-mono);
+  font-size: 11px;
   font-weight: 600;
-  color: var(--color-text-secondary);
+  color: var(--text-secondary);
   flex-shrink: 0;
+  transition: all var(--transition-fast);
 }
 
 .opt-selected .opt-letter {
-  background-color: var(--color-accent);
-  color: #ffffff;
-  border-color: var(--color-accent);
+  background-color: var(--accent);
+  color: #080A0D;
+  border-color: var(--accent);
+  font-weight: 700;
 }
 
 .opt-content {
+  font-family: var(--font-family-sans);
   font-size: var(--font-size-sm);
-  color: var(--color-text-primary);
+  color: var(--text-primary);
 }
 
 .aptitude-card-nav {
@@ -148,18 +170,19 @@
   align-items: center;
   justify-content: space-between;
   padding-top: var(--space-4);
-  border-top: 1px solid var(--color-border-subtle);
+  border-top: 1px solid var(--border-subtle);
+  gap: var(--space-2);
 }
 
 .aptitude-result-card {
-  background-color: var(--color-bg-card);
-  border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-xl);
-  padding: var(--space-10);
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-8);
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  max-width: 600px;
-  margin: var(--space-8) auto;
+  max-width: 560px;
+  margin: var(--space-6) auto;
 }

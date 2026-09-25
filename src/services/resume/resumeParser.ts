@@ -1,21 +1,66 @@
-import { ParsedResume } from '../../types/resume';
+import { ParsedResume, CandidateAiProfile } from '../../types/resume';
 import { validateResumeFile } from './resumeValidator';
-import { analyzeResumeTextWithAi } from '../ai/resumeAnalysis';
-import { getEffectiveAiConfig } from '../ai/aiConfig';
+import { aiService, ResumeAnalysisOutput } from '../ai/aiService';
+import mammoth from 'mammoth';
 
+/**
+ * Robust client-side text extractor for TXT, DOCX, and PDF documents.
+ */
 export const extractTextFromFile = async (file: File): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    // If plain text
-    if (file.type === 'text/plain' || file.name.endsWith('.txt')) {
-      const reader = new FileReader();
-      reader.onload = (e) => resolve((e.target?.result as string) || '');
-      reader.onerror = () => reject(new Error('Failed to read text file.'));
-      reader.readAsText(file);
-      return;
-    }
+  const fileExt = file.name.toLowerCase().split('.').pop() || '';
 
-    // For PDF / Word files in client-side environment:
-    // Read ArrayBuffer and extract readable UTF-8 strings
+  // 1. Plain text format
+  if (fileExt === 'txt' || file.type === 'text/plain') {
+    return await file.text();
+  }
+
+  // 2. DOCX Word documents (via mammoth)
+  if (fileExt === 'docx') {
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const result = await mammoth.extractRawText({ arrayBuffer });
+      if (result.value && result.value.trim().length > 20) {
+        return result.value.trim();
+      }
+    } catch (docxErr) {
+      console.warn('Mammoth docx parsing failed, attempting fallback:', docxErr);
+    }
+  }
+
+  // 3. PDF documents
+  if (fileExt === 'pdf' || file.type === 'application/pdf') {
+    try {
+      // Dynamically load pdfjs to minimize initial bundle overhead
+      const pdfjsLib = await import('pdfjs-dist');
+      // Set worker source to CDN or disable worker if in pure JS mode
+      if (pdfjsLib.GlobalWorkerOptions && !pdfjsLib.GlobalWorkerOptions.workerSrc) {
+        pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version || '4.0.379'}/build/pdf.worker.min.mjs`;
+      }
+
+      const arrayBuffer = await file.arrayBuffer();
+      const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) });
+      const pdf = await loadingTask.promise;
+
+      let extractedPdfText = '';
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const textContent = await page.getTextContent();
+        const pageText = textContent.items
+          .map((item: any) => item.str || '')
+          .join(' ');
+        extractedPdfText += pageText + '\n';
+      }
+
+      if (extractedPdfText.trim().length > 30) {
+        return extractedPdfText.trim();
+      }
+    } catch (pdfErr) {
+      console.warn('PDF.js text parsing failed, using stream fallback:', pdfErr);
+    }
+  }
+
+  // 4. Fallback Binary ArrayBuffer String Scanner (for DOC, older PDFs, or stream text)
+  return new Promise((resolve) => {
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
@@ -23,58 +68,40 @@ export const extractTextFromFile = async (file: File): Promise<string> => {
         const decoder = new TextDecoder('utf-8', { fatal: false });
         const rawString = decoder.decode(buffer);
 
-        // Filter printable ascii and common text sequences
+        // Filter printable text runs
         const cleaned = rawString
           .replace(/[^\x20-\x7E\t\r\n]/g, ' ')
           .replace(/\s+/g, ' ')
           .trim();
 
-        if (cleaned.length < 30) {
-          // If binary document text isn't directly extractable via raw stream
-          resolve(`Candidate Resume Document: ${file.name}\nFile Size: ${file.size} bytes`);
-        } else {
+        if (cleaned.length > 50) {
           resolve(cleaned);
+        } else {
+          resolve(`Candidate Resume Document: ${file.name}\nFile Size: ${file.size} bytes`);
         }
-      } catch (err) {
+      } catch {
         resolve(`Candidate Resume Document: ${file.name}`);
       }
     };
-    reader.onerror = () => reject(new Error('Error reading resume document.'));
+    reader.onerror = () => resolve(`Candidate Resume Document: ${file.name}`);
     reader.readAsArrayBuffer(file);
   });
 };
 
-export const parseResumeFile = async (file: File): Promise<ParsedResume> => {
+/**
+ * Parses and analyzes a candidate resume file through the centralized AI service.
+ * Returns both the structured ParsedResume and the synthesized CandidateAiProfile.
+ */
+export const parseResumeFile = async (
+  file: File
+): Promise<ResumeAnalysisOutput> => {
   const validation = validateResumeFile(file);
   if (!validation.isValid) {
     throw new Error(validation.error || 'Invalid resume file.');
   }
 
   const rawText = await extractTextFromFile(file);
-  const aiConfig = getEffectiveAiConfig();
 
-  // If AI is configured, use AI analysis
-  if (aiConfig.isConfigured) {
-    return await analyzeResumeTextWithAi(rawText, file.name, file.size);
-  }
-
-  // If backend endpoint is configured
-  if (aiConfig.provider === 'custom_backend') {
-    const formData = new FormData();
-    formData.append('resume', file);
-    const resp = await fetch(`${aiConfig.endpoint}/resume/analyze`, {
-      method: 'POST',
-      body: formData,
-    });
-    if (!resp.ok) {
-      throw new Error(`Resume analysis backend returned status ${resp.status}`);
-    }
-    const data = await resp.json();
-    return data;
-  }
-
-  // If neither AI provider nor backend is configured, notify user clearly
-  throw new Error(
-    'AI service is not configured. Please configure your API key in Settings to extract and analyze your resume.'
-  );
+  // Call the centralized internal server-side AI pipeline
+  return await aiService.analyzeResume(rawText, file.name, file.size);
 };

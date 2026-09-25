@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Settings2, Play, AlertCircle } from 'lucide-react';
+import { Settings2, Play } from 'lucide-react';
 import { InterviewType, InterviewDifficulty, InterviewConfig } from '../../types/interview';
 import { Button } from '../common/Button/Button';
 import './InterviewConfigForm.css';

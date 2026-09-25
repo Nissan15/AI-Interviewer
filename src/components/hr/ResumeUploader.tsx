@@ -18,6 +18,8 @@ export const ResumeUploader: React.FC<ResumeUploaderProps> = ({ onSuccess }) => 
     error,
     setUploadedFile,
     setResume,
+    setCandidateProfile,
+    saveResumeAndProfile,
     setIsUploading,
     setIsAnalyzing,
     setError,
@@ -39,8 +41,13 @@ export const ResumeUploader: React.FC<ResumeUploaderProps> = ({ onSuccess }) => 
 
     try {
       setIsAnalyzing(true);
-      const parsed = await parseResumeFile(file);
-      setResume(parsed);
+      const result = await parseResumeFile(file);
+      setResume(result.parsedResume);
+      setCandidateProfile(result.candidateProfile);
+
+      // Persist to Supabase
+      await saveResumeAndProfile(file, result.parsedResume, result.candidateProfile);
+
       onSuccess?.();
     } catch (err: any) {
       setError(err.message || 'Failed to process and analyze resume.');
@@ -97,23 +104,23 @@ export const ResumeUploader: React.FC<ResumeUploaderProps> = ({ onSuccess }) => 
         <div className="drop-zone-text-block">
           <h4 className="drop-title">
             {isAnalyzing
-              ? 'Analyzing resume with AI...'
+              ? 'Analyzing candidate resume with AI...'
               : isUploading
-              ? 'Uploading resume...'
+              ? 'Uploading resume document...'
               : 'Upload your resume'}
           </h4>
 
           <p className="drop-description">
             {isAnalyzing
-              ? 'Extracting skills, projects, technologies, and experience for interview personalization.'
-              : 'Drag & drop your resume here, or click to browse'}
+              ? 'Extracting skills, cross-referencing projects, and constructing your AI interview profile.'
+              : 'Drag & drop your PDF or DOCX file here, or click to browse'}
           </p>
 
           <div className="drop-formats">
             <span>Supported formats:</span>
             <span className="format-tag">PDF</span>
-            <span className="format-tag">DOC</span>
             <span className="format-tag">DOCX</span>
+            <span className="format-tag">TXT</span>
             <span className="file-size-limit">(Max 5MB)</span>
           </div>
         </div>

@@ -14,21 +14,21 @@
 
 .loading-spinner-rings {
   position: relative;
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .app-loading-state.size-sm .loading-spinner-rings {
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
 }
 
 .app-loading-state.size-lg .loading-spinner-rings {
-  width: 64px;
-  height: 64px;
+  width: 56px;
+  height: 56px;
 }
 
 .ring {
@@ -40,32 +40,34 @@
 .ring-outer {
   width: 100%;
   height: 100%;
-  border-top-color: var(--color-accent);
-  animation: spin 1s linear infinite;
+  border-top-color: var(--accent);
+  animation: spin 0.9s linear infinite;
 }
 
 .ring-middle {
   width: 75%;
   height: 75%;
-  border-right-color: #818cf8;
-  animation: spin 1.5s linear infinite reverse;
+  border-right-color: var(--accent-hover);
+  animation: spin 1.4s linear infinite reverse;
 }
 
 .ring-inner {
   width: 50%;
   height: 50%;
-  border-bottom-color: #c7d2fe;
-  animation: spin 2s linear infinite;
+  border-bottom-color: var(--accent-dark);
+  animation: spin 1.8s linear infinite;
 }
 
 .loading-message {
+  font-family: var(--font-family-display);
   font-size: var(--font-size-sm);
   font-weight: 500;
-  color: var(--color-text-primary);
+  color: var(--text-primary);
 }
 
 .loading-submessage {
+  font-family: var(--font-family-sans);
   font-size: var(--font-size-xs);
-  color: var(--color-text-muted);
+  color: var(--text-muted);
   max-width: 320px;
 }

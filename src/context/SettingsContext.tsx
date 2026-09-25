@@ -1,16 +1,9 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-export type AiProvider = 'gemini' | 'openai' | 'custom_backend';
-
 export interface SettingsState {
-  aiProvider: AiProvider;
-  apiKey: string;
-  customApiUrl: string;
-  selectedModel: string;
   autoSpeakQuestions: boolean;
-  speechRate: number; // 0.8 - 1.2
+  speechRate: number; // 0.7 - 1.3
   voiceUri: string;
-  isAiConfigured: boolean;
 }
 
 interface SettingsContextValue extends SettingsState {
@@ -18,17 +11,12 @@ interface SettingsContextValue extends SettingsState {
   resetSettings: () => void;
 }
 
-const STORAGE_KEY = 'ai_mock_interviewer_settings';
+const STORAGE_KEY = 'ai_mock_interviewer_user_preferences';
 
 const defaultSettings: SettingsState = {
-  aiProvider: 'gemini',
-  apiKey: '',
-  customApiUrl: 'http://localhost:5000/api',
-  selectedModel: 'gemini-1.5-flash',
   autoSpeakQuestions: true,
   speechRate: 1.0,
   voiceUri: '',
-  isAiConfigured: false,
 };
 
 const SettingsContext = createContext<SettingsContextValue | undefined>(undefined);
@@ -41,12 +29,13 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         const parsed = JSON.parse(stored);
         return {
           ...defaultSettings,
-          ...parsed,
-          isAiConfigured: Boolean(parsed.apiKey || parsed.customApiUrl),
+          autoSpeakQuestions: parsed.autoSpeakQuestions ?? defaultSettings.autoSpeakQuestions,
+          speechRate: parsed.speechRate ?? defaultSettings.speechRate,
+          voiceUri: parsed.voiceUri ?? defaultSettings.voiceUri,
         };
       }
     } catch (e) {
-      console.warn('Failed to read settings from storage', e);
+      console.warn('Failed to read user preferences from storage', e);
     }
     return defaultSettings;
   });
@@ -55,16 +44,12 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
     } catch (e) {
-      console.warn('Failed to save settings to storage', e);
+      console.warn('Failed to save user preferences to storage', e);
     }
   }, [settings]);
 
   const updateSettings = (newSettings: Partial<SettingsState>) => {
-    setSettings((prev) => {
-      const updated = { ...prev, ...newSettings };
-      updated.isAiConfigured = Boolean(updated.apiKey.trim() || (updated.aiProvider === 'custom_backend' && updated.customApiUrl.trim()));
-      return updated;
-    });
+    setSettings((prev) => ({ ...prev, ...newSettings }));
   };
 
   const resetSettings = () => {
@@ -72,7 +57,7 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     try {
       localStorage.removeItem(STORAGE_KEY);
     } catch (e) {
-      console.warn('Failed to reset settings in storage', e);
+      console.warn('Failed to reset user preferences in storage', e);
     }
   };
 

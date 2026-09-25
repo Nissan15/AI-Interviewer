@@ -1,9 +1,9 @@
 .app-card {
-  background-color: var(--color-bg-card);
-  border: 1px solid var(--color-border-subtle);
+  background-color: var(--surface);
+  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   overflow: hidden;
-  transition: all var(--transition-normal);
+  transition: all var(--transition-fast);
   display: flex;
   flex-direction: column;
 }
@@ -22,13 +22,13 @@
 }
 
 .app-card.card-pad-lg .card-body {
-  padding: var(--space-8);
+  padding: var(--space-6);
 }
 
 /* Card Header & Footer */
 .card-header {
-  padding: var(--space-4) var(--space-5);
-  border-bottom: 1px solid var(--color-border-subtle);
+  padding: var(--space-3) var(--space-5);
+  border-bottom: 1px solid var(--border-subtle);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -36,32 +36,29 @@
 
 .card-footer {
   padding: var(--space-3) var(--space-5);
-  border-top: 1px solid var(--color-border-subtle);
-  background-color: rgba(9, 13, 22, 0.4);
+  border-top: 1px solid var(--border-subtle);
+  background-color: #0b0e13;
 }
 
 /* Variants */
 .app-card.card-variant-elevated {
-  background-color: var(--color-bg-elevated);
-  border-color: var(--color-border-default);
-  box-shadow: var(--shadow-md);
+  background-color: var(--surface-elevated);
+  border-color: var(--border);
+  box-shadow: var(--shadow-sm);
 }
 
 .app-card.card-variant-interactive {
   cursor: pointer;
-  border-color: var(--color-border-default);
+  border-color: var(--border);
 }
 
 .app-card.card-variant-interactive:hover {
-  transform: translateY(-2px);
-  border-color: var(--color-border-hover);
-  background-color: var(--color-bg-card-hover);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  border-color: var(--border-hover);
+  background-color: var(--surface-hover);
+  box-shadow: var(--shadow-md);
 }
 
 .app-card.card-variant-glass {
-  background: rgba(19, 27, 46, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--surface);
+  border: 1px solid var(--border);
 }

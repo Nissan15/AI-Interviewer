@@ -1,14 +1,7 @@
 import { ApiResponse } from '../../types/api';
 
 const getApiBaseUrl = (): string => {
-  try {
-    const raw = localStorage.getItem('ai_mock_interviewer_settings');
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (parsed.customApiUrl) return parsed.customApiUrl;
-    }
-  } catch {}
-  return (import.meta as any).env?.VITE_API_BASE_URL || 'http://localhost:5000/api';
+  return (import.meta as any).env?.VITE_API_BASE_URL || '';
 };
 
 export class ApiClient {
@@ -24,14 +17,12 @@ export class ApiClient {
       });
 
       if (!response.ok) {
-        // Return clean empty structure rather than fake data
         return fallbackEmpty;
       }
 
       const json = await response.json();
       return json.data !== undefined ? json.data : json;
     } catch (err) {
-      // Backend not running yet — return zero/empty state
       return fallbackEmpty;
     }
   }

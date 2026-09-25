@@ -1,0 +1,233 @@
+.candidate-profile-banner {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  position: relative;
+  overflow: hidden;
+}
+
+.candidate-profile-banner.active-profile {
+  border-color: var(--border);
+  background-color: var(--surface);
+}
+
+.profile-banner-top,
+.profile-banner-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.profile-banner-top {
+  justify-content: space-between;
+}
+
+.profile-banner-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background-color: var(--surface-elevated);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.profile-banner-icon.active {
+  background-color: var(--accent-subtle);
+  border-color: var(--accent-border);
+  color: var(--accent);
+}
+
+.profile-badge-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: 2px;
+}
+
+.profile-tag {
+  font-family: var(--font-family-display);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.profile-tag.verified {
+  color: var(--success);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.profile-projects-count {
+  font-family: var(--font-family-display);
+  font-size: 11px;
+  color: var(--text-secondary);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 6px;
+}
+
+.profile-banner-title {
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.profile-banner-desc {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+  margin-top: 4px;
+  line-height: 1.5;
+  max-width: 600px;
+}
+
+.profile-banner-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--border-subtle);
+  padding-top: var(--space-3);
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.profile-skills-preview {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.skills-preview-label {
+  font-family: var(--font-family-display);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.skills-badges-wrap {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.profile-topics-preview {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-family-display);
+  font-size: 11px;
+}
+
+.topics-preview-text {
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.profile-learning-section {
+  border-top: 1px solid var(--border-subtle);
+  padding-top: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.learning-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.learning-title {
+  font-family: var(--font-family-display);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-primary);
+}
+
+.learning-cards-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-3);
+}
+
+.learning-mini-card {
+  background: var(--surface-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.priority-tag {
+  font-family: var(--font-family-display);
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  align-self: flex-start;
+  padding: 1px 5px;
+  border-radius: var(--radius-xs);
+}
+
+.priority-tag.critical {
+  background: var(--danger-subtle);
+  color: var(--danger);
+  border: 1px solid var(--danger-border);
+}
+
+.priority-tag.high {
+  background: var(--warning-subtle);
+  color: var(--warning);
+  border: 1px solid var(--warning-border);
+}
+
+.priority-tag.medium,
+.priority-tag.low {
+  background: var(--accent-subtle);
+  color: var(--accent);
+  border: 1px solid var(--accent-border);
+}
+
+.learning-topic-name {
+  font-family: var(--font-family-display);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.learning-task-snippet {
+  font-family: var(--font-family-sans);
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .profile-banner-top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

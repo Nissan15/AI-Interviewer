@@ -1,8 +1,8 @@
 .app-header {
   height: var(--header-height);
   padding: 0 var(--space-6);
-  background-color: var(--color-bg-surface);
-  border-bottom: 1px solid var(--color-border-subtle);
+  background-color: var(--surface);
+  border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -14,95 +14,122 @@
 .header-left {
   display: flex;
   align-items: center;
-  gap: var(--space-4);
+  gap: var(--space-3);
 }
 
 .mobile-menu-trigger {
   display: none;
   background: transparent;
-  border: none;
-  color: var(--color-text-secondary);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
   cursor: pointer;
-  padding: var(--space-2);
-  border-radius: var(--radius-md);
+  padding: 6px;
+  border-radius: var(--radius-sm);
   align-items: center;
   justify-content: center;
+  transition: all var(--transition-fast);
 }
 
 .mobile-menu-trigger:hover {
-  background-color: var(--color-bg-elevated);
-  color: var(--color-text-primary);
+  background-color: var(--surface-hover);
+  color: var(--text-primary);
+  border-color: var(--border);
 }
 
 .header-page-title {
+  font-family: var(--font-family-display);
   font-size: var(--font-size-base);
   font-weight: 600;
-  color: var(--color-text-primary);
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
 }
 
 .header-right {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-}
-
-.engine-status-pill {
-  display: flex;
-  align-items: center;
   gap: var(--space-2);
-  font-size: var(--font-size-xs);
-  padding: 5px 12px;
-  background-color: var(--color-bg-elevated);
-  border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-full);
-  color: var(--color-text-secondary);
 }
 
-.engine-icon {
-  color: var(--color-accent);
-}
-
-.data-policy-tag {
-  display: flex;
+/* Subtle Technical Status Pills */
+.tech-status-pill {
+  display: inline-flex;
   align-items: center;
-  gap: var(--space-1);
-  font-size: 11px;
-  font-weight: 600;
+  gap: 6px;
   padding: 4px 10px;
-  background-color: var(--color-success-subtle);
-  border: 1px solid var(--color-success-border);
-  border-radius: var(--radius-full);
-  color: #6ee7b7;
+  background-color: var(--surface-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+  white-space: nowrap;
+  user-select: none;
 }
 
+/* Green dot for successful system states */
+.status-dot.green-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--success);
+  box-shadow: 0 0 6px var(--success);
+  animation: pulseGreenReady 2s infinite ease-in-out;
+  flex-shrink: 0;
+}
+
+/* Cyan for AI-related state */
+.pill-cyan-icon {
+  color: var(--accent);
+}
+
+.pill-green-icon {
+  color: var(--success);
+}
+
+.pill-ai-ready {
+  border-color: var(--border);
+}
+
+.pill-ai-ready .pill-text {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.pill-zero-data {
+  border-color: var(--border-subtle);
+  color: var(--text-muted);
+}
+
+.pill-zero-data .pill-text {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* Header User Section */
 .header-user-section {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: 6px;
   margin-left: var(--space-2);
 }
 
-.header-user-badge {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: 4px 10px;
-  background-color: var(--color-bg-elevated);
-  border: 1px solid var(--color-border-subtle);
-  border-radius: var(--radius-full);
-  font-size: var(--font-size-xs);
-  color: var(--color-text-primary);
+.pill-user {
+  background-color: var(--surface-elevated);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  padding: 4px 8px;
 }
 
 .user-avatar-mini {
-  width: 22px;
-  height: 22px;
-  border-radius: var(--radius-full);
-  background: var(--color-accent-subtle);
-  color: var(--color-accent);
+  width: 18px;
+  height: 18px;
+  border-radius: var(--radius-xs);
+  background: var(--accent-subtle);
+  color: var(--accent);
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .user-display-name {
@@ -110,39 +137,48 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-weight: 500;
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--text-primary);
 }
 
-.header-logout-btn {
-  display: flex;
+.header-signout-btn {
+  display: inline-flex;
   align-items: center;
-  gap: var(--space-1);
+  gap: 5px;
   padding: 5px 10px;
-  background: transparent;
-  border: 1px solid var(--color-border-subtle);
-  border-radius: var(--radius-md);
-  color: var(--color-text-secondary);
+  background-color: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-family: var(--font-family-display);
   font-size: var(--font-size-xs);
   font-weight: 500;
   cursor: pointer;
   transition: all var(--transition-fast);
 }
 
-.header-logout-btn:hover {
-  background: var(--color-error-subtle);
-  border-color: var(--color-error-border);
-  color: #fca5a5;
+.header-signout-btn:hover {
+  background-color: var(--danger-subtle);
+  border-color: var(--danger-border);
+  color: var(--danger);
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
+  .pill-zero-data {
+    display: none;
+  }
+}
+
+@media (max-width: 820px) {
   .mobile-menu-trigger {
     display: flex;
   }
-  .data-policy-tag,
-  .engine-status-pill {
+  .pill-ai-ready {
     display: none;
   }
-  .logout-text {
+  .signout-label {
     display: none;
   }
   .app-header {

@@ -15,7 +15,6 @@ interface LiveInterviewRoomProps {
 export const LiveInterviewRoom: React.FC<LiveInterviewRoomProps> = ({ onFinish }) => {
   const {
     session,
-    status,
     currentQuestion,
     currentQuestionNumber,
     currentTranscript,

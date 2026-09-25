@@ -1,6 +1,6 @@
 .quiz-question-card {
-  background-color: var(--color-bg-card);
-  border: 1px solid var(--color-border-default);
+  background-color: var(--surface);
+  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: var(--space-6);
   display: flex;
@@ -11,88 +11,94 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-bottom: var(--space-4);
-  border-bottom: 1px solid var(--color-border-subtle);
-  margin-bottom: var(--space-6);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: var(--space-5);
 }
 
 .question-counter {
-  font-size: var(--font-size-sm);
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-xs);
   font-weight: 600;
-  color: var(--color-text-secondary);
+  color: var(--text-secondary);
+  letter-spacing: 0.02em;
 }
 
 .marked-review-active {
-  background-color: var(--color-warning-subtle) !important;
-  color: #fcd34d !important;
-  border-color: var(--color-warning-border) !important;
+  background-color: var(--warning-subtle) !important;
+  color: var(--warning) !important;
+  border-color: var(--warning-border) !important;
 }
 
 .question-prompt-text {
-  font-size: var(--font-size-lg);
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-base);
   font-weight: 600;
-  color: var(--color-text-primary);
+  color: var(--text-primary);
   line-height: 1.5;
-  margin-bottom: var(--space-6);
+  margin-bottom: var(--space-5);
 }
 
 .options-list {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
-  margin-bottom: var(--space-8);
+  gap: var(--space-2);
+  margin-bottom: var(--space-6);
 }
 
 .quiz-option-button {
   display: flex;
   align-items: center;
-  gap: var(--space-4);
-  padding: var(--space-4) var(--space-5);
-  background-color: var(--color-bg-elevated);
-  border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-md);
-  color: var(--color-text-primary);
+  gap: var(--space-3);
+  padding: 10px 14px;
+  background-color: var(--surface-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
   cursor: pointer;
   text-align: left;
   transition: all var(--transition-fast);
 }
 
 .quiz-option-button:hover {
-  background-color: var(--color-bg-card-hover);
-  border-color: var(--color-border-hover);
+  background-color: var(--surface-hover);
+  border-color: var(--border-hover);
 }
 
+/* Selected state: Cyan primary interaction */
 .quiz-option-button.option-selected {
-  background-color: var(--color-accent-subtle);
-  border-color: var(--color-accent);
-  box-shadow: 0 0 12px rgba(99, 102, 241, 0.2);
+  background-color: var(--accent-subtle);
+  border-color: var(--accent);
 }
 
 .option-indicator {
-  width: 28px;
-  height: 28px;
-  border-radius: var(--radius-full);
-  background-color: var(--color-bg-card);
-  border: 1px solid var(--color-border-default);
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-xs);
+  background-color: #0b0e13;
+  border: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: var(--font-size-xs);
+  font-family: var(--font-family-mono);
+  font-size: 11px;
   font-weight: 600;
-  color: var(--color-text-secondary);
+  color: var(--text-secondary);
   flex-shrink: 0;
   transition: all var(--transition-fast);
 }
 
 .option-selected .option-indicator {
-  background-color: var(--color-accent);
-  border-color: var(--color-accent);
-  color: #ffffff;
+  background-color: var(--accent);
+  border-color: var(--accent);
+  color: #080A0D;
+  font-weight: 700;
 }
 
 .option-text-content {
+  font-family: var(--font-family-sans);
   font-size: var(--font-size-sm);
-  color: var(--color-text-primary);
+  color: var(--text-primary);
   line-height: 1.4;
 }
 
@@ -101,11 +107,11 @@
   align-items: center;
   justify-content: space-between;
   padding-top: var(--space-4);
-  border-top: 1px solid var(--color-border-subtle);
+  border-top: 1px solid var(--border-subtle);
 }
 
 .nav-right-actions {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--space-2);
 }

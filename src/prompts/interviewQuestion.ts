@@ -30,7 +30,7 @@ Candidate Resume Context:
 - Skills: ${resume.skills.join(', ') || 'Not specified'}
 - Technologies: ${resume.technologies.join(', ') || 'Not specified'}
 - Projects: ${resume.projects.map((p) => `${p.name} (${p.technologies.join(', ')})`).join('; ') || 'None listed'}
-- Experience: ${resume.experience.map((e) => `${e.role} at ${e.company}`).join('; ') || 'None listed'}
+- Experience: ${resume.experience.map((e) => `${e.role} at ${e.organization || e.company || 'Company'}`).join('; ') || 'None listed'}
 - Education: ${resume.education.map((ed) => `${ed.degree} in ${ed.fieldOfStudy} from ${ed.institution}`).join('; ') || 'None listed'}
 `
     : 'No resume provided. Ask standard industry placement interview questions.';

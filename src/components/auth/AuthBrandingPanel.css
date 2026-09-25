@@ -3,9 +3,9 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: var(--space-10) var(--space-8);
-  background: linear-gradient(145deg, #0d1527 0%, #070b14 100%);
-  border-right: 1px solid var(--color-border-subtle);
+  padding: var(--space-8);
+  background-color: var(--surface);
+  border-right: 1px solid var(--border);
   overflow: hidden;
   height: 100%;
   min-height: 100vh;
@@ -13,11 +13,11 @@
 
 .branding-ambient-glow {
   position: absolute;
-  top: -120px;
+  top: -100px;
   left: -80px;
-  width: 480px;
-  height: 480px;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.16) 0%, rgba(9, 13, 22, 0) 70%);
+  width: 360px;
+  height: 360px;
+  background: radial-gradient(circle, rgba(36, 222, 251, 0.08) 0%, transparent 70%);
   border-radius: 50%;
   pointer-events: none;
 }
@@ -34,16 +34,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
-  background: linear-gradient(135deg, var(--color-accent) 0%, #4338ca 100%);
-  border-radius: var(--radius-md);
-  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.35);
-  color: #ffffff;
+  width: 38px;
+  height: 38px;
+  background-color: var(--surface-elevated);
+  border: 1px solid var(--accent-border);
+  border-radius: var(--radius-sm);
+  color: var(--accent);
 }
 
 .branding-bot-icon {
-  color: #ffffff;
+  color: var(--accent);
 }
 
 .branding-title-group {
@@ -52,15 +52,17 @@
 }
 
 .branding-app-name {
-  font-size: var(--font-size-lg);
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-base);
   font-weight: 700;
-  color: var(--color-text-primary);
-  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  letter-spacing: -0.015em;
 }
 
 .branding-edition-tag {
-  font-size: var(--font-size-xs);
-  color: var(--color-accent);
+  font-family: var(--font-family-display);
+  font-size: 11px;
+  color: var(--accent);
   font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -68,7 +70,7 @@
 
 .branding-hero-content {
   position: relative;
-  margin: var(--space-8) 0;
+  margin: var(--space-6) 0;
   z-index: 1;
 }
 
@@ -76,38 +78,39 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  padding: 4px 12px;
-  border-radius: var(--radius-full);
-  background: var(--color-accent-subtle);
-  border: 1px solid var(--color-accent-border);
-  color: #c7d2fe;
-  font-size: var(--font-size-xs);
+  padding: 3px 10px;
+  border-radius: var(--radius-xs);
+  background: var(--accent-subtle);
+  border: 1px solid var(--accent-border);
+  color: var(--accent);
+  font-family: var(--font-family-display);
+  font-size: 11px;
   font-weight: 600;
-  margin-bottom: var(--space-4);
+  margin-bottom: var(--space-3);
 }
 
 .kicker-icon {
-  color: var(--color-accent);
+  color: var(--accent);
 }
 
 .branding-main-heading {
-  font-size: clamp(2rem, 3.2vw, 2.75rem);
-  font-weight: 800;
+  font-family: var(--font-family-display);
+  font-size: clamp(1.85rem, 2.8vw, 2.4rem);
+  font-weight: 700;
   line-height: 1.15;
-  color: var(--color-text-primary);
+  color: var(--text-primary);
   letter-spacing: -0.03em;
-  margin-bottom: var(--space-4);
+  margin-bottom: var(--space-3);
 }
 
 .gradient-text {
-  background: linear-gradient(135deg, #a5b4fc 0%, #818cf8 40%, #6366f1 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--accent);
 }
 
 .branding-description {
-  font-size: var(--font-size-base);
-  color: var(--color-text-secondary);
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
   line-height: 1.6;
   max-width: 480px;
 }
@@ -116,39 +119,37 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-3);
   z-index: 1;
-  margin-bottom: var(--space-6);
+  margin-bottom: var(--space-4);
 }
 
 .branding-feature-item {
   display: flex;
   align-items: flex-start;
   gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
-  background: rgba(19, 27, 46, 0.6);
-  border: 1px solid var(--color-border-subtle);
-  border-radius: var(--radius-lg);
-  backdrop-filter: blur(8px);
-  transition: transform var(--transition-fast), border-color var(--transition-fast);
+  padding: 10px 14px;
+  background: var(--surface-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  transition: border-color var(--transition-fast);
 }
 
 .branding-feature-item:hover {
-  border-color: var(--color-accent-border);
-  transform: translateX(4px);
+  border-color: var(--accent-border);
 }
 
 .feature-icon-wrapper {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: var(--radius-md);
-  background: var(--color-accent-subtle);
-  color: var(--color-accent);
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-xs);
+  background: var(--accent-subtle);
+  color: var(--accent);
   flex-shrink: 0;
-  margin-top: 2px;
+  margin-top: 1px;
 }
 
 .feature-text {
@@ -158,14 +159,16 @@
 }
 
 .feature-title {
-  font-size: var(--font-size-sm);
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-xs);
   font-weight: 600;
-  color: var(--color-text-primary);
+  color: var(--text-primary);
 }
 
 .feature-desc {
-  font-size: var(--font-size-xs);
-  color: var(--color-text-secondary);
+  font-family: var(--font-family-sans);
+  font-size: 11px;
+  color: var(--text-secondary);
   line-height: 1.4;
 }
 
@@ -174,26 +177,24 @@
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-md);
-  background: rgba(16, 185, 129, 0.08);
-  border: 1px solid rgba(16, 185, 129, 0.2);
-  color: #6ee7b7;
-  font-size: var(--font-size-xs);
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-elevated);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-family: var(--font-family-display);
+  font-size: 11px;
   font-weight: 500;
   z-index: 1;
 }
 
 .badge-shield-icon {
-  color: var(--color-success);
+  color: var(--success);
   flex-shrink: 0;
 }
 
 @media (max-width: 1024px) {
   .auth-branding-panel {
     padding: var(--space-6);
-  }
-  .branding-main-heading {
-    font-size: 1.85rem;
   }
 }

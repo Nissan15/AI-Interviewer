@@ -4,12 +4,12 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: var(--space-10) var(--space-6);
+  padding: var(--space-8) var(--space-6);
   border-radius: var(--radius-lg);
-  background-color: var(--color-bg-card);
-  border: 1px dashed var(--color-border-default);
+  background-color: var(--surface);
+  border: 1px dashed var(--border);
   margin: var(--space-4) 0;
-  max-width: 640px;
+  max-width: 600px;
   width: 100%;
   margin-left: auto;
   margin-right: auto;
@@ -25,33 +25,34 @@
 
 .empty-state-icon-glow {
   position: absolute;
-  width: 72px;
-  height: 72px;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.25) 0%, rgba(99, 102, 241, 0) 70%);
+  width: 64px;
+  height: 64px;
+  background: radial-gradient(circle, rgba(36, 222, 251, 0.12) 0%, transparent 70%);
   border-radius: var(--radius-full);
 }
 
 .empty-state-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: var(--radius-xl);
-  background-color: var(--color-bg-elevated);
-  border: 1px solid var(--color-border-subtle);
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-md);
+  background-color: var(--surface-elevated);
+  border: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-accent);
+  color: var(--accent);
   position: relative;
   z-index: 1;
 }
 
 .empty-state-badge {
-  font-size: var(--font-size-xs);
-  color: var(--color-accent);
-  background-color: var(--color-accent-subtle);
-  border: 1px solid var(--color-accent-border);
-  padding: 2px 10px;
-  border-radius: var(--radius-full);
+  font-family: var(--font-family-display);
+  font-size: 11px;
+  color: var(--accent);
+  background-color: var(--accent-subtle);
+  border: 1px solid var(--accent-border);
+  padding: 2px 8px;
+  border-radius: var(--radius-xs);
   margin-bottom: var(--space-2);
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -59,15 +60,17 @@
 }
 
 .empty-state-title {
+  font-family: var(--font-family-display);
   font-size: var(--font-size-lg);
   font-weight: 600;
-  color: var(--color-text-primary);
+  color: var(--text-primary);
   margin-bottom: var(--space-2);
 }
 
 .empty-state-description {
+  font-family: var(--font-family-sans);
   font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
+  color: var(--text-secondary);
   max-width: 440px;
   line-height: 1.6;
   margin-bottom: var(--space-6);

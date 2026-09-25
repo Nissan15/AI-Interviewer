@@ -106,15 +106,117 @@ export type InterviewMessage = {
 export type InterviewEvaluation = {
   id: string;
   session_id: string;
+  user_id?: string | null;
   communication_score: number | null;
   technical_score: number | null;
   relevance_score: number | null;
   clarity_score: number | null;
   confidence_score: number | null;
+  depth_score?: number | null;
+  problem_solving_score?: number | null;
   overall_score: number | null;
   strengths: Json | null;
   improvements: Json | null;
   feedback: string | null;
+  created_at: string;
+};
+
+export type ResumeAnalysisRecord = {
+  id: string;
+  user_id: string;
+  resume_id: string | null;
+  candidate_name: string | null;
+  email: string | null;
+  phone: string | null;
+  linkedin: string | null;
+  github: string | null;
+  portfolio: string | null;
+  summary: string | null;
+  education: Json | null;
+  skills_categorized: Json | null;
+  projects_detailed: Json | null;
+  experience: Json | null;
+  certifications: Json | null;
+  technical_strengths: Json | null;
+  weak_areas: Json | null;
+  potential_interview_topics: Json | null;
+  raw_text: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type CandidateSkillRecord = {
+  id: string;
+  user_id: string;
+  resume_id: string | null;
+  skill_name: string;
+  category: string;
+  proficiency_level: 'strong' | 'intermediate' | 'beginner' | 'improve' | 'recommended';
+  evidence: string | null;
+  project_count: number;
+  created_at: string;
+};
+
+export type CandidateProjectRecord = {
+  id: string;
+  user_id: string;
+  resume_id: string | null;
+  project_name: string;
+  problem_solved: string | null;
+  technologies: Json | null;
+  technical_complexity: string | null;
+  architecture_understanding: string | null;
+  backend_details: string | null;
+  frontend_details: string | null;
+  database_details: string | null;
+  ai_ml_details: string | null;
+  deployment_details: string | null;
+  potential_questions: Json | null;
+  created_at: string;
+};
+
+export type InterviewQuestionRecord = {
+  id: string;
+  session_id: string;
+  user_id: string;
+  question_number: number;
+  question_text: string;
+  question_type: string | null;
+  topic: string | null;
+  difficulty: string | null;
+  is_follow_up: boolean;
+  follow_up_reason: string | null;
+  expected_key_points: Json | null;
+  created_at: string;
+};
+
+export type InterviewAnswerRecord = {
+  id: string;
+  question_id: string;
+  session_id: string;
+  user_id: string;
+  answer_text: string;
+  technical_accuracy: number | null;
+  communication: number | null;
+  clarity: number | null;
+  depth: number | null;
+  problem_solving: number | null;
+  confidence: number | null;
+  quick_feedback: string | null;
+  created_at: string;
+};
+
+export type LearningRecommendationRecord = {
+  id: string;
+  user_id: string;
+  session_id: string | null;
+  current_skill: string;
+  weak_area: string;
+  recommended_topic: string;
+  practice_task: string;
+  mock_test_focus: string;
+  reassessment_criteria: string;
+  priority: 'critical' | 'high' | 'medium' | 'low';
   created_at: string;
 };
 
@@ -386,11 +488,14 @@ export type Database = {
         Insert: {
           id?: string;
           session_id: string;
+          user_id?: string | null;
           communication_score?: number | null;
           technical_score?: number | null;
           relevance_score?: number | null;
           clarity_score?: number | null;
           confidence_score?: number | null;
+          depth_score?: number | null;
+          problem_solving_score?: number | null;
           overall_score?: number | null;
           strengths?: Json | null;
           improvements?: Json | null;
@@ -400,11 +505,14 @@ export type Database = {
         Update: {
           id?: string;
           session_id?: string;
+          user_id?: string | null;
           communication_score?: number | null;
           technical_score?: number | null;
           relevance_score?: number | null;
           clarity_score?: number | null;
           confidence_score?: number | null;
+          depth_score?: number | null;
+          problem_solving_score?: number | null;
           overall_score?: number | null;
           strengths?: Json | null;
           improvements?: Json | null;
@@ -420,6 +528,42 @@ export type Database = {
             referencedColumns: ['id'];
           }
         ];
+      };
+      resume_analysis: {
+        Row: ResumeAnalysisRecord;
+        Insert: Partial<ResumeAnalysisRecord> & { user_id: string };
+        Update: Partial<ResumeAnalysisRecord>;
+        Relationships: [];
+      };
+      candidate_skills: {
+        Row: CandidateSkillRecord;
+        Insert: Partial<CandidateSkillRecord> & { user_id: string; skill_name: string; category: string; proficiency_level: 'strong' | 'intermediate' | 'beginner' | 'improve' | 'recommended' };
+        Update: Partial<CandidateSkillRecord>;
+        Relationships: [];
+      };
+      candidate_projects: {
+        Row: CandidateProjectRecord;
+        Insert: Partial<CandidateProjectRecord> & { user_id: string; project_name: string };
+        Update: Partial<CandidateProjectRecord>;
+        Relationships: [];
+      };
+      interview_questions: {
+        Row: InterviewQuestionRecord;
+        Insert: Partial<InterviewQuestionRecord> & { session_id: string; user_id: string; question_number: number; question_text: string };
+        Update: Partial<InterviewQuestionRecord>;
+        Relationships: [];
+      };
+      interview_answers: {
+        Row: InterviewAnswerRecord;
+        Insert: Partial<InterviewAnswerRecord> & { question_id: string; session_id: string; user_id: string; answer_text: string };
+        Update: Partial<InterviewAnswerRecord>;
+        Relationships: [];
+      };
+      learning_recommendations: {
+        Row: LearningRecommendationRecord;
+        Insert: Partial<LearningRecommendationRecord> & { user_id: string; current_skill: string; weak_area: string; recommended_topic: string; practice_task: string; mock_test_focus: string; reassessment_criteria: string };
+        Update: Partial<LearningRecommendationRecord>;
+        Relationships: [];
       };
     };
     Views: Record<string, never>;

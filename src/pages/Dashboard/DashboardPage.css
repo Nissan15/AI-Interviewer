@@ -1,6 +1,7 @@
 .dashboard-page {
   display: flex;
   flex-direction: column;
+  gap: var(--space-4);
 }
 
 .dashboard-section {
@@ -12,23 +13,28 @@
   align-items: baseline;
   justify-content: space-between;
   margin-bottom: var(--space-4);
+  flex-wrap: wrap;
+  gap: var(--space-2);
 }
 
 .dashboard-h2 {
+  font-family: var(--font-family-display);
   font-size: var(--font-size-xl);
-  font-weight: 700;
-  color: var(--color-text-primary);
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.015em;
 }
 
 .section-hint {
+  font-family: var(--font-family-sans);
   font-size: var(--font-size-xs);
-  color: var(--color-text-muted);
+  color: var(--text-muted);
 }
 
 .dashboard-grid-dual {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--space-6);
+  gap: var(--space-5);
 }
 
 @media (max-width: 900px) {

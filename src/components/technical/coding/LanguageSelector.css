@@ -3,18 +3,24 @@
 }
 
 .language-select {
-  background-color: var(--color-bg-elevated);
-  border: 1px solid var(--color-border-default);
-  color: var(--color-text-primary);
-  padding: 6px 12px;
-  border-radius: var(--radius-md);
+  background-color: #0b0e13;
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  padding: 5px 10px;
+  border-radius: var(--radius-sm);
   font-size: var(--font-size-xs);
   font-family: var(--font-family-mono);
   outline: none;
   cursor: pointer;
-  transition: border-color var(--transition-fast);
+  transition: all var(--transition-fast);
 }
 
 .language-select:focus {
-  border-color: var(--color-accent);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-subtle);
+}
+
+.language-select option {
+  background-color: var(--surface-elevated);
+  color: var(--text-primary);
 }
