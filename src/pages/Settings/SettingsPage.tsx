@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Volume2,
   CheckCircle2,
@@ -7,12 +7,11 @@ import {
   Bot,
   Sliders,
   ShieldCheck,
-} from 'lucide-react';
-import { useSettings } from '../../context/SettingsContext';
-import { textToSpeechService } from '../../services/speech/textToSpeech';
-import { Button } from '../../components/common/Button/Button';
-import { SpeechRecognitionWidget } from '../../components/speech/SpeechRecognitionWidget';
-import './SettingsPage.css';
+} from "lucide-react";
+import { useSettings } from "../../context/SettingsContext";
+import { textToSpeechService } from "../../services/speech/textToSpeech";
+import { Button } from "../../components/common/Button/Button";
+import "./SettingsPage.css";
 
 export const SettingsPage: React.FC = () => {
   const {
@@ -23,7 +22,9 @@ export const SettingsPage: React.FC = () => {
     resetSettings,
   } = useSettings();
 
-  const [availableVoices, setAvailableVoices] = useState<SpeechSynthesisVoice[]>([]);
+  const [availableVoices, setAvailableVoices] = useState<
+    SpeechSynthesisVoice[]
+  >([]);
 
   useEffect(() => {
     textToSpeechService.getVoices().then((voices) => {
@@ -32,10 +33,13 @@ export const SettingsPage: React.FC = () => {
   }, []);
 
   const handleTestVoice = () => {
-    textToSpeechService.speak('Hello! I am your AI Mock Interviewer. I am ready to conduct your interview.', {
-      rate: speechRate,
-      voiceUri: voiceUri || undefined,
-    });
+    textToSpeechService.speak(
+      "Hello! I am your AI Mock Interviewer. I am ready to conduct your interview.",
+      {
+        rate: speechRate,
+        voiceUri: voiceUri || undefined,
+      },
+    );
   };
 
   return (
@@ -43,7 +47,8 @@ export const SettingsPage: React.FC = () => {
       <div className="settings-header">
         <h2 className="settings-title">Platform Preferences</h2>
         <p className="settings-subtitle">
-          Configure speech output, audio rate, and interviewer voice interaction settings.
+          Configure speech output, audio rate, and interviewer voice interaction
+          settings.
         </p>
       </div>
 
@@ -54,7 +59,10 @@ export const SettingsPage: React.FC = () => {
             <Bot size={20} className="card-icon" />
             <h3 className="card-heading">Platform Intelligence</h3>
             <span className="status-pill status-connected">
-              <CheckCircle2 size={12} style={{ display: 'inline', marginRight: 4 }} />
+              <CheckCircle2
+                size={12}
+                style={{ display: "inline", marginRight: 4 }}
+              />
               Active System Service
             </span>
           </div>
@@ -62,10 +70,15 @@ export const SettingsPage: React.FC = () => {
           <div className="platform-info-box">
             <div className="platform-info-header">
               <Sparkles size={16} className="text-accent" />
-              <span className="info-title">Centralized Placement Interview Engine</span>
+              <span className="info-title">
+                Centralized Placement Interview Engine
+              </span>
             </div>
             <p className="info-text">
-              The AI interviewer, resume analyzer, skill evaluator, and learning path generator run internally as fully integrated platform capabilities. No API key configuration or provider selection is required.
+              The AI interviewer, resume analyzer, skill evaluator, and learning
+              path generator run internally as fully integrated platform
+              capabilities. No API key configuration or provider selection is
+              required.
             </p>
             <div className="platform-features-list">
               <div className="feature-item">
@@ -115,7 +128,9 @@ export const SettingsPage: React.FC = () => {
               max="1.3"
               step="0.1"
               value={speechRate}
-              onChange={(e) => updateSettings({ speechRate: parseFloat(e.target.value) })}
+              onChange={(e) =>
+                updateSettings({ speechRate: parseFloat(e.target.value) })
+              }
               className="settings-slider"
             />
           </div>
@@ -123,12 +138,16 @@ export const SettingsPage: React.FC = () => {
           <div className="settings-toggle-field">
             <div>
               <span className="toggle-title">Auto-speak Questions</span>
-              <p className="toggle-sub">Automatically vocalize questions when the AI turn begins.</p>
+              <p className="toggle-sub">
+                Automatically vocalize questions when the AI turn begins.
+              </p>
             </div>
             <input
               type="checkbox"
               checked={autoSpeakQuestions}
-              onChange={(e) => updateSettings({ autoSpeakQuestions: e.target.checked })}
+              onChange={(e) =>
+                updateSettings({ autoSpeakQuestions: e.target.checked })
+              }
               className="toggle-checkbox"
             />
           </div>
@@ -144,11 +163,6 @@ export const SettingsPage: React.FC = () => {
             </Button>
           </div>
         </div>
-      </div>
-
-      {/* Section 3: Speech-to-Text Recognition Calibration & Mic Diagnostics */}
-      <div style={{ marginTop: '20px' }}>
-        <SpeechRecognitionWidget />
       </div>
 
       <div className="settings-footer">

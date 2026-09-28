@@ -1,13 +1,9 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect } from "react";
 
 export interface SettingsState {
   autoSpeakQuestions: boolean;
   speechRate: number; // 0.7 - 1.3
   voiceUri: string;
-  speechLanguage: string; // e.g. 'en-US', 'en-IN', 'en-GB'
-  continuousListening: boolean;
-  technicalTermCorrection: boolean;
-  noiseSuppression: boolean;
 }
 
 interface SettingsContextValue extends SettingsState {
@@ -15,21 +11,21 @@ interface SettingsContextValue extends SettingsState {
   resetSettings: () => void;
 }
 
-const STORAGE_KEY = 'ai_mock_interviewer_user_preferences';
+const STORAGE_KEY = "ai_mock_interviewer_user_preferences";
 
 const defaultSettings: SettingsState = {
   autoSpeakQuestions: true,
   speechRate: 1.0,
-  voiceUri: '',
-  speechLanguage: 'en-US',
-  continuousListening: true,
-  technicalTermCorrection: true,
-  noiseSuppression: true,
+  voiceUri: "",
 };
 
-const SettingsContext = createContext<SettingsContextValue | undefined>(undefined);
+const SettingsContext = createContext<SettingsContextValue | undefined>(
+  undefined,
+);
 
-export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [settings, setSettings] = useState<SettingsState>(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
@@ -37,17 +33,14 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         const parsed = JSON.parse(stored);
         return {
           ...defaultSettings,
-          autoSpeakQuestions: parsed.autoSpeakQuestions ?? defaultSettings.autoSpeakQuestions,
+          autoSpeakQuestions:
+            parsed.autoSpeakQuestions ?? defaultSettings.autoSpeakQuestions,
           speechRate: parsed.speechRate ?? defaultSettings.speechRate,
           voiceUri: parsed.voiceUri ?? defaultSettings.voiceUri,
-          speechLanguage: parsed.speechLanguage ?? defaultSettings.speechLanguage,
-          continuousListening: parsed.continuousListening ?? defaultSettings.continuousListening,
-          technicalTermCorrection: parsed.technicalTermCorrection ?? defaultSettings.technicalTermCorrection,
-          noiseSuppression: parsed.noiseSuppression ?? defaultSettings.noiseSuppression,
         };
       }
     } catch (e) {
-      console.warn('Failed to read user preferences from storage', e);
+      console.warn("Failed to read user preferences from storage", e);
     }
     return defaultSettings;
   });
@@ -56,7 +49,7 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
     } catch (e) {
-      console.warn('Failed to save user preferences to storage', e);
+      console.warn("Failed to save user preferences to storage", e);
     }
   }, [settings]);
 
@@ -69,12 +62,14 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     try {
       localStorage.removeItem(STORAGE_KEY);
     } catch (e) {
-      console.warn('Failed to reset user preferences in storage', e);
+      console.warn("Failed to reset user preferences in storage", e);
     }
   };
 
   return (
-    <SettingsContext.Provider value={{ ...settings, updateSettings, resetSettings }}>
+    <SettingsContext.Provider
+      value={{ ...settings, updateSettings, resetSettings }}
+    >
       {children}
     </SettingsContext.Provider>
   );
@@ -83,7 +78,7 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 export const useSettings = (): SettingsContextValue => {
   const context = useContext(SettingsContext);
   if (!context) {
-    throw new Error('useSettings must be used within a SettingsProvider');
+    throw new Error("useSettings must be used within a SettingsProvider");
   }
   return context;
 };

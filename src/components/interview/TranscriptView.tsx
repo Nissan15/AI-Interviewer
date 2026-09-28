@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
-import { Send, MessageSquare, History, Edit3, RotateCcw, Sparkles } from 'lucide-react';
-import { InterviewExchange } from '../../types/interview';
-import { Button } from '../common/Button/Button';
-import { speechToTextService } from '../../services/speech/speechToText';
-import './TranscriptView.css';
+import React, { useState } from "react";
+import { Mic, Send, MessageSquare, History, Edit3 } from "lucide-react";
+import { InterviewExchange } from "../../types/interview";
+import { Button } from "../common/Button/Button";
+import "./TranscriptView.css";
 
 interface TranscriptViewProps {
   currentTranscript: string;
@@ -20,32 +19,25 @@ export const TranscriptView: React.FC<TranscriptViewProps> = ({
   onSubmitAnswer,
   exchanges,
 }) => {
-  const [manualText, setManualText] = useState<string>('');
+  const [manualText, setManualText] = useState<string>("");
   const [isEditingManually, setIsEditingManually] = useState<boolean>(false);
   const [showHistory, setShowHistory] = useState<boolean>(false);
 
-  const activeText = isEditingManually ? manualText : currentTranscript || manualText;
-  const wordCount = (isEditingManually ? manualText : currentTranscript)
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean).length;
+  const activeText = isEditingManually
+    ? manualText
+    : currentTranscript || manualText;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!activeText.trim() && !currentTranscript.trim()) return;
     onSubmitAnswer(isEditingManually ? manualText : undefined);
-    setManualText('');
+    setManualText("");
     setIsEditingManually(false);
   };
 
   const handleStartTyping = () => {
     setIsEditingManually(true);
     setManualText(currentTranscript);
-  };
-
-  const handleRestartAnswer = () => {
-    speechToTextService.resetTranscript();
-    setManualText('');
   };
 
   return (
@@ -56,37 +48,21 @@ export const TranscriptView: React.FC<TranscriptViewProps> = ({
           <span className="transcript-heading">Candidate Answer</span>
           {isListening && (
             <span className="live-mic-tag">
-              <span className="live-dot" /> High-Accuracy Stream
-            </span>
-          )}
-          {wordCount > 0 && (
-            <span style={{ fontSize: '0.75rem', color: '#94a3b8', marginLeft: '6px' }}>
-              ({wordCount} words)
+              <span className="live-dot" /> Capturing Speech
             </span>
           )}
         </div>
 
         <div className="transcript-toggles">
-          {!isEditingManually && currentTranscript && (
-            <button
-              type="button"
-              className="toggle-mode-btn"
-              onClick={handleRestartAnswer}
-              title="Clear current spoken text and re-speak"
-            >
-              <RotateCcw size={13} /> Re-speak
-            </button>
-          )}
-
           <button
             type="button"
             className="toggle-mode-btn"
             onClick={handleStartTyping}
             disabled={isEditingManually}
           >
-            <Edit3 size={13} /> {isEditingManually ? 'Typing Mode' : 'Type / Refine'}
+            <Edit3 size={13} />{" "}
+            {isEditingManually ? "Typing Mode" : "Type / Refine"}
           </button>
-
           {exchanges.length > 0 && (
             <button
               type="button"
@@ -117,8 +93,8 @@ export const TranscriptView: React.FC<TranscriptViewProps> = ({
             ) : (
               <p className="speech-placeholder">
                 {isListening
-                  ? 'Listening continuous speech... Speak your answer now. Technical terms and acronyms will be enhanced automatically.'
-                  : 'Microphone is standby. Click Submit or Type to respond.'}
+                  ? "Listening to your microphone... speak your answer now."
+                  : "Microphone is standby. Click Submit or Type to respond."}
               </p>
             )}
           </div>
@@ -126,14 +102,9 @@ export const TranscriptView: React.FC<TranscriptViewProps> = ({
 
         <div className="transcript-submit-row">
           <span className="submit-hint">
-            {isEditingManually ? (
-              'Click Submit to send your typed response.'
-            ) : (
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                <Sparkles size={12} className="text-accent" />
-                <span>Continuous listening active • No timeout cutoff</span>
-              </span>
-            )}
+            {isEditingManually
+              ? "Click Submit to send your typed response."
+              : "Answers are analyzed continuously for adaptive follow-ups."}
           </span>
 
           <Button
@@ -144,7 +115,7 @@ export const TranscriptView: React.FC<TranscriptViewProps> = ({
             disabled={!activeText.trim() && !currentTranscript.trim()}
             rightIcon={<Send size={15} />}
           >
-            {isProcessing ? 'Processing Answer...' : 'Submit Answer'}
+            {isProcessing ? "Processing Answer..." : "Submit Answer"}
           </Button>
         </div>
       </form>

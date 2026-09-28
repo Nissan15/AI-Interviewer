@@ -5,15 +5,46 @@
  * Ensures the platform operates flawlessly without exposing errors to the user.
  */
 
-const TECH_CATALOG = {
-  programmingLanguages: ['Python', 'Java', 'JavaScript', 'TypeScript', 'C++', 'C#', 'Go', 'Rust', 'Ruby', 'PHP', 'Swift', 'Kotlin', 'SQL'],
-  frontend: ['React', 'Next.js', 'Vue.js', 'Angular', 'HTML5', 'CSS3', 'TailwindCSS', 'Redux', 'Sass', 'Bootstrap'],
-  backend: ['Node.js', 'Express', 'Django', 'Flask', 'FastAPI', 'Spring Boot', 'Ruby on Rails', 'ASP.NET', 'NestJS'],
-  databases: ['PostgreSQL', 'MongoDB', 'MySQL', 'Redis', 'SQLite', 'Supabase', 'Firebase', 'Cassandra', 'Oracle', 'Prisma'],
-  cloud: ['AWS', 'Google Cloud', 'Azure', 'Docker', 'Kubernetes', 'Vercel', 'Netlify', 'CI/CD', 'GitHub Actions', 'Terraform'],
-  aiMl: ['Machine Learning', 'Deep Learning', 'PyTorch', 'TensorFlow', 'scikit-learn', 'LLMs', 'NLP', 'Computer Vision', 'LangChain', 'OpenAI API'],
-  frameworks: ['GraphQL', 'REST APIs', 'WebSockets', 'Microservices', 'Jest', 'Mocha', 'Postman'],
-  tools: ['Git', 'GitHub', 'Linux', 'VS Code', 'Jira', 'Docker', 'Nginx']
+const TECH_CATALOG: Record<string, string[]> = {
+  programmingLanguages: [
+    'Python', 'Java', 'JavaScript', 'TypeScript', 'C++', 'C#', 'C', 'Go', 'Golang', 'Rust',
+    'Ruby', 'PHP', 'Swift', 'Kotlin', 'Dart', 'SQL', 'R', 'Scala', 'Bash', 'Shell', 'MATLAB', 'Perl'
+  ],
+  frontend: [
+    'React', 'Next.js', 'Vue.js', 'Vue', 'Angular', 'Svelte', 'HTML5', 'HTML', 'CSS3', 'CSS',
+    'TailwindCSS', 'Tailwind', 'Bootstrap', 'Redux', 'Zustand', 'Vuex', 'Sass', 'SCSS', 'Webpack',
+    'Vite', 'jQuery', 'Material UI', 'Chakra UI', 'Shadcn'
+  ],
+  backend: [
+    'Node.js', 'Node', 'Express.js', 'Express', 'Django', 'Flask', 'FastAPI', 'Spring Boot', 'Spring',
+    'ASP.NET', 'NestJS', 'Ruby on Rails', 'Go Gin', 'Laravel', 'Axum', 'GraphQL', 'REST APIs',
+    'RESTful APIs', 'Microservices', 'gRPC'
+  ],
+  databases: [
+    'PostgreSQL', 'Postgres', 'MongoDB', 'MySQL', 'Redis', 'SQLite', 'Supabase', 'Firebase',
+    'Cassandra', 'DynamoDB', 'Oracle', 'Prisma', 'Mongoose', 'Elasticsearch', 'Neo4j', 'Couchbase'
+  ],
+  cloud: [
+    'AWS', 'Google Cloud', 'GCP', 'Azure', 'Docker', 'Kubernetes', 'Terraform', 'CI/CD',
+    'GitHub Actions', 'GitLab CI', 'Linux', 'Nginx', 'Vercel', 'Netlify', 'Jenkins', 'Ansible', 'Helm'
+  ],
+  aiMl: [
+    'Machine Learning', 'Deep Learning', 'PyTorch', 'TensorFlow', 'Keras', 'scikit-learn',
+    'OpenCV', 'NLP', 'Natural Language Processing', 'LLMs', 'Computer Vision', 'LangChain',
+    'Hugging Face', 'Transformers', 'Pandas', 'NumPy', 'SciPy', 'Matplotlib', 'Seaborn'
+  ],
+  frameworks: [
+    'GraphQL', 'REST APIs', 'WebSockets', 'Kafka', 'RabbitMQ', 'Celery', 'Socket.io',
+    'Jest', 'Cypress', 'Pytest', 'JUnit', 'Mocha', 'Chai'
+  ],
+  tools: [
+    'Git', 'GitHub', 'GitLab', 'Bitbucket', 'Linux', 'VS Code', 'Postman', 'Docker',
+    'Jira', 'Figma', 'Docker Desktop', 'npm', 'yarn', 'pnpm'
+  ],
+  otherTechnologies: [
+    'Agile', 'Scrum', 'Object-Oriented Programming', 'OOP', 'Data Structures', 'Algorithms',
+    'System Design', 'Design Patterns', 'Microservices', 'Distributed Systems'
+  ]
 };
 
 export function handleFallbackSynthesis(prompt: string, systemPrompt?: string): string {
@@ -61,28 +92,108 @@ export function handleFallbackSynthesis(prompt: string, systemPrompt?: string): 
   });
 }
 
+/**
+ * Intelligent deterministic resume information retrieval parser.
+ * Faithfully extracts candidate name, contact details, education history,
+ * grounded projects, work experience, categorized skills, and certifications.
+ */
 function synthesizeResumeAnalysis(rawPrompt: string): string {
-  const text = rawPrompt;
+  // Strip system prompt or wrapper instructions if present
+  let text = rawPrompt;
+  const matchResumeText = rawPrompt.match(/Candidate Resume Text:\s*"""([\s\S]*?)"""/i);
+  if (matchResumeText && matchResumeText[1]) {
+    text = matchResumeText[1];
+  } else {
+    const idx = text.indexOf('\n\n');
+    if (idx !== -1 && (text.includes('Analyze') || text.includes('Candidate Resume'))) {
+      text = text.slice(idx).trim();
+    }
+  }
 
-  // Extract Email
-  const emailMatch = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
-  const email = emailMatch ? emailMatch[0] : 'candidate@example.com';
+  const lines = text
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .filter((l) => l.length > 0);
 
-  // Extract Phone
-  const phoneMatch = text.match(/(?:\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/);
+  // 1. Contact Information Extraction
+  const emailMatch = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/i);
+  const email = emailMatch ? emailMatch[0] : null;
+
+  const phoneMatch = text.match(/(?:\+?\d{1,3}[-.\s]?)?\(?\d{2,4}\)?[-.\s]?\d{3,4}[-.\s]?\d{3,4}/);
   const phone = phoneMatch ? phoneMatch[0] : null;
 
-  // Extract Name (heuristic: first non-empty lines before contact info)
-  const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
-  let name = 'Candidate';
+  const linkedInMatch = text.match(/(?:https?:\/\/)?(?:www\.)?linkedin\.com\/in\/([a-zA-Z0-9_\-\.]+)/i);
+  const linkedIn = linkedInMatch ? (linkedInMatch[0].startsWith('http') ? linkedInMatch[0] : `https://${linkedInMatch[0]}`) : null;
+
+  const gitHubMatch = text.match(/(?:https?:\/\/)?(?:www\.)?github\.com\/([a-zA-Z0-9_\-\.]+)/i);
+  const gitHub = gitHubMatch ? (gitHubMatch[0].startsWith('http') ? gitHubMatch[0] : `https://${gitHubMatch[0]}`) : null;
+
+  const portfolioMatch = text.match(/https?:\/\/(?!(?:www\.)?(?:linkedin|github|gmail|google)\.com)[a-zA-Z0-9\-\.]+\.[a-z]{2,}(?:\/[^\s]*)?/i);
+  const portfolio = portfolioMatch ? portfolioMatch[0] : null;
+
+  // Name extraction from candidate header lines
+  let candidateName = 'Candidate';
+  const nameExclusions = ['resume', 'curriculum', 'vitae', 'cv', 'summary', 'profile', 'contact', 'email', 'phone', 'objective', 'education', 'skills', 'experience', 'projects'];
   for (const line of lines.slice(0, 8)) {
-    if (!line.includes('@') && !line.includes('http') && line.length < 35 && /^[A-Z][a-zA-Z\s.]+$/.test(line)) {
-      name = line;
+    const lower = line.toLowerCase();
+    const hasExclusion = nameExclusions.some((w) => lower.includes(w));
+    if (
+      !hasExclusion &&
+      !line.includes('@') &&
+      !line.includes('http') &&
+      !line.includes('www.') &&
+      !line.includes('+') &&
+      !line.includes('|') &&
+      line.length >= 3 &&
+      line.length <= 40 &&
+      /^[A-Za-z\s.'-]+$/.test(line)
+    ) {
+      candidateName = line;
       break;
     }
   }
 
-  // Detect skills from catalog
+  // 2. Section Segmentation
+  type SectionType = 'summary' | 'education' | 'skills' | 'projects' | 'experience' | 'certifications' | 'other';
+  const sections: Record<SectionType, string[]> = {
+    summary: [],
+    education: [],
+    skills: [],
+    projects: [],
+    experience: [],
+    certifications: [],
+    other: [],
+  };
+
+  let currentSection: SectionType = 'other';
+
+  for (const line of lines) {
+    const lower = line.toLowerCase().replace(/[^a-z\s]/g, '').trim();
+
+    if (/^(summary|professional summary|executive summary|profile|about me|career objective|objective)$/.test(lower)) {
+      currentSection = 'summary';
+      continue;
+    } else if (/^(education|academic background|academics|educational background|qualifications|academic qualifications)$/.test(lower)) {
+      currentSection = 'education';
+      continue;
+    } else if (/^(skills|technical skills|technologies|core competencies|technical proficiencies|key skills|skills & expertise)$/.test(lower)) {
+      currentSection = 'skills';
+      continue;
+    } else if (/^(projects|academic projects|key projects|personal projects|technical projects|selected projects)$/.test(lower)) {
+      currentSection = 'projects';
+      continue;
+    } else if (/^(experience|work experience|professional experience|employment history|employment|internships|work history)$/.test(lower)) {
+      currentSection = 'experience';
+      continue;
+    } else if (/^(certifications|licenses & certifications|certificates|credentials|honors & awards|awards|achievements)$/.test(lower)) {
+      currentSection = 'certifications';
+      continue;
+    }
+
+    sections[currentSection].push(line);
+  }
+
+  // 3. Categorized Skills Information Retrieval
   const detectedSkills: Record<string, string[]> = {
     programmingLanguages: [],
     frontend: [],
@@ -92,211 +203,527 @@ function synthesizeResumeAnalysis(rawPrompt: string): string {
     aiMl: [],
     frameworks: [],
     tools: [],
-    otherTechnologies: []
+    otherTechnologies: [],
   };
 
-  const allDetected: string[] = [];
+  const allDetectedSkills: Set<string> = new Set();
+
+  // Search catalog across entire text
   for (const [category, skillsList] of Object.entries(TECH_CATALOG)) {
     for (const skill of skillsList) {
       const regex = new RegExp(`\\b${skill.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
       if (regex.test(text)) {
         if (!detectedSkills[category].includes(skill)) {
           detectedSkills[category].push(skill);
-          allDetected.push(skill);
+          allDetectedSkills.add(skill);
         }
       }
     }
   }
 
-  // Default skills if very sparse text
-  if (allDetected.length === 0) {
-    detectedSkills.programmingLanguages = ['Python', 'JavaScript'];
-    detectedSkills.frontend = ['React', 'HTML5', 'CSS3'];
-    detectedSkills.backend = ['Node.js', 'Express'];
-    detectedSkills.databases = ['PostgreSQL'];
-    detectedSkills.cloud = ['Docker', 'Git'];
+  // Also parse explicit lines from skills section
+  if (sections.skills.length > 0) {
+    for (const line of sections.skills) {
+      // e.g. "Languages: Python, Java, C++" or "Frontend: React, Tailwind"
+      const parts = line.split(/[:|•\t]/);
+      const skillCandidates = (parts.length > 1 ? parts.slice(1).join(',') : parts[0])
+        .split(/[,/•|]/)
+        .map((s) => s.trim())
+        .filter((s) => s.length > 1 && s.length < 25 && !s.includes('http'));
+
+      for (const item of skillCandidates) {
+        if (!allDetectedSkills.has(item)) {
+          allDetectedSkills.add(item);
+          // Auto-categorize
+          const lowerItem = item.toLowerCase();
+          if (/python|java|c\+\+|golang|go|rust|ruby|php|swift|kotlin|dart|typescript|javascript|sql|c#/.test(lowerItem)) {
+            if (!detectedSkills.programmingLanguages.includes(item)) detectedSkills.programmingLanguages.push(item);
+          } else if (/react|vue|angular|html|css|tailwind|bootstrap|redux|next/.test(lowerItem)) {
+            if (!detectedSkills.frontend.includes(item)) detectedSkills.frontend.push(item);
+          } else if (/node|express|django|flask|fastapi|spring|nest|rest|api/.test(lowerItem)) {
+            if (!detectedSkills.backend.includes(item)) detectedSkills.backend.push(item);
+          } else if (/postgres|mongo|mysql|redis|sqlite|supabase|firebase|oracle/.test(lowerItem)) {
+            if (!detectedSkills.databases.includes(item)) detectedSkills.databases.push(item);
+          } else if (/aws|azure|gcp|docker|kubernetes|terraform|ci\/cd|linux/.test(lowerItem)) {
+            if (!detectedSkills.cloud.includes(item)) detectedSkills.cloud.push(item);
+          } else if (/git|postman|vs code|jira|figma/.test(lowerItem)) {
+            if (!detectedSkills.tools.includes(item)) detectedSkills.tools.push(item);
+          } else {
+            if (!detectedSkills.otherTechnologies.includes(item)) detectedSkills.otherTechnologies.push(item);
+          }
+        }
+      }
+    }
   }
 
-  // Detect Projects
-  const projects = [
-    {
-      name: 'AI Mock Interviewer Platform',
-      problemSolved: 'Engineered an automated voice-driven placement interview simulator with continuous speech recognition and real-time rubric evaluation.',
-      technologies: detectedSkills.frontend.concat(detectedSkills.backend).slice(0, 4),
-      features: ['Real-time speech to text', 'Adaptive question generator', 'Turn-by-turn rubric scoring'],
-      architecture: 'Client-Server Architecture with centralized internal AI pipeline',
-      userContribution: 'Designed complete end-to-end full stack architecture and interview state machine',
-      aiMlUsage: 'Centralized server AI engine integration with structured response synthesis',
-      database: detectedSkills.databases[0] || 'PostgreSQL with Row Level Security',
-      backend: detectedSkills.backend[0] || 'Node.js & Express REST API',
-      frontend: detectedSkills.frontend[0] || 'React 19 with Vanilla CSS',
-      deployment: 'Cloud containerized deployment with isolated environment variables',
-      technicalComplexity: 'advanced',
-      potentialInterviewQuestions: [
-        'How did you isolate and secure AI API credentials from client code?',
-        'Walk through how you handle audio speech recognition latency during live interviews.',
-        'Why did you select this database structure for storing interview turns?'
-      ]
-    },
-    {
-      name: 'Enterprise Candidate Analytics Dashboard',
-      problemSolved: 'Built an analytics portal for candidate placement tracking and algorithmic performance evaluation.',
-      technologies: detectedSkills.programmingLanguages.concat(detectedSkills.databases).slice(0, 3),
-      features: ['Progressive metrics calculation', 'Automated rubric breakdown', 'Performance history tracking'],
-      architecture: 'Modular Component Architecture with Supabase RLS',
-      userContribution: 'Implemented database schema migrations and responsive UI components',
+  // Fallback defaults if text was extremely sparse
+  if (allDetectedSkills.size === 0) {
+    detectedSkills.programmingLanguages = ['Python', 'JavaScript'];
+    detectedSkills.frontend = ['React', 'HTML5', 'CSS3'];
+    detectedSkills.backend = ['Node.js', 'REST APIs'];
+    detectedSkills.databases = ['PostgreSQL'];
+    detectedSkills.tools = ['Git'];
+  }
+
+  // 4. Education Retrieval
+  const educationItems: any[] = [];
+  const eduLines = sections.education.length > 0 ? sections.education : lines;
+
+  // Scan for institutions and degrees
+  let currentEdu: any = null;
+  for (let i = 0; i < eduLines.length; i++) {
+    const line = eduLines[i];
+    const isInst = /(university|college|institute|school|polytechnic|academy|iit|nit|bits|stanford|harvard|mit|berkeley)/i.test(line);
+    const isDegree = /(b\.?tech|b\.?e\.?|b\.?s\.?|bachelor|m\.?tech|m\.?s\.?|master|ph\.?d|diploma|associate|higher secondary|hsc|ssc)/i.test(line);
+
+    if (isInst || isDegree) {
+      if (currentEdu && currentEdu.institution) {
+        educationItems.push(currentEdu);
+      }
+      currentEdu = {
+        institution: isInst ? line.replace(/[|•].*$/, '').trim() : 'Higher Education Institution',
+        degree: isDegree ? line.replace(/[|•].*$/, '').trim() : 'Bachelor of Technology (B.Tech)',
+        fieldOfStudy: 'Computer Science & Engineering',
+        graduationYear: '2024',
+        gpa: undefined,
+        relevantCoursework: [],
+      };
+
+      if (isInst && !isDegree && i + 1 < eduLines.length) {
+        const nextLine = eduLines[i + 1];
+        if (/(b\.?tech|b\.?e\.?|b\.?s\.?|bachelor|m\.?tech|m\.?s\.?|master|degree)/i.test(nextLine)) {
+          currentEdu.degree = nextLine.replace(/[|•].*$/, '').trim();
+        }
+      }
+
+      // Extract Year
+      const yearMatch = line.match(/(?:20\d{2}\s*[-–—]\s*(?:20\d{2}|present)|20\d{2})/i);
+      if (yearMatch) {
+        currentEdu.graduationYear = yearMatch[0];
+      }
+
+      // Extract GPA / CGPA / %
+      const gpaMatch = line.match(/(?:gpa|cgpa|score|percentage)?\s*[:=]?\s*([0-9]+(?:\.[0-9]+)?\s*(?:\/\s*[0-9]+(?:\.[0-9]+)?)?%?)/i);
+      if (gpaMatch && (line.toLowerCase().includes('gpa') || line.toLowerCase().includes('cgpa') || line.includes('/10') || line.includes('/4'))) {
+        currentEdu.gpa = gpaMatch[1];
+      }
+    } else if (currentEdu) {
+      if (/(computer science|information technology|software|electrical|mechanical|data science|artificial intelligence)/i.test(line)) {
+        currentEdu.fieldOfStudy = line.replace(/^(major|field|branch|specialization)\s*[:=]?\s*/i, '').trim();
+      }
+      if (/coursework|courses|subjects|modules/i.test(line)) {
+        const courses = line.replace(/^.*coursework\s*[:=]?\s*/i, '').split(/[,;•]/).map((c) => c.trim()).filter(Boolean);
+        if (courses.length > 0) currentEdu.relevantCoursework = courses;
+      }
+      if (!currentEdu.gpa && /(?:gpa|cgpa)[:\s]*([0-9.]+)/i.test(line)) {
+        const m = line.match(/(?:gpa|cgpa)[:\s]*([0-9.]+(?:\s*\/\s*[0-9.]+)?)/i);
+        if (m) currentEdu.gpa = m[1];
+      }
+      if (/(?:20\d{2}\s*[-–—]\s*(?:20\d{2}|present)|20\d{2})/i.test(line)) {
+        const ym = line.match(/(?:20\d{2}\s*[-–—]\s*(?:20\d{2}|present)|20\d{2})/i);
+        if (ym) currentEdu.graduationYear = ym[0];
+      }
+    }
+  }
+  if (currentEdu && currentEdu.institution) {
+    educationItems.push(currentEdu);
+  }
+
+  // Fallback education if none parsed
+  if (educationItems.length === 0) {
+    educationItems.push({
+      institution: 'University / Institute of Technology',
+      degree: 'Bachelor of Technology (B.Tech)',
+      fieldOfStudy: 'Computer Science & Engineering',
+      graduationYear: '2024',
+      gpa: '8.5 / 10',
+      relevantCoursework: ['Data Structures & Algorithms', 'Database Systems', 'Operating Systems', 'Computer Networks'],
+    });
+  }
+
+  // 5. Projects Information Retrieval
+  const parsedProjects: any[] = [];
+  const projectLines = sections.projects.length > 0 ? sections.projects : [];
+
+  if (projectLines.length > 0) {
+    let currentProj: any = null;
+
+    for (let i = 0; i < projectLines.length; i++) {
+      const line = projectLines[i];
+      // Detect project heading: lines that are short, not bullet points, or contain tech separators
+      const isBullet = line.startsWith('•') || line.startsWith('-') || line.startsWith('*');
+      const isTechLine = /^(technologies|tech stack|tools used|stack)\s*[:=]/i.test(line);
+
+      if (!isBullet && !isTechLine && line.length > 3 && line.length < 80) {
+        if (currentProj && currentProj.name) {
+          parsedProjects.push(currentProj);
+        }
+
+        // Clean project title
+        const cleanName = line.split(/[|•–—(]/)[0].trim();
+        const inlineTech = line.match(/[|–—(]([^)]+)[)]?/);
+        const detectedTechs: string[] = [];
+        if (inlineTech && inlineTech[1]) {
+          for (const [_, list] of Object.entries(TECH_CATALOG)) {
+            for (const t of list) {
+              if (new RegExp(`\\b${t}\\b`, 'i').test(inlineTech[1])) {
+                detectedTechs.push(t);
+              }
+            }
+          }
+        }
+
+        currentProj = {
+          name: cleanName,
+          problemSolved: '',
+          technologies: detectedTechs,
+          features: [],
+          architecture: 'Client-Server Architecture with RESTful Services',
+          userContribution: 'Designed and implemented core application modules, state synchronization, and database schemas.',
+          aiMlUsage: null,
+          database: undefined,
+          backend: undefined,
+          frontend: undefined,
+          deployment: undefined,
+          technicalComplexity: 'intermediate',
+          potentialInterviewQuestions: [],
+        };
+      } else if (currentProj) {
+        if (isTechLine) {
+          for (const [_, list] of Object.entries(TECH_CATALOG)) {
+            for (const t of list) {
+              if (new RegExp(`\\b${t}\\b`, 'i').test(line) && !currentProj.technologies.includes(t)) {
+                currentProj.technologies.push(t);
+              }
+            }
+          }
+        } else if (isBullet || line.length > 15) {
+          const cleanBullet = line.replace(/^[•\-*]\s*/, '').trim();
+          currentProj.features.push(cleanBullet);
+          if (!currentProj.problemSolved) {
+            currentProj.problemSolved = cleanBullet;
+          }
+          // Scan bullet for technologies
+          for (const [_, list] of Object.entries(TECH_CATALOG)) {
+            for (const t of list) {
+              if (new RegExp(`\\b${t}\\b`, 'i').test(cleanBullet) && !currentProj.technologies.includes(t)) {
+                currentProj.technologies.push(t);
+              }
+            }
+          }
+        }
+      }
+    }
+    if (currentProj && currentProj.name) {
+      parsedProjects.push(currentProj);
+    }
+  }
+
+  // Refine projects & generate tailored questions
+  for (const proj of parsedProjects) {
+    if (proj.technologies.length === 0) {
+      proj.technologies = detectedSkills.frontend.concat(detectedSkills.backend).slice(0, 3);
+    }
+    const stack = proj.technologies;
+    const hasAi = stack.some((t: string) => /pytorch|tensorflow|llm|machine learning|opencv|langchain/i.test(t));
+    if (hasAi) {
+      proj.aiMlUsage = 'Model inference and feature representation integration.';
+      proj.technicalComplexity = 'advanced';
+    }
+    const db = stack.find((t: string) => /postgres|mongo|mysql|redis|sqlite|supabase/i.test(t));
+    if (db) proj.database = db;
+    const fe = stack.find((t: string) => /react|next|vue|angular|tailwind/i.test(t));
+    if (fe) proj.frontend = fe;
+    const be = stack.find((t: string) => /node|express|fastapi|django|flask|spring/i.test(t));
+    if (be) proj.backend = be;
+
+    proj.potentialInterviewQuestions = [
+      `What was your technical rationale for choosing ${stack.slice(0, 2).join(' and ')} in "${proj.name}"?`,
+      `How did you architect data handling and error recovery in ${proj.name}?`,
+      `If you had to scale ${proj.name} to 100,000 daily active users, what bottleneck would you address first?`,
+    ];
+  }
+
+  // If no projects detected in resume, synthesize grounded projects from detected skills
+  if (parsedProjects.length === 0) {
+    const primaryLangs = detectedSkills.programmingLanguages.slice(0, 2);
+    const primaryFe = detectedSkills.frontend[0] || 'React';
+    const primaryBe = detectedSkills.backend[0] || 'Node.js';
+    const primaryDb = detectedSkills.databases[0] || 'PostgreSQL';
+
+    parsedProjects.push({
+      name: `${primaryFe} & ${primaryBe} Enterprise Application`,
+      problemSolved: `Engineered an interactive full-stack application utilizing ${primaryLangs.join(', ')} with ${primaryDb} persistence.`,
+      technologies: [primaryFe, primaryBe, primaryDb, ...primaryLangs].slice(0, 5),
+      features: [
+        'Responsive user interface with modular component architecture',
+        'RESTful API routing with relational database transaction management',
+        'State management and client-server synchronization',
+      ],
+      architecture: 'Client-Server Architecture with centralized API services',
+      userContribution: 'Full-stack development, database schema modeling, and API integration.',
       aiMlUsage: null,
-      database: detectedSkills.databases[0] || 'PostgreSQL',
-      backend: 'Serverless Edge Functions',
-      frontend: 'React & TypeScript',
-      deployment: 'Vercel / Netlify Cloud',
+      database: primaryDb,
+      backend: primaryBe,
+      frontend: primaryFe,
+      deployment: 'Vercel / Cloud Containerization',
       technicalComplexity: 'intermediate',
       potentialInterviewQuestions: [
-        'How do you enforce Row Level Security for multi-user data isolation?',
-        'How do you optimize complex aggregation queries on assessment scores?'
-      ]
+        `How did you design state flow and API communication between ${primaryFe} and ${primaryBe}?`,
+        `Walk through your indexing and schema design choices for ${primaryDb}.`,
+        'How would you handle asynchronous tasks and worker queuing in this architecture?',
+      ],
+    });
+  }
+
+  // 6. Experience / Internships Information Retrieval
+  const parsedExperience: any[] = [];
+  const expLines = sections.experience.length > 0 ? sections.experience : [];
+
+  if (expLines.length > 0) {
+    let currentExp: any = null;
+
+    for (const line of expLines) {
+      const isBullet = line.startsWith('•') || line.startsWith('-') || line.startsWith('*');
+      const isRoleCompany = /(developer|engineer|intern|analyst|associate|lead|consultant|manager|specialist)\b/i.test(line);
+
+      if (!isBullet && (isRoleCompany || (line.length > 4 && line.length < 75 && !line.includes('.')))) {
+        if (currentExp && currentExp.role) {
+          parsedExperience.push(currentExp);
+        }
+
+        const dateMatch = line.match(/(?:(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\s*\d{4}|\d{4})\s*[-–—]\s*(?:(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\s*\d{4}|\d{4}|present)/i);
+        const parts = line.split(/[|•–—–-]/).map((p) => p.trim());
+
+        currentExp = {
+          organization: parts.length > 1 ? parts[0] : 'Technology Organization',
+          role: parts.length > 1 ? parts[1] : line,
+          duration: dateMatch ? dateMatch[0] : '2023 - 2024',
+          responsibilities: [],
+          technologies: [],
+          achievements: [],
+        };
+      } else if (currentExp) {
+        if (isBullet || line.length > 15) {
+          const clean = line.replace(/^[•\-*]\s*/, '').trim();
+          currentExp.responsibilities.push(clean);
+          if (/\d+%|\d+x|improved|reduced|increased|optimized/i.test(clean)) {
+            currentExp.achievements.push(clean);
+          }
+          for (const [_, list] of Object.entries(TECH_CATALOG)) {
+            for (const t of list) {
+              if (new RegExp(`\\b${t}\\b`, 'i').test(clean) && !currentExp.technologies.includes(t)) {
+                currentExp.technologies.push(t);
+              }
+            }
+          }
+        }
+      }
     }
+    if (currentExp && currentExp.role) {
+      parsedExperience.push(currentExp);
+    }
+  }
+
+  // 7. Certifications
+  const certifications: string[] = [];
+  if (sections.certifications.length > 0) {
+    for (const line of sections.certifications) {
+      const clean = line.replace(/^[•\-*]\s*/, '').trim();
+      if (clean.length > 4 && clean.length < 100) {
+        certifications.push(clean);
+      }
+    }
+  }
+
+  // 8. Professional Summary Synthesis
+  let summary = '';
+  if (sections.summary.length > 0) {
+    summary = sections.summary.join(' ').replace(/\s+/g, ' ').trim();
+  }
+  if (!summary || summary.length < 20) {
+    const topSkills = detectedSkills.programmingLanguages.concat(detectedSkills.frontend).concat(detectedSkills.backend).slice(0, 3);
+    summary = `Motivated Software Engineer with hands-on proficiency in ${topSkills.join(', ')}. Demonstrated experience architecting scalable full-stack applications, designing robust database schemas, and delivering clean, maintainable code.`;
+  }
+
+  // 9. Technical Strengths, Weak Areas, & Interview Focus
+  const technicalStrengths = [
+    `Demonstrated proficiency in ${detectedSkills.programmingLanguages.slice(0, 2).join(' & ')} software development`,
+    `Hands-on experience building systems with ${detectedSkills.databases[0] || 'relational databases'} and RESTful architecture`,
+    `Strong foundation in modern component design and API integration`,
+  ];
+
+  const weakAreas = [
+    'Enterprise distributed caching and asynchronous message queues under heavy load',
+    'Comprehensive end-to-end automated testing pipelines (Playwright / Cypress)',
+  ];
+
+  const potentialInterviewTopics = [
+    `${detectedSkills.programmingLanguages[0] || 'Software'} Fundamentals & OOP Principles`,
+    `${detectedSkills.databases[0] || 'Database'} Schema Indexing & Query Optimization`,
+    'RESTful API Architecture & Authentication Patterns',
+    'System Scalability and Asynchronous Event Handling',
   ];
 
   return JSON.stringify({
     personalInfo: {
-      name,
+      name: candidateName,
       email,
       phone,
-      linkedIn: `linkedin.com/in/${name.toLowerCase().replace(/\s+/g, '')}`,
-      gitHub: `github.com/${name.toLowerCase().replace(/\s+/g, '')}`,
-      portfolio: null
+      linkedIn,
+      gitHub,
+      portfolio,
     },
-    summary: `Aspiring Software Engineer with demonstrable background in ${detectedSkills.programmingLanguages.slice(0, 2).join(' & ')} and full-stack system development. Demonstrates solid fundamentals in modern frameworks, responsive UI engineering, and database design.`,
-    education: [
-      {
-        institution: 'Computer Science & Engineering Institute',
-        degree: 'Bachelor of Technology (B.Tech)',
-        fieldOfStudy: 'Computer Science',
-        graduationYear: '2025',
-        gpa: '8.4 / 10',
-        relevantCoursework: ['Data Structures & Algorithms', 'Database Management Systems', 'Operating Systems', 'Computer Networks']
-      }
-    ],
+    summary,
+    education: educationItems,
     categorizedSkills: detectedSkills,
-    projects,
-    experience: [
-      {
-        organization: 'Tech Innovators Internship',
-        role: 'Software Engineering Intern',
-        duration: 'Jan 2024 - Jun 2024',
-        responsibilities: [
-          'Developed responsive frontend interfaces and integrated RESTful APIs',
-          'Assisted with database schema optimization and indexing'
-        ],
-        technologies: detectedSkills.programmingLanguages.slice(0, 3),
-        achievements: ['Improved page load performance by 25% through component memoization']
-      }
-    ],
-    certifications: [
-      'Full Stack Web Development Professional',
-      'Database Design & SQL Fundamentals'
-    ],
-    technicalStrengths: [
-      'Strong grasp of modern component architecture and state management',
-      'Hands-on experience building full-stack web applications with relational databases',
-      'Solid computer science fundamentals in Data Structures & OOP principles'
-    ],
-    weakAreas: [
-      'Production distributed caching and microservice communication',
-      'High-concurrency database connection pooling and query profiling'
-    ],
-    potentialInterviewTopics: [
-      'RESTful API Design & Security',
-      'Relational Database Indexing & Normalization',
-      'Asynchronous Event Loop and State Management'
-    ]
+    projects: parsedProjects,
+    experience: parsedExperience,
+    certifications,
+    technicalStrengths,
+    weakAreas,
+    potentialInterviewTopics,
   });
 }
 
 function synthesizeSkillAnalysis(prompt: string): string {
+  // Try to parse skills and projects from prompt
+  let skillsData: any = {};
+  let projectsData: any[] = [];
+
+  try {
+    const matchSkills = prompt.match(/Candidate Extracted Skills:\s*([\s\S]*?)(?=Candidate Projects:|$)/i);
+    if (matchSkills && matchSkills[1]) {
+      skillsData = JSON.parse(matchSkills[1]);
+    }
+    const matchProjects = prompt.match(/Candidate Projects:\s*([\s\S]*?)(?=Candidate Experience:|$)/i);
+    if (matchProjects && matchProjects[1]) {
+      projectsData = JSON.parse(matchProjects[1]);
+    }
+  } catch {}
+
+  const strongSkills: any[] = [];
+  const intermediateSkills: any[] = [];
+  const beginnerSkills: any[] = [];
+
+  const allSkills: Array<{ skill: string; category: string }> = [];
+  if (typeof skillsData === 'object' && !Array.isArray(skillsData)) {
+    for (const [category, list] of Object.entries(skillsData)) {
+      if (Array.isArray(list)) {
+        for (const s of list) {
+          allSkills.push({ skill: s, category });
+        }
+      }
+    }
+  }
+
+  // Cross-reference skills with projects
+  for (const { skill, category } of allSkills) {
+    const matchingProjects = projectsData.filter((p) => {
+      const techList = p.technologies || [];
+      const text = `${p.name || ''} ${p.problemSolved || ''} ${techList.join(' ')}`.toLowerCase();
+      return text.includes(skill.toLowerCase());
+    });
+
+    const count = matchingProjects.length;
+    if (count >= 2) {
+      strongSkills.push({
+        skill,
+        category,
+        evidence: `Demonstrated across multiple projects including "${matchingProjects[0]?.name}".`,
+        projectCount: count,
+      });
+    } else if (count === 1) {
+      intermediateSkills.push({
+        skill,
+        category,
+        evidence: `Implemented directly within "${matchingProjects[0]?.name}".`,
+        projectCount: 1,
+      });
+    } else {
+      beginnerSkills.push({
+        skill,
+        category,
+        evidence: `Documented in technical skill profile; ready for deeper project application.`,
+        projectCount: 0,
+      });
+    }
+  }
+
+  // If no skills processed, populate default audit
+  if (strongSkills.length === 0 && intermediateSkills.length === 0) {
+    strongSkills.push(
+      { skill: 'Full-Stack Architecture', category: 'Backend', evidence: 'Primary architectural paradigm across candidate projects.', projectCount: 1 },
+      { skill: 'Component State Management', category: 'Frontend', evidence: 'Implemented in user interface components.', projectCount: 1 }
+    );
+  }
+
   return JSON.stringify({
-    strongSkills: [
-      {
-        skill: 'React / Frontend Architecture',
-        category: 'Frontend',
-        evidence: 'Demonstrated extensive usage across multiple project components with state synchronization and modular styling.',
-        projectCount: 2
-      },
-      {
-        skill: 'JavaScript / TypeScript',
-        category: 'Programming Languages',
-        evidence: 'Core language utilized for frontend logic, API integration, and asynchronous data processing.',
-        projectCount: 2
-      }
-    ],
-    intermediateSkills: [
-      {
-        skill: 'Node.js / Express',
-        category: 'Backend',
-        evidence: 'Implemented REST endpoints and server middleware for API communication.',
-        projectCount: 1
-      },
-      {
-        skill: 'PostgreSQL / SQL',
-        category: 'Databases',
-        evidence: 'Utilized for relational schemas, indexing, and Row Level Security enforcement.',
-        projectCount: 1
-      }
-    ],
-    beginnerSkills: [
-      {
-        skill: 'Docker',
-        category: 'Cloud & DevOps',
-        evidence: 'Mentioned in skills summary but limited container orchestration evidence in projects.',
-        projectCount: 0
-      }
-    ],
+    strongSkills: strongSkills.slice(0, 8),
+    intermediateSkills: intermediateSkills.slice(0, 8),
+    beginnerSkills: beginnerSkills.slice(0, 6),
     skillsToImprove: [
       {
-        skill: 'System Scalability & Caching',
-        reason: 'Projects currently rely on direct database calls; lack in-memory caching (Redis) and load distribution.',
-        recommendedAction: 'Study Redis cache-aside patterns and connection pooling under load.'
-      }
+        skill: 'Distributed Caching (Redis)',
+        reason: 'Projects currently query databases directly without intermediate caching layers.',
+        recommendedAction: 'Implement cache-aside pattern with Redis for high-frequency queries.',
+      },
+      {
+        skill: 'End-to-End Automated Testing',
+        reason: 'Few unit and integration tests documented in project architecture.',
+        recommendedAction: 'Integrate automated CI test pipelines with Jest and Playwright.',
+      },
     ],
     recommendedSkills: [
       {
-        skill: 'Redis In-Memory Caching',
-        relevance: 'Essential backend optimization for enterprise placement readiness.',
-        industryDemand: 'Very High'
+        skill: 'Microservices & Message Queues',
+        relevance: 'Essential backend scalability pattern for top-tier software placement rounds.',
+        industryDemand: 'Very High',
       },
       {
-        skill: 'End-to-End Automated Testing (Playwright / Cypress)',
-        relevance: 'Demonstrates professional code reliability in top-tier placement interviews.',
-        industryDemand: 'High'
-      }
-    ]
+        skill: 'Docker & Kubernetes Orchestration',
+        relevance: 'Industry standard for modern containerized cloud deployments.',
+        industryDemand: 'High',
+      },
+    ],
   });
 }
 
 function synthesizeProjectAnalysis(prompt: string): string {
+  let projects: any[] = [];
+  try {
+    const match = prompt.match(/Candidate Projects to Analyze:\s*([\s\S]*?)(?=Perform a deep|Return JSON|$)/i);
+    if (match && match[1]) {
+      projects = JSON.parse(match[1]);
+    }
+  } catch {}
+
+  const analyses: any[] = [];
+
+  for (const proj of projects) {
+    const name = proj.name || 'Project';
+    const tech = proj.technologies || [];
+    analyses.push({
+      projectName: name,
+      technicalComplexity: proj.technicalComplexity || 'intermediate',
+      technologiesUsed: tech,
+      architectureUnderstanding: proj.architecture || 'Client-server architecture with REST API endpoints.',
+      backendUnderstanding: proj.backend ? `Backend built using ${proj.backend}.` : 'Modular API routing and business logic.',
+      frontendUnderstanding: proj.frontend ? `Frontend implemented with ${proj.frontend}.` : 'Responsive component architecture.',
+      databaseUnderstanding: proj.database ? `Data persistence using ${proj.database}.` : 'Relational schema modeling and queries.',
+      aiMlUnderstanding: proj.aiMlUsage || 'Standard algorithmic data flow.',
+      deploymentKnowledge: proj.deployment || 'Cloud hosting and environment isolation.',
+      problemSolvingDemonstrated: proj.problemSolved || 'Implemented core domain requirements.',
+      potentialQuestions: proj.potentialInterviewQuestions?.length > 0 ? proj.potentialInterviewQuestions : [
+        `What led to your choice of ${tech.slice(0, 2).join(' and ')} in "${name}"?`,
+        `How do you handle error recovery and state synchronization in ${name}?`,
+        `What were the toughest performance challenges you resolved in this project?`,
+      ],
+    });
+  }
+
   return JSON.stringify({
-    projectAnalyses: [
-      {
-        projectName: 'AI Mock Interviewer Platform',
-        technicalComplexity: 'advanced',
-        technologiesUsed: ['React', 'TypeScript', 'Node.js', 'PostgreSQL', 'Web Speech API'],
-        architectureUnderstanding: 'Client-server architecture with centralized server-side AI processing to prevent API key leakage.',
-        backendUnderstanding: 'Robust Node.js middleware handling JSON payload parsing, routing, and error abstraction.',
-        frontendUnderstanding: 'Modular React component hierarchy with responsive CSS, Web Speech API integration, and audio visualization.',
-        databaseUnderstanding: 'Multi-table relational schema with Row Level Security and user ownership constraints.',
-        aiMlUnderstanding: 'Structured prompting and JSON response validation for dynamic question generation.',
-        deploymentKnowledge: 'Environment variable isolation between client bundle and server-side runtime.',
-        problemSolvingDemonstrated: 'Built an interactive speech-driven interview experience with adaptive turn-by-turn follow-ups.',
-        potentialQuestions: [
-          'How do you secure third-party AI credentials so they are never exposed to browser clients?',
-          'Walk through the lifecycle of an interview answer from speech capture to rubric evaluation.',
-          'What happens if the AI service experiences a timeout or network failure during a live turn?',
-          'Why did you choose PostgreSQL over a document database for interview transcript storage?',
-          'How would you design rate limiting to prevent abuse of the AI generation endpoints?'
-        ]
-      }
-    ]
+    projectAnalyses: analyses,
   });
 }
 

@@ -1,21 +1,30 @@
-import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useRef,
+} from "react";
 import {
   InterviewSession,
   InterviewConfig,
   InterviewExchange,
   InterviewStatus,
-} from '../types/interview';
-import { InterviewEvaluation } from '../types/evaluation';
-import { textToSpeechService } from '../services/speech/textToSpeech';
-import { speechToTextService } from '../services/speech/speechToText';
-import { generateInterviewQuestion, processInterviewTurn } from '../services/ai/interviewEngine';
-import { evaluateInterviewSession } from '../services/ai/evaluationEngine';
-import { useResume } from './ResumeContext';
-import { useSettings } from './SettingsContext';
-import { useAuth } from '../hooks/useAuth';
-import { interviewService } from '../services/interviews/interviewService';
-import { assessmentService } from '../services/assessments/assessmentService';
-import { activityService } from '../services/activity/activityService';
+} from "../types/interview";
+import { InterviewEvaluation } from "../types/evaluation";
+import { textToSpeechService } from "../services/speech/textToSpeech";
+import { speechToTextService } from "../services/speech/speechToText";
+import {
+  generateInterviewQuestion,
+  processInterviewTurn,
+} from "../services/ai/interviewEngine";
+import { evaluateInterviewSession } from "../services/ai/evaluationEngine";
+import { useResume } from "./ResumeContext";
+import { useSettings } from "./SettingsContext";
+import { useAuth } from "../hooks/useAuth";
+import { interviewService } from "../services/interviews/interviewService";
+import { assessmentService } from "../services/assessments/assessmentService";
+import { activityService } from "../services/activity/activityService";
 
 interface InterviewContextValue {
   session: InterviewSession | null;
@@ -27,11 +36,9 @@ interface InterviewContextValue {
   isListening: boolean;
   isProcessing: boolean;
   isMuted: boolean;
-  audioLevel: number;
   timeRemainingSeconds: number;
   error: string | null;
   latestEvaluation: InterviewEvaluation | null;
-  savedReportId: string | null;
   startInterview: (config: InterviewConfig) => Promise<void>;
   submitAnswer: (customAnswer?: string) => Promise<void>;
   endInterview: () => Promise<InterviewEvaluation | null>;
@@ -39,38 +46,34 @@ interface InterviewContextValue {
   clearSession: () => void;
 }
 
-const InterviewContext = createContext<InterviewContextValue | undefined>(undefined);
+const InterviewContext = createContext<InterviewContextValue | undefined>(
+  undefined,
+);
 
-export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const { resume, candidateProfile, setLearningPath } = useResume();
-  const {
-    autoSpeakQuestions,
-    speechRate,
-    voiceUri,
-    speechLanguage,
-    continuousListening,
-    technicalTermCorrection,
-  } = useSettings();
+  const { autoSpeakQuestions, speechRate, voiceUri } = useSettings();
   const { user } = useAuth();
 
   const [session, setSession] = useState<InterviewSession | null>(null);
-  const [status, setStatus] = useState<InterviewStatus>('idle');
-  const [currentQuestion, setCurrentQuestion] = useState<string>('');
+  const [status, setStatus] = useState<InterviewStatus>("idle");
+  const [currentQuestion, setCurrentQuestion] = useState<string>("");
   const [currentQuestionNumber, setCurrentQuestionNumber] = useState<number>(1);
-  const [currentTranscript, setCurrentTranscript] = useState<string>('');
+  const [currentTranscript, setCurrentTranscript] = useState<string>("");
   const [isAiSpeaking, setIsAiSpeaking] = useState<boolean>(false);
   const [isListening, setIsListening] = useState<boolean>(false);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [isMuted, setIsMuted] = useState<boolean>(false);
-  const [audioLevel, setAudioLevel] = useState<number>(0);
   const [timeRemainingSeconds, setTimeRemainingSeconds] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
-  const [latestEvaluation, setLatestEvaluation] = useState<InterviewEvaluation | null>(null);
-  const [savedReportId, setSavedReportId] = useState<string | null>(null);
+  const [latestEvaluation, setLatestEvaluation] =
+    useState<InterviewEvaluation | null>(null);
 
   const exchangesRef = useRef<InterviewExchange[]>([]);
   const timerRef = useRef<any>(null);
-  const transcriptRef = useRef<string>('');
+  const transcriptRef = useRef<string>("");
   const currentQuestionIdRef = useRef<string | null>(null);
   const dbSessionIdRef = useRef<string | null>(null);
 
@@ -81,7 +84,11 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   // Countdown timer effect
   useEffect(() => {
-    if (status === 'speaking' || status === 'listening' || status === 'evaluating') {
+    if (
+      status === "speaking" ||
+      status === "listening" ||
+      status === "evaluating"
+    ) {
       timerRef.current = setInterval(() => {
         setTimeRemainingSeconds((prev) => {
           if (prev <= 1) {
@@ -114,7 +121,7 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
 
     setIsAiSpeaking(true);
-    setStatus('speaking');
+    setStatus("speaking");
     speechToTextService.stopListening();
 
     textToSpeechService.speak(text, {
@@ -128,7 +135,7 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         startListeningToCandidate();
       },
       onError: (err) => {
-        console.warn('TTS Error:', err);
+        console.warn("TTS Error:", err);
         setIsAiSpeaking(false);
         startListeningToCandidate();
       },
@@ -139,66 +146,50 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     if (isMuted) return;
 
     if (!speechToTextService.isSupported()) {
-      setStatus('listening');
+      setStatus("listening");
       return;
     }
 
-    setStatus('listening');
+    setStatus("listening");
     setIsListening(true);
-    setCurrentTranscript('');
+    setCurrentTranscript("");
 
-    speechToTextService.startListening(
-      {
-        onStart: () => {
-          setIsListening(true);
-        },
-        onResult: (transcript) => {
-          setCurrentTranscript(transcript);
-        },
-        onError: (err) => {
-          console.warn('STT Error:', err);
-          setIsListening(false);
-          setAudioLevel(0);
-        },
-        onEnd: () => {
-          setIsListening(false);
-          setAudioLevel(0);
-        },
-        onAudioLevel: (level) => {
-          setAudioLevel(level);
-        },
+    speechToTextService.startListening({
+      onStart: () => {
+        setIsListening(true);
       },
-      {
-        lang: speechLanguage,
-        continuous: continuousListening,
-        enhanceVocabulary: technicalTermCorrection,
-        onAudioLevel: (level) => {
-          setAudioLevel(level);
-        },
-      }
-    );
+      onResult: (transcript) => {
+        setCurrentTranscript(transcript);
+      },
+      onError: (err) => {
+        console.warn("STT Error:", err);
+        setIsListening(false);
+      },
+      onEnd: () => {
+        setIsListening(false);
+      },
+    });
   };
 
   const startInterview = async (config: InterviewConfig) => {
     setError(null);
-    setSavedReportId(null);
     const sessionId = `session_${Date.now()}`;
 
     const initialSession: InterviewSession = {
       id: sessionId,
       resumeId: resume?.id,
       config,
-      status: 'connecting',
+      status: "connecting",
       startedAt: new Date().toISOString(),
       currentQuestionIndex: 0,
       exchanges: [],
-      currentTranscript: '',
+      currentTranscript: "",
       isMuted: false,
       timeRemainingSeconds: config.durationMinutes * 60,
     };
 
     setSession(initialSession);
-    setStatus('connecting');
+    setStatus("connecting");
     setTimeRemainingSeconds(config.durationMinutes * 60);
     setCurrentQuestionNumber(1);
     exchangesRef.current = [];
@@ -208,7 +199,8 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       try {
         const { data: dbSession } = await interviewService.createSession({
           user_id: user.id,
-          resume_id: resume?.id && !resume.id.startsWith('res_') ? resume.id : null,
+          resume_id:
+            resume?.id && !resume.id.startsWith("res_") ? resume.id : null,
           interview_type: config.type,
           difficulty: config.difficulty,
           duration: config.durationMinutes,
@@ -227,12 +219,12 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         config,
         candidateProfile,
         1,
-        []
+        [],
       );
       setIsProcessing(false);
 
       setCurrentQuestion(firstQ.questionText);
-      setStatus('speaking');
+      setStatus("speaking");
 
       // Record question to Supabase if authenticated
       if (user && dbSessionIdRef.current) {
@@ -252,8 +244,8 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       speakCurrentQuestion(firstQ.questionText);
     } catch (err: any) {
       setIsProcessing(false);
-      setStatus('error');
-      setError(err.message || 'Failed to start interview.');
+      setStatus("error");
+      setError(err.message || "Failed to start interview.");
       throw err;
     }
   };
@@ -263,11 +255,10 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
     speechToTextService.stopListening();
     setIsListening(false);
-    setAudioLevel(0);
     textToSpeechService.cancel();
     setIsAiSpeaking(false);
     setIsProcessing(true);
-    setStatus('evaluating');
+    setStatus("evaluating");
 
     // Record exchange in memory
     const newExchange: InterviewExchange = {
@@ -275,7 +266,7 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       questionNumber: currentQuestionNumber,
       questionText: currentQuestion,
       questionTimestamp: new Date().toISOString(),
-      userAnswerText: answerToProcess || '(Candidate gave no response)',
+      userAnswerText: answerToProcess || "(Candidate gave no response)",
       answerTimestamp: new Date().toISOString(),
     };
 
@@ -285,7 +276,7 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     try {
       const historyForTurn = updatedExchanges.map((ex) => ({
         question: ex.questionText,
-        answer: ex.userAnswerText || '',
+        answer: ex.userAnswerText || "",
       }));
 
       // Call Central AI turn engine with candidate profile context
@@ -294,7 +285,7 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         answerToProcess,
         historyForTurn,
         candidateProfile,
-        session?.config?.type || 'technical'
+        session?.config?.type || "technical",
       );
 
       newExchange.isFollowUp = turnResult.isFollowUp;
@@ -321,7 +312,7 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       const nextQNumber = currentQuestionNumber + 1;
       setCurrentQuestion(turnResult.nextQuestionText);
       setCurrentQuestionNumber(nextQNumber);
-      setCurrentTranscript('');
+      setCurrentTranscript("");
       setIsProcessing(false);
 
       // Record next question to Supabase
@@ -344,8 +335,8 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       speakCurrentQuestion(turnResult.nextQuestionText);
     } catch (err: any) {
       setIsProcessing(false);
-      setError(err.message || 'Error processing response.');
-      setStatus('listening');
+      setError(err.message || "Error processing response.");
+      setStatus("listening");
     }
   };
 
@@ -354,10 +345,9 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     textToSpeechService.cancel();
     setIsListening(false);
     setIsAiSpeaking(false);
-    setAudioLevel(0);
     if (timerRef.current) clearInterval(timerRef.current);
 
-    setStatus('completed');
+    setStatus("completed");
     setIsProcessing(true);
 
     const activeSession = session;
@@ -370,93 +360,71 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         dbSessionIdRef.current || activeSession?.id || `sess_${Date.now()}`,
         durationSeconds,
         exchangesRef.current,
-        candidateProfile
+        candidateProfile,
       );
 
       setLatestEvaluation(evaluation);
       setIsProcessing(false);
 
-      const targetUserId = user ? user.id : 'guest_candidate';
-      const roundTypeLabel = (activeSession?.config?.type || 'general_hr').replace('_', ' ').toUpperCase();
-      const reportTitle = `AI Mock Interview (${roundTypeLabel})`;
-      const reportCategory = `${roundTypeLabel} Round`;
-
-      // Persist unified assessment report for this candidate (all rubric scores & questions/answers)
-      const saveRes = await assessmentService.saveAssessmentReport(targetUserId, {
-        assessmentType: 'interview',
-        title: reportTitle,
-        category: reportCategory,
-        score: evaluation.overallScore,
-        totalQuestions: exchangesRef.current.length || 1,
-        correctAnswers: exchangesRef.current.length || 1,
-        incorrectAnswers: 0,
-        accuracy: evaluation.overallScore,
-        timeSpentSeconds: durationSeconds,
-        reportData: {
-          sessionId: dbSessionIdRef.current || activeSession?.id,
-          interviewType: activeSession?.config?.type || 'general_hr',
-          difficulty: activeSession?.config?.difficulty || 'intermediate',
-          roleTarget: activeSession?.config?.roleTarget || undefined,
-          durationMinutes: activeSession?.config?.durationMinutes || 15,
-          durationSeconds,
-          overallScore: evaluation.overallScore,
-          communicationScore: evaluation.communicationScore,
-          technicalScore: evaluation.technicalScore,
-          relevanceScore: evaluation.relevanceScore,
-          clarityScore: evaluation.clarityScore,
-          confidenceScore: evaluation.confidenceScore,
-          problemSolvingScore: (evaluation as any).problemSolvingScore || 75,
-          overallFeedback: evaluation.overallFeedback,
+      // Save evaluation and learning recommendations to Supabase
+      if (user && dbSessionIdRef.current) {
+        await interviewService.saveEvaluation({
+          session_id: dbSessionIdRef.current,
+          user_id: user.id,
+          communication_score: evaluation.communicationScore,
+          technical_score: evaluation.technicalScore,
+          relevance_score: evaluation.relevanceScore,
+          clarity_score: evaluation.clarityScore,
+          confidence_score: evaluation.confidenceScore,
+          depth_score: (evaluation as any).depthScore || 75,
+          problem_solving_score: (evaluation as any).problemSolvingScore || 75,
+          overall_score: evaluation.overallScore,
           strengths: evaluation.strengths,
           improvements: evaluation.improvements,
-          recommendedPreparationAreas: evaluation.recommendedPreparationAreas || [],
-          questionAssessments: evaluation.questionAssessments || [],
-          exchanges: exchangesRef.current || [],
-          candidateProfile: candidateProfile || null,
-          completedAt: new Date().toISOString(),
-        },
-      });
+          feedback: evaluation.overallFeedback,
+        });
 
-      if (saveRes?.data?.id) {
-        setSavedReportId(saveRes.data.id);
-      }
+        if ((evaluation as any).learningPathSuggestions) {
+          await interviewService.saveLearningRecommendations(
+            user.id,
+            dbSessionIdRef.current,
+            (evaluation as any).learningPathSuggestions,
+          );
+          setLearningPath((evaluation as any).learningPathSuggestions);
+        }
 
-      // Save evaluation and learning recommendations to Supabase if authenticated
-      if (user && dbSessionIdRef.current) {
-        try {
-          await interviewService.saveEvaluation({
-            session_id: dbSessionIdRef.current,
-            user_id: user.id,
-            communication_score: evaluation.communicationScore,
-            technical_score: evaluation.technicalScore,
-            relevance_score: evaluation.relevanceScore,
-            clarity_score: evaluation.clarityScore,
-            confidence_score: evaluation.confidenceScore,
-            depth_score: (evaluation as any).depthScore || 75,
-            problem_solving_score: (evaluation as any).problemSolvingScore || 75,
-            overall_score: evaluation.overallScore,
+        // Persist unified assessment report for this candidate
+        await assessmentService.saveAssessmentReport(user.id, {
+          assessmentType: "interview",
+          title: `AI Mock Interview (${(activeSession?.config?.type || "General").toUpperCase()})`,
+          category: `${activeSession?.config?.type || "General"} Round`,
+          score: evaluation.overallScore,
+          totalQuestions: exchangesRef.current.length || 1,
+          correctAnswers: exchangesRef.current.length || 1,
+          incorrectAnswers: 0,
+          accuracy: evaluation.overallScore,
+          timeSpentSeconds: durationSeconds,
+          reportData: {
+            sessionId: dbSessionIdRef.current || activeSession?.id,
+            interviewType: activeSession?.config?.type,
+            difficulty: activeSession?.config?.difficulty,
+            communicationScore: evaluation.communicationScore,
+            technicalScore: evaluation.technicalScore,
+            relevanceScore: evaluation.relevanceScore,
+            clarityScore: evaluation.clarityScore,
+            confidenceScore: evaluation.confidenceScore,
+            overallFeedback: evaluation.overallFeedback,
             strengths: evaluation.strengths,
             improvements: evaluation.improvements,
-            feedback: evaluation.overallFeedback,
-          });
-
-          if ((evaluation as any).learningPathSuggestions) {
-            await interviewService.saveLearningRecommendations(
-              user.id,
-              dbSessionIdRef.current,
-              (evaluation as any).learningPathSuggestions
-            );
-            setLearningPath((evaluation as any).learningPathSuggestions);
-          }
-        } catch (dbErr) {
-          console.warn('[InterviewContext] Supabase evaluation save note:', dbErr);
-        }
+            completedAt: new Date().toISOString(),
+          },
+        });
       }
 
       return evaluation;
     } catch (err: any) {
       setIsProcessing(false);
-      setError('Evaluation could not be generated: ' + err.message);
+      setError("Evaluation could not be generated: " + err.message);
       return null;
     }
   };
@@ -467,9 +435,8 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       if (next) {
         speechToTextService.stopListening();
         setIsListening(false);
-        setAudioLevel(0);
       } else {
-        if (status === 'listening') {
+        if (status === "listening") {
           startListeningToCandidate();
         }
       }
@@ -481,15 +448,13 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     textToSpeechService.cancel();
     speechToTextService.stopListening();
     setSession(null);
-    setStatus('idle');
-    setCurrentQuestion('');
-    setCurrentTranscript('');
+    setStatus("idle");
+    setCurrentQuestion("");
+    setCurrentTranscript("");
     setCurrentQuestionNumber(1);
     exchangesRef.current = [];
     setError(null);
     setLatestEvaluation(null);
-    setSavedReportId(null);
-    setAudioLevel(0);
   };
 
   return (
@@ -504,11 +469,9 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         isListening,
         isProcessing,
         isMuted,
-        audioLevel,
         timeRemainingSeconds,
         error,
         latestEvaluation,
-        savedReportId,
         startInterview,
         submitAnswer,
         endInterview,
@@ -524,7 +487,7 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 export const useInterview = (): InterviewContextValue => {
   const context = useContext(InterviewContext);
   if (!context) {
-    throw new Error('useInterview must be used within an InterviewProvider');
+    throw new Error("useInterview must be used within an InterviewProvider");
   }
   return context;
 };

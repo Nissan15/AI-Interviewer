@@ -287,43 +287,73 @@ async function callOpenRouter(
   }
   messages.push({ role: 'user', content: prompt });
 
-  const payload: any = {
-    model: config.model,
-    messages,
-    temperature,
+  const tryRequest = async (useJsonFormat: boolean, modelOverride?: string): Promise<string> => {
+    const payload: any = {
+      model: modelOverride || config.model,
+      messages,
+      temperature,
+    };
+
+    if (useJsonFormat) {
+      payload.response_format = { type: 'json_object' };
+    }
+
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${config.apiKey}`,
+        'HTTP-Referer': 'https://aimockinterviewer.internal',
+        'X-Title': 'AI Mock Interviewer Platform',
+      },
+      body: JSON.stringify(payload),
+      signal,
+    });
+
+    if (!res.ok) {
+      const errText = await res.text();
+      let msg = `OpenRouter API returned status ${res.status}`;
+      try {
+        const parsed = JSON.parse(errText);
+        msg = parsed.error?.message || msg;
+      } catch {}
+      throw new Error(msg);
+    }
+
+    const data: any = await res.json();
+    const content = data.choices?.[0]?.message?.content;
+    if (!content) {
+      throw new Error('AI returned an empty response.');
+    }
+
+    return jsonMode ? sanitizeJsonResponse(content) : content;
   };
 
-  if (jsonMode) {
-    payload.response_format = { type: 'json_object' };
+  try {
+    return await tryRequest(jsonMode);
+  } catch (err: any) {
+    const errMsg = err.message || '';
+    // If failed because model doesn't support response_format { type: 'json_object' }, retry without it
+    if (jsonMode && (errMsg.includes('response_format') || errMsg.includes('400') || errMsg.includes('schema') || errMsg.includes('JSON'))) {
+      try {
+        console.info('[AI Service] Retrying OpenRouter request without response_format constraint...');
+        return await tryRequest(false);
+      } catch (retryErr: any) {
+        console.warn('[AI Service] OpenRouter retry failed:', retryErr.message);
+      }
+    }
+
+    // Try fallback models on OpenRouter
+    const fallbackModels = ['meta-llama/llama-3.3-70b-instruct', 'google/gemini-2.0-flash-001'];
+    for (const altModel of fallbackModels) {
+      if (altModel !== config.model) {
+        try {
+          console.info(`[AI Service] Attempting fallback model ${altModel} on OpenRouter...`);
+          return await tryRequest(false, altModel);
+        } catch {}
+      }
+    }
+
+    throw err;
   }
-
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${config.apiKey}`,
-      'HTTP-Referer': 'https://aimockinterviewer.internal',
-      'X-Title': 'AI Mock Interviewer Platform',
-    },
-    body: JSON.stringify(payload),
-    signal,
-  });
-
-  if (!res.ok) {
-    const errText = await res.text();
-    let msg = `OpenRouter API returned status ${res.status}`;
-    try {
-      const parsed = JSON.parse(errText);
-      msg = parsed.error?.message || msg;
-    } catch {}
-    throw new Error(msg);
-  }
-
-  const data: any = await res.json();
-  const content = data.choices?.[0]?.message?.content;
-  if (!content) {
-    throw new Error('AI returned an empty response.');
-  }
-
-  return jsonMode ? sanitizeJsonResponse(content) : content;
 }

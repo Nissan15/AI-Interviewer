@@ -1,18 +1,20 @@
-import React from 'react';
-import { Mic, MicOff, PhoneOff, AlertTriangle } from 'lucide-react';
-import { useInterview } from '../../context/InterviewContext';
-import { AudioVisualizer } from './AudioVisualizer';
-import { QuestionDisplay } from './QuestionDisplay';
-import { TranscriptView } from './TranscriptView';
-import { Timer } from '../common/Timer/Timer';
-import { Button } from '../common/Button/Button';
-import './LiveInterviewRoom.css';
+import React from "react";
+import { Mic, MicOff, PhoneOff, AlertTriangle } from "lucide-react";
+import { useInterview } from "../../context/InterviewContext";
+import { AudioVisualizer } from "./AudioVisualizer";
+import { QuestionDisplay } from "./QuestionDisplay";
+import { TranscriptView } from "./TranscriptView";
+import { Timer } from "../common/Timer/Timer";
+import { Button } from "../common/Button/Button";
+import "./LiveInterviewRoom.css";
 
 interface LiveInterviewRoomProps {
   onFinish: () => void;
 }
 
-export const LiveInterviewRoom: React.FC<LiveInterviewRoomProps> = ({ onFinish }) => {
+export const LiveInterviewRoom: React.FC<LiveInterviewRoomProps> = ({
+  onFinish,
+}) => {
   const {
     session,
     currentQuestion,
@@ -22,7 +24,6 @@ export const LiveInterviewRoom: React.FC<LiveInterviewRoomProps> = ({ onFinish }
     isListening,
     isProcessing,
     isMuted,
-    audioLevel,
     timeRemainingSeconds,
     error,
     submitAnswer,
@@ -36,11 +37,11 @@ export const LiveInterviewRoom: React.FC<LiveInterviewRoomProps> = ({ onFinish }
   };
 
   const getStatusText = () => {
-    if (isProcessing) return 'AI Processing Answer...';
-    if (isAiSpeaking) return 'AI Interviewer Speaking...';
-    if (isMuted) return 'Microphone Muted';
-    if (isListening) return 'Listening to Candidate...';
-    return 'Ready';
+    if (isProcessing) return "AI Processing Answer...";
+    if (isAiSpeaking) return "AI Interviewer Speaking...";
+    if (isMuted) return "Microphone Muted";
+    if (isListening) return "Listening to Candidate...";
+    return "Ready";
   };
 
   return (
@@ -50,19 +51,20 @@ export const LiveInterviewRoom: React.FC<LiveInterviewRoomProps> = ({ onFinish }
         <div className="room-info-cluster">
           <span className="room-badge">Live AI Session</span>
           <span className="room-config-tag">
-            {session?.config.type.replace('_', ' ').toUpperCase()} • {session?.config.difficulty.toUpperCase()}
+            {session?.config.type.replace("_", " ").toUpperCase()} •{" "}
+            {session?.config.difficulty.toUpperCase()}
           </span>
         </div>
 
         <div className="room-controls-right">
           <Timer seconds={timeRemainingSeconds} label="Session Time" />
           <Button
-            variant={isMuted ? 'danger' : 'secondary'}
+            variant={isMuted ? "danger" : "secondary"}
             size="sm"
             leftIcon={isMuted ? <MicOff size={16} /> : <Mic size={16} />}
             onClick={toggleMute}
           >
-            {isMuted ? 'Unmute' : 'Mute'}
+            {isMuted ? "Unmute" : "Mute"}
           </Button>
           <Button
             variant="danger"
@@ -87,9 +89,8 @@ export const LiveInterviewRoom: React.FC<LiveInterviewRoomProps> = ({ onFinish }
         {/* Center Audio Visualizer */}
         <AudioVisualizer
           isAiSpeaking={isAiSpeaking}
-          isCandidateSpeaking={Boolean(isListening && (currentTranscript || audioLevel > 5))}
+          isCandidateSpeaking={Boolean(isListening && currentTranscript)}
           statusText={getStatusText()}
-          audioLevel={audioLevel}
         />
 
         {/* Question Display */}
