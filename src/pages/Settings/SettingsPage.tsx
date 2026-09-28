@@ -11,6 +11,7 @@ import {
 import { useSettings } from '../../context/SettingsContext';
 import { textToSpeechService } from '../../services/speech/textToSpeech';
 import { Button } from '../../components/common/Button/Button';
+import { SpeechRecognitionWidget } from '../../components/speech/SpeechRecognitionWidget';
 import './SettingsPage.css';
 
 export const SettingsPage: React.FC = () => {
@@ -143,6 +144,11 @@ export const SettingsPage: React.FC = () => {
             </Button>
           </div>
         </div>
+      </div>
+
+      {/* Section 3: Speech-to-Text Recognition Calibration & Mic Diagnostics */}
+      <div style={{ marginTop: '20px' }}>
+        <SpeechRecognitionWidget />
       </div>
 
       <div className="settings-footer">

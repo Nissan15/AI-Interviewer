@@ -22,6 +22,7 @@ export const LiveInterviewRoom: React.FC<LiveInterviewRoomProps> = ({ onFinish }
     isListening,
     isProcessing,
     isMuted,
+    audioLevel,
     timeRemainingSeconds,
     error,
     submitAnswer,
@@ -86,8 +87,9 @@ export const LiveInterviewRoom: React.FC<LiveInterviewRoomProps> = ({ onFinish }
         {/* Center Audio Visualizer */}
         <AudioVisualizer
           isAiSpeaking={isAiSpeaking}
-          isCandidateSpeaking={Boolean(isListening && currentTranscript)}
+          isCandidateSpeaking={Boolean(isListening && (currentTranscript || audioLevel > 5))}
           statusText={getStatusText()}
+          audioLevel={audioLevel}
         />
 
         {/* Question Display */}

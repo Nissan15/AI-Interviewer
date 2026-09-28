@@ -4,6 +4,10 @@ export interface SettingsState {
   autoSpeakQuestions: boolean;
   speechRate: number; // 0.7 - 1.3
   voiceUri: string;
+  speechLanguage: string; // e.g. 'en-US', 'en-IN', 'en-GB'
+  continuousListening: boolean;
+  technicalTermCorrection: boolean;
+  noiseSuppression: boolean;
 }
 
 interface SettingsContextValue extends SettingsState {
@@ -17,6 +21,10 @@ const defaultSettings: SettingsState = {
   autoSpeakQuestions: true,
   speechRate: 1.0,
   voiceUri: '',
+  speechLanguage: 'en-US',
+  continuousListening: true,
+  technicalTermCorrection: true,
+  noiseSuppression: true,
 };
 
 const SettingsContext = createContext<SettingsContextValue | undefined>(undefined);
@@ -32,6 +40,10 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           autoSpeakQuestions: parsed.autoSpeakQuestions ?? defaultSettings.autoSpeakQuestions,
           speechRate: parsed.speechRate ?? defaultSettings.speechRate,
           voiceUri: parsed.voiceUri ?? defaultSettings.voiceUri,
+          speechLanguage: parsed.speechLanguage ?? defaultSettings.speechLanguage,
+          continuousListening: parsed.continuousListening ?? defaultSettings.continuousListening,
+          technicalTermCorrection: parsed.technicalTermCorrection ?? defaultSettings.technicalTermCorrection,
+          noiseSuppression: parsed.noiseSuppression ?? defaultSettings.noiseSuppression,
         };
       }
     } catch (e) {

@@ -1,15 +1,27 @@
+export interface SpeechRecognitionOptions {
+  lang?: string;
+  continuous?: boolean;
+  interimResults?: boolean;
+  enhanceVocabulary?: boolean;
+  onAudioLevel?: (level: number) => void;
+}
+
 export interface SpeechToTextCallbacks {
   onResult: (transcript: string, isFinal: boolean) => void;
   onError: (error: string) => void;
   onStart: () => void;
   onEnd: () => void;
+  onAudioLevel?: (level: number) => void;
 }
 
 export interface ISpeechToTextService {
   isSupported: () => boolean;
-  startListening: (callbacks: SpeechToTextCallbacks) => void;
+  startListening: (callbacks: SpeechToTextCallbacks, options?: SpeechRecognitionOptions) => void;
   stopListening: () => void;
   isListening: () => boolean;
+  setLanguage: (lang: string) => void;
+  resetTranscript: () => void;
+  getCurrentTranscript: () => string;
 }
 
 export interface TextToSpeechOptions {
