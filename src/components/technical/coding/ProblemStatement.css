@@ -71,7 +71,7 @@
 }
 
 .constraints-list li code {
-  background-color: #080A0D;
+  background-color: var(--color-bg-input, var(--surface-elevated));
   border: 1px solid var(--border-subtle);
   padding: 1px 6px;
   border-radius: var(--radius-xs);
@@ -118,7 +118,7 @@
 }
 
 .io-code {
-  background-color: #080A0D;
+  background-color: var(--color-bg-input, var(--surface-elevated));
   border-radius: var(--radius-xs);
   padding: 6px 8px;
   font-family: var(--font-family-mono);

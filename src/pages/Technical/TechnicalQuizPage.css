@@ -34,7 +34,7 @@
 }
 
 .category-dropdown {
-  background-color: #0b0e13;
+  background-color: var(--color-bg-input, var(--surface-elevated));
   border: 1px solid var(--border);
   color: var(--text-primary);
   padding: 6px 12px;

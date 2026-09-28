@@ -16,7 +16,7 @@
 .app-input-inner {
   display: flex;
   align-items: center;
-  background-color: #0b0e13;
+  background-color: var(--color-bg-input, var(--surface-elevated));
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: 0 12px;

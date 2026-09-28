@@ -219,7 +219,7 @@
 .audit-score-pill {
   font-family: var(--font-family-mono);
   font-size: 10px;
-  background-color: #0b0e13;
+  background-color: var(--color-bg-input, var(--surface-elevated));
   padding: 2px 7px;
   border-radius: var(--radius-xs);
   color: var(--text-secondary);
@@ -235,7 +235,7 @@
 }
 
 .audit-candidate-reply {
-  background-color: #0b0e13;
+  background-color: var(--color-bg-input, var(--surface-elevated));
   border-radius: var(--radius-xs);
   padding: var(--space-2) var(--space-3);
   border: 1px solid var(--border-subtle);
@@ -260,7 +260,7 @@
 }
 
 .model-answer-block {
-  background-color: #0b0e13;
+  background-color: var(--color-bg-input, var(--surface-elevated));
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-xs);
   padding: var(--space-2) var(--space-3);

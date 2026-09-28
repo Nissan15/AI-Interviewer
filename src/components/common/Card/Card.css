@@ -37,7 +37,7 @@
 .card-footer {
   padding: var(--space-3) var(--space-5);
   border-top: 1px solid var(--border-subtle);
-  background-color: #0b0e13;
+  background-color: var(--surface-elevated);
 }
 
 /* Variants */

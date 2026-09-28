@@ -74,8 +74,8 @@
 
 .grid-num-btn.btn-current {
   background-color: var(--accent);
-  color: #080A0D;
-  box-shadow: 0 0 8px rgba(36, 222, 251, 0.3);
+  color: var(--accent-contrast, #080A0D);
+  box-shadow: var(--accent-glow);
 }
 
 .grid-num-btn.btn-answered {

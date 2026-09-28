@@ -17,7 +17,7 @@
   display: flex;
   align-items: center;
   position: relative;
-  background-color: #0b0e13;
+  background-color: var(--color-bg-input, var(--surface-elevated));
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   transition: all var(--transition-fast);

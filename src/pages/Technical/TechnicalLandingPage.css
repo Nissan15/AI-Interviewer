@@ -69,7 +69,7 @@
 }
 
 .tech-card-icon-box.coding-theme {
-  background-color: #0b0e13;
+  background-color: var(--color-bg-input, var(--surface-elevated));
   color: var(--accent);
   border: 1px solid var(--border);
 }
@@ -163,7 +163,7 @@
 
 .banner-sub code {
   color: var(--accent);
-  background-color: #0b0e13;
+  background-color: var(--color-bg-input, var(--surface-elevated));
   padding: 1px 4px;
   border-radius: var(--radius-xs);
   border: 1px solid var(--border-subtle);

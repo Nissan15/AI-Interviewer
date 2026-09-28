@@ -139,7 +139,7 @@
   width: 24px;
   height: 24px;
   border-radius: var(--radius-xs);
-  background-color: #0b0e13;
+  background-color: var(--color-bg-input, var(--surface-elevated));
   border: 1px solid var(--border);
   display: flex;
   align-items: center;
@@ -154,7 +154,7 @@
 
 .opt-selected .opt-letter {
   background-color: var(--accent);
-  color: #080A0D;
+  color: var(--accent-contrast, #080A0D);
   border-color: var(--accent);
   font-weight: 700;
 }

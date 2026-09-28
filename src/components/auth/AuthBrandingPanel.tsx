@@ -15,7 +15,6 @@ export const AuthBrandingPanel: React.FC = () => {
         </div>
         <div className="branding-title-group">
           <span className="branding-app-name">AI Mock Interviewer</span>
-          <span className="branding-edition-tag">Enterprise SaaS</span>
         </div>
       </div>
 

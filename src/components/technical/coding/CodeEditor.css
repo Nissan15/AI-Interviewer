@@ -1,6 +1,6 @@
 .reusable-code-editor {
   display: flex;
-  background-color: #080A0D;
+  background-color: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   overflow: hidden;
@@ -19,7 +19,7 @@
 
 .editor-gutter {
   width: 44px;
-  background-color: #080A0D;
+  background-color: var(--surface-elevated);
   border-right: 1px solid var(--border-subtle);
   padding: 12px 0;
   display: flex;
@@ -36,7 +36,7 @@
   padding-right: 10px;
   font-size: 11px;
   font-family: var(--font-family-mono);
-  color: #4b5563;
+  color: var(--text-muted);
 }
 
 .editor-textarea-wrapper {
@@ -65,10 +65,10 @@
 }
 
 .editor-textarea::selection {
-  background-color: rgba(36, 222, 251, 0.25);
-  color: #ffffff;
+  background-color: var(--accent-subtle);
+  color: var(--text-primary);
 }
 
 .editor-textarea::placeholder {
-  color: #4b5563;
+  color: var(--text-muted);
 }

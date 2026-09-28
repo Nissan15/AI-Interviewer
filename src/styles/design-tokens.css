@@ -1,7 +1,8 @@
 :root {
   /* ==================================================
-     DARK NEUTRAL + CYAN TECHNICAL DESIGN SYSTEM
+     DARK NEUTRAL + CYAN TECHNICAL DESIGN SYSTEM (DEFAULT)
      ================================================== */
+  color-scheme: dark;
 
   /* Primary Theme Canvas & Surfaces */
   --background: #080A0D;
@@ -24,6 +25,7 @@
   --accent: #24DEFB;
   --accent-hover: #2CF0F8;
   --accent-dark: #107195;
+  --accent-contrast: #080A0D;
   --accent-subtle: rgba(36, 222, 251, 0.08);
   --accent-muted: rgba(36, 222, 251, 0.16);
   --accent-border: rgba(36, 222, 251, 0.28);
@@ -33,14 +35,17 @@
   --success: #39D98A;
   --success-subtle: rgba(57, 217, 138, 0.1);
   --success-border: rgba(57, 217, 138, 0.25);
+  --success-contrast: #080A0D;
 
   --warning: #F5C451;
   --warning-subtle: rgba(245, 196, 81, 0.1);
   --warning-border: rgba(245, 196, 81, 0.25);
+  --warning-contrast: #080A0D;
 
   --danger: #FF6B6B;
   --danger-subtle: rgba(255, 107, 107, 0.1);
   --danger-border: rgba(255, 107, 107, 0.25);
+  --danger-contrast: #FFFFFF;
 
   /* Subtle AI accent (optional, does not dominate) */
   --ai-accent: #9d8df1;
@@ -147,4 +152,114 @@
   /* Layout dimensions */
   --sidebar-width: 256px;
   --header-height: 56px;
+}
+
+/* ==================================================
+   LIGHT TECHNICAL DESIGN SYSTEM
+   ================================================== */
+[data-theme="light"],
+.theme-light {
+  color-scheme: light;
+
+  /* Primary Theme Canvas & Surfaces */
+  --background: #F8FAFC;
+  --surface: #FFFFFF;
+  --surface-elevated: #F1F5F9;
+  --surface-hover: #E2E8F0;
+
+  /* Thin Crisp Borders */
+  --border: #E2E8F0;
+  --border-subtle: #EEF2F6;
+  --border-hover: #CBD5E1;
+
+  /* High Contrast Typography */
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #64748B;
+  --text-inverse: #FFFFFF;
+
+  /* Primary Interaction Accent (Ocean Teal / Sky Cyan for Light BG) */
+  --accent: #0284C7;
+  --accent-hover: #0369A1;
+  --accent-dark: #075985;
+  --accent-contrast: #FFFFFF;
+  --accent-subtle: rgba(2, 132, 199, 0.08);
+  --accent-muted: rgba(2, 132, 199, 0.16);
+  --accent-border: rgba(2, 132, 199, 0.28);
+  --accent-glow: 0 0 16px rgba(2, 132, 199, 0.14);
+
+  /* Semantic Feedback Tokens */
+  --success: #16A34A;
+  --success-subtle: rgba(22, 163, 74, 0.1);
+  --success-border: rgba(22, 163, 74, 0.25);
+  --success-contrast: #FFFFFF;
+
+  --warning: #D97706;
+  --warning-subtle: rgba(217, 119, 6, 0.1);
+  --warning-border: rgba(217, 119, 6, 0.25);
+  --warning-contrast: #FFFFFF;
+
+  --danger: #DC2626;
+  --danger-subtle: rgba(220, 38, 38, 0.1);
+  --danger-border: rgba(220, 38, 38, 0.25);
+  --danger-contrast: #FFFFFF;
+
+  /* Subtle AI accent */
+  --ai-accent: #7C3AED;
+  --ai-subtle: rgba(124, 58, 237, 0.08);
+  --ai-border: rgba(124, 58, 237, 0.22);
+
+  /* System aliases */
+  --color-bg-canvas: var(--background);
+  --color-bg-surface: var(--surface);
+  --color-bg-elevated: var(--surface-elevated);
+  --color-bg-card: var(--surface);
+  --color-bg-card-hover: var(--surface-hover);
+  --color-bg-input: #FFFFFF;
+  --color-bg-overlay: rgba(15, 23, 42, 0.55);
+
+  --color-border-subtle: var(--border-subtle);
+  --color-border-default: var(--border);
+  --color-border-focus: var(--accent);
+  --color-border-hover: var(--border-hover);
+
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-text-inverse: var(--text-inverse);
+
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-active: var(--accent-dark);
+  --color-accent-subtle: var(--accent-subtle);
+  --color-accent-border: var(--accent-border);
+  --color-accent-glow: var(--accent-glow);
+
+  --color-success: var(--success);
+  --color-success-subtle: var(--success-subtle);
+  --color-success-border: var(--success-border);
+
+  --color-warning: var(--warning);
+  --color-warning-subtle: var(--warning-subtle);
+  --color-warning-border: var(--warning-border);
+
+  --color-error: var(--danger);
+  --color-error-subtle: var(--danger-subtle);
+  --color-error-border: var(--danger-border);
+
+  --color-info: var(--accent);
+  --color-info-subtle: var(--accent-subtle);
+  --color-info-border: var(--accent-border);
+
+  /* Elevation & Shadows in Light Mode */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+/* Explicit dark theme class when needed */
+[data-theme="dark"],
+.theme-dark {
+  color-scheme: dark;
 }

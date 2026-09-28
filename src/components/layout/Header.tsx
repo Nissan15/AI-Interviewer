@@ -2,6 +2,7 @@ import React from 'react';
 import { Menu, ShieldCheck, Cpu, LogOut, User as UserIcon } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { ThemeToggle } from '../common/ThemeToggle/ThemeToggle';
 import './Header.css';
 
 interface HeaderProps {
@@ -55,10 +56,11 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
       <div className="header-right">
         {/* Voice & AI Pipeline status pill: Green dot for ready, cyan AI indicator */}
         <div className="tech-status-pill pill-ai-ready" title="Continuous Speech & Internal AI Inference Active">
-          <span className="status-dot green-dot" />
-          <Cpu size={13} className="pill-cyan-icon" />
-          <span className="pill-text">Voice & AI Pipeline: Ready</span>
         </div>
+        
+        {/* Light / Dark Mode Toggle Button */}
+        <ThemeToggle size="md" />
+
         {user && (
           <div className="header-user-section">
             <div className="tech-status-pill pill-user" title={user.email || undefined}>

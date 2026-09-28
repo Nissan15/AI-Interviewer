@@ -7,13 +7,18 @@ import {
   Bot,
   Sliders,
   ShieldCheck,
+  Palette,
+  Moon,
+  Sun,
 } from "lucide-react";
 import { useSettings } from "../../context/SettingsContext";
+import { useTheme } from "../../context/ThemeContext";
 import { textToSpeechService } from "../../services/speech/textToSpeech";
 import { Button } from "../../components/common/Button/Button";
 import "./SettingsPage.css";
 
 export const SettingsPage: React.FC = () => {
+  const { theme, isDark, setTheme } = useTheme();
   const {
     autoSpeakQuestions,
     speechRate,
@@ -47,13 +52,58 @@ export const SettingsPage: React.FC = () => {
       <div className="settings-header">
         <h2 className="settings-title">Platform Preferences</h2>
         <p className="settings-subtitle">
-          Configure speech output, audio rate, and interviewer voice interaction
-          settings.
+          Configure appearance theme, speech output, audio rate, and interviewer voice interaction settings.
         </p>
       </div>
 
       <div className="settings-grid">
-        {/* Section 1: AI Platform Capability Status */}
+        {/* Section 1: Appearance & Theme */}
+        <div className="settings-card">
+          <div className="card-heading-row">
+            <Palette size={20} className="card-icon" />
+            <h3 className="card-heading">Appearance & Interface Theme</h3>
+          </div>
+
+          <p className="platform-info-desc">
+            Customize the platform aesthetic. Select dark mode for reduced eye strain during extended coding sessions or light mode for crisp daylight contrast.
+          </p>
+
+          <div className="theme-options-grid">
+            <button
+              type="button"
+              className={`theme-selection-card ${isDark ? 'selected' : ''}`}
+              onClick={() => setTheme('dark')}
+              aria-label="Switch to Dark Mode"
+            >
+              <div className="theme-card-icon-wrap dark-icon-wrap">
+                <Moon size={20} />
+              </div>
+              <div className="theme-card-text">
+                <span className="theme-card-title">Dark Mode</span>
+                <span className="theme-card-desc">Deep graphite & cyan technical glow</span>
+              </div>
+              {isDark && <span className="theme-active-tag">Active</span>}
+            </button>
+
+            <button
+              type="button"
+              className={`theme-selection-card ${!isDark ? 'selected' : ''}`}
+              onClick={() => setTheme('light')}
+              aria-label="Switch to Light Mode"
+            >
+              <div className="theme-card-icon-wrap light-icon-wrap">
+                <Sun size={20} />
+              </div>
+              <div className="theme-card-text">
+                <span className="theme-card-title">Light Mode</span>
+                <span className="theme-card-desc">Crisp slate & high-contrast daylight clarity</span>
+              </div>
+              {!isDark && <span className="theme-active-tag">Active</span>}
+            </button>
+          </div>
+        </div>
+
+        {/* Section 2: AI Platform Capability Status */}
         <div className="settings-card">
           <div className="card-heading-row">
             <Bot size={20} className="card-icon" />
@@ -97,7 +147,7 @@ export const SettingsPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Section 2: Speech & Voice Settings */}
+        {/* Section 3: Speech & Voice Settings */}
         <div className="settings-card">
           <div className="card-heading-row">
             <Volume2 size={20} className="card-icon" />

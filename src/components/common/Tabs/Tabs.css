@@ -87,7 +87,7 @@
 
 /* Variant: Buttons (Grouped) */
 .tabs-buttons {
-  background-color: #0b0e13;
+  background-color: var(--color-bg-input, var(--surface-elevated));
   padding: 3px;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-subtle);
@@ -122,5 +122,5 @@
 
 .tab-active .tab-badge {
   background-color: var(--accent);
-  color: #080A0D;
+  color: var(--accent-contrast, #080A0D);
 }

@@ -121,7 +121,7 @@
 }
 
 .error-trace {
-  background-color: #080A0D;
+  background-color: var(--danger-subtle);
   border: 1px solid var(--danger-border);
   border-radius: var(--radius-xs);
   padding: var(--space-2) var(--space-3);
@@ -193,7 +193,7 @@
 }
 
 .io-data {
-  background-color: #080A0D;
+  background-color: var(--color-bg-input, var(--surface-elevated));
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-xs);
   padding: 6px 10px;
