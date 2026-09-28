@@ -30,6 +30,9 @@
 .performance-card,
 .activity-card {
   margin-bottom: var(--space-6);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .performance-empty,
@@ -38,4 +41,215 @@
   background: transparent;
   padding: var(--space-6) var(--space-4);
   margin: 0;
+}
+
+/* Activity Items List */
+.activity-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 380px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.activity-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 12px;
+  background: rgba(30, 41, 59, 0.35);
+  border: 1px solid var(--border-color, #1e293b);
+  border-radius: 10px;
+  transition: all 0.2s ease;
+}
+
+.activity-item:hover {
+  background: rgba(30, 41, 59, 0.6);
+  border-color: rgba(99, 102, 241, 0.3);
+}
+
+.activity-icon-bubble {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.icon-bubble-assessment {
+  background: rgba(168, 85, 247, 0.15);
+  color: #c084fc;
+}
+
+.icon-bubble-coding {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+}
+
+.icon-bubble-interview {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+}
+
+.icon-bubble-resume {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+}
+
+.icon-bubble-general {
+  background: rgba(148, 163, 184, 0.15);
+  color: #94a3b8;
+}
+
+.activity-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.activity-top-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.activity-title {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--color-text-primary, #f8fafc);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.activity-time {
+  font-size: 0.72rem;
+  color: var(--color-text-muted, #64748b);
+  white-space: nowrap;
+}
+
+.activity-desc {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary, #94a3b8);
+  margin: 3px 0 0;
+  line-height: 1.35;
+}
+
+/* Performance Analytics Live Card */
+.performance-live-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: 100%;
+}
+
+.perf-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.perf-stat-box {
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid var(--border-color, #1e293b);
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.perf-stat-label {
+  font-size: 0.7rem;
+  color: var(--color-text-muted, #94a3b8);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.perf-stat-num {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-text-primary, #f8fafc);
+}
+
+.perf-domains-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: rgba(30, 41, 59, 0.25);
+  border: 1px solid var(--border-color, #1e293b);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+
+.domain-bar-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.domain-bar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.82rem;
+}
+
+.domain-name {
+  color: var(--color-text-secondary, #cbd5e1);
+  font-weight: 500;
+}
+
+.domain-score {
+  font-weight: 600;
+  color: var(--color-text-primary, #f8fafc);
+}
+
+.domain-bar-track {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.domain-bar-fill {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.6s ease;
+}
+
+.fill-aptitude {
+  background: linear-gradient(90deg, #c084fc, #a855f7);
+}
+
+.fill-technical {
+  background: linear-gradient(90deg, #60a5fa, #3b82f6);
+}
+
+.fill-coding {
+  background: linear-gradient(90deg, #34d399, #10b981);
+}
+
+.fill-interview {
+  background: linear-gradient(90deg, #fbbf24, #f59e0b);
+}
+
+.perf-card-footer {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 10px;
+}
+
+.isolation-verified-text {
+  font-size: 0.75rem;
+  color: #10b981;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }

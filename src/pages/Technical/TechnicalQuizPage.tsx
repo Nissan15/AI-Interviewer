@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { HelpCircle, RefreshCw, Filter, CheckCircle2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { HelpCircle, Filter, CheckCircle2, ShieldCheck, LayoutDashboard } from 'lucide-react';
 import { TechnicalQuestion, TechnicalCategory, QuizResult } from '../../types/technical';
 import { technicalApi } from '../../services/api/technicalApi';
+import { assessmentService } from '../../services/assessments/assessmentService';
+import { useAuth } from '../../hooks/useAuth';
 import { TECHNICAL_CATEGORIES } from '../../constants/technicalCategories';
 import { QuizQuestionCard } from '../../components/technical/quiz/QuizQuestionCard';
 import { QuestionNavigation } from '../../components/technical/quiz/QuestionNavigation';
@@ -13,6 +16,9 @@ import { Button } from '../../components/common/Button/Button';
 import './TechnicalQuizPage.css';
 
 export const TechnicalQuizPage: React.FC = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
   const [selectedCategory, setSelectedCategory] = useState<TechnicalCategory>('Programming');
   const [questions, setQuestions] = useState<TechnicalQuestion[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -22,18 +28,19 @@ export const TechnicalQuizPage: React.FC = () => {
   const [timeRemainingSeconds, setTimeRemainingSeconds] = useState<number>(1200); // 20 mins
   const [quizSubmitted, setQuizSubmitted] = useState<boolean>(false);
   const [quizResult, setQuizResult] = useState<QuizResult | null>(null);
+  const [reportSaved, setReportSaved] = useState<boolean>(false);
 
   const fetchQuestions = async () => {
     setLoading(true);
     try {
       const data = await technicalApi.getQuizQuestions(selectedCategory);
-      // Data is initially empty [] (Zero sample data guarantee!)
       setQuestions(data);
       setCurrentIndex(0);
       setAnswers({});
       setMarkedForReview([]);
       setQuizSubmitted(false);
       setQuizResult(null);
+      setReportSaved(false);
     } catch (err) {
       setQuestions([]);
     } finally {
@@ -62,23 +69,57 @@ export const TechnicalQuizPage: React.FC = () => {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      const result = await technicalApi.submitQuiz({
-        testId: `quiz_${Date.now()}`,
-        category: selectedCategory,
-        answers,
-        markedForReview,
-        timeSpentSeconds: 1200 - timeRemainingSeconds,
-      });
+      const result = await technicalApi.submitQuiz(
+        {
+          testId: `quiz_${Date.now()}`,
+          category: selectedCategory,
+          answers,
+          markedForReview,
+          timeSpentSeconds: 1200 - timeRemainingSeconds,
+        },
+        questions
+      );
+
       setQuizResult(result);
       setQuizSubmitted(true);
+
+      // Persist report strictly for current user
+      if (user) {
+        const breakdown = questions.map((q) => ({
+          questionId: q.id,
+          selectedAnswer: answers[q.id] !== undefined ? answers[q.id] : -1,
+          isCorrect: answers[q.id] === q.correctOptionIndex,
+        }));
+
+        await assessmentService.saveAssessmentReport(user.id, {
+          assessmentType: 'technical',
+          title: `${selectedCategory} Technical Assessment`,
+          category: selectedCategory,
+          score: result.score,
+          totalQuestions: result.totalQuestions,
+          correctAnswers: result.correctAnswers,
+          incorrectAnswers: result.incorrectAnswers,
+          skippedAnswers: result.skippedAnswers,
+          accuracy: result.accuracy,
+          timeSpentSeconds: result.timeSpentSeconds,
+          reportData: {
+            category: selectedCategory,
+            answers,
+            markedForReview,
+            completedAt: result.completedAt,
+          },
+          answersBreakdown: breakdown,
+        });
+
+        setReportSaved(true);
+      }
     } catch (err) {
-      // In case backend is offline, calculate score from active questions
       let correct = 0;
       questions.forEach((q) => {
         if (answers[q.id] === q.correctOptionIndex) correct++;
       });
-      setQuizResult({
-        score: Math.round((correct / questions.length) * 100),
+      const fallbackResult: QuizResult = {
+        score: Math.round((correct / (questions.length || 1)) * 100),
         totalQuestions: questions.length,
         correctAnswers: correct,
         incorrectAnswers: Object.keys(answers).length - correct,
@@ -87,8 +128,25 @@ export const TechnicalQuizPage: React.FC = () => {
         timeSpentSeconds: 1200 - timeRemainingSeconds,
         category: selectedCategory,
         completedAt: new Date().toISOString(),
-      });
+      };
+      setQuizResult(fallbackResult);
       setQuizSubmitted(true);
+
+      if (user) {
+        await assessmentService.saveAssessmentReport(user.id, {
+          assessmentType: 'technical',
+          title: `${selectedCategory} Technical Assessment`,
+          category: selectedCategory,
+          score: fallbackResult.score,
+          totalQuestions: fallbackResult.totalQuestions,
+          correctAnswers: fallbackResult.correctAnswers,
+          incorrectAnswers: fallbackResult.incorrectAnswers,
+          skippedAnswers: fallbackResult.skippedAnswers,
+          accuracy: fallbackResult.accuracy,
+          timeSpentSeconds: fallbackResult.timeSpentSeconds,
+        });
+        setReportSaved(true);
+      }
     } finally {
       setLoading(false);
     }
@@ -129,16 +187,16 @@ export const TechnicalQuizPage: React.FC = () => {
 
       {loading ? (
         <LoadingState
-          message="Querying technical question bank..."
-          subMessage="Connecting to /api/technical/questions"
+          message="Loading technical questions..."
+          subMessage="Connecting to question repository"
         />
       ) : questions.length === 0 ? (
-        /* Zero Sample Data Empty State */
+        /* Empty State */
         <EmptyState
           icon={<HelpCircle size={32} />}
-          badge="Empty Question Bank"
+          badge="Question Bank"
           title="No questions available yet"
-          description={`There are currently no technical questions available for the ${selectedCategory} category. Connect your backend API at /api/technical/questions to fetch real assessment items.`}
+          description={`There are currently no technical questions available for the ${selectedCategory} category.`}
           actionText="Refresh Question Bank"
           onAction={fetchQuestions}
         />
@@ -150,6 +208,28 @@ export const TechnicalQuizPage: React.FC = () => {
           <p className="result-subtitle">
             Category: {quizResult.category} | Accuracy: {quizResult.accuracy}%
           </p>
+
+          {reportSaved && user && (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              backgroundColor: 'rgba(16, 185, 129, 0.1)',
+              border: '1px solid rgba(16, 185, 129, 0.3)',
+              borderRadius: '8px',
+              padding: '10px 16px',
+              margin: '12px auto 20px',
+              maxWidth: '520px',
+              fontSize: '0.88rem',
+              color: 'var(--text-primary)',
+            }}>
+              <ShieldCheck size={20} style={{ color: '#10b981', flexShrink: 0 }} />
+              <span>
+                Assessment report stored in database &amp; isolated to candidate: <strong>{user.email}</strong>
+              </span>
+            </div>
+          )}
+
           <div className="result-stats-grid">
             <div className="stat-box">
               <span className="stat-label">Total Questions</span>
@@ -168,9 +248,19 @@ export const TechnicalQuizPage: React.FC = () => {
               <span className="stat-num text-accent">{quizResult.score}%</span>
             </div>
           </div>
-          <Button variant="primary" onClick={fetchQuestions}>
-            Retake Assessment
-          </Button>
+
+          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', marginTop: '16px' }}>
+            <Button variant="secondary" onClick={fetchQuestions}>
+              Retake Assessment
+            </Button>
+            <Button
+              variant="primary"
+              leftIcon={<LayoutDashboard size={16} />}
+              onClick={() => navigate('/dashboard')}
+            >
+              View on Dashboard
+            </Button>
+          </div>
         </div>
       ) : (
         /* Active Quiz Interface */
@@ -178,34 +268,58 @@ export const TechnicalQuizPage: React.FC = () => {
           <div className="quiz-main-column">
             <ProgressBar
               value={progressPercentage}
-              label={`Progress (${answeredCount}/${questions.length} Answered)`}
-              showPercentage
+              label={`Answered ${answeredCount} of ${questions.length}`}
+              size="md"
             />
 
-            <QuizQuestionCard
-              question={questions[currentIndex]}
-              questionNumber={currentIndex + 1}
-              totalQuestions={questions.length}
-              selectedOption={answers[questions[currentIndex].id]}
-              isMarkedForReview={markedForReview.includes(questions[currentIndex].id)}
-              onSelectOption={handleSelectOption}
-              onToggleReview={handleToggleReview}
-              onPrevious={() => setCurrentIndex((prev) => Math.max(0, prev - 1))}
-              onNext={() => setCurrentIndex((prev) => Math.min(questions.length - 1, prev + 1))}
-              hasPrevious={currentIndex > 0}
-              hasNext={currentIndex < questions.length - 1}
-              onSubmit={handleSubmit}
-            />
+            {questions[currentIndex] && (
+              <QuizQuestionCard
+                question={questions[currentIndex]}
+                questionIndex={currentIndex}
+                totalQuestions={questions.length}
+                selectedOption={answers[questions[currentIndex].id]}
+                isMarkedForReview={markedForReview.includes(questions[currentIndex].id)}
+                onSelectOption={handleSelectOption}
+                onToggleReview={handleToggleReview}
+              />
+            )}
+
+            <div className="quiz-action-bar">
+              <Button
+                variant="secondary"
+                disabled={currentIndex === 0}
+                onClick={() => setCurrentIndex((prev) => Math.max(0, prev - 1))}
+              >
+                Previous Question
+              </Button>
+
+              <div className="quiz-right-actions">
+                {currentIndex < questions.length - 1 ? (
+                  <Button
+                    variant="primary"
+                    onClick={() => setCurrentIndex((prev) => Math.min(questions.length - 1, prev + 1))}
+                  >
+                    Next Question
+                  </Button>
+                ) : (
+                  <Button variant="primary" onClick={handleSubmit}>
+                    Submit Assessment
+                  </Button>
+                )}
+              </div>
+            </div>
           </div>
 
-          <div className="quiz-side-column">
+          {/* Question Navigation Drawer/Grid */}
+          <div className="quiz-sidebar-column">
             <QuestionNavigation
               totalQuestions={questions.length}
               currentIndex={currentIndex}
               answers={answers}
               questionIds={questions.map((q) => q.id)}
               markedForReview={markedForReview}
-              onSelectQuestion={(idx) => setCurrentIndex(idx)}
+              onSelectQuestion={(index) => setCurrentIndex(index)}
+              onNavigate={(index) => setCurrentIndex(index)}
             />
           </div>
         </div>

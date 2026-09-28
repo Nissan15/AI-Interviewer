@@ -6,6 +6,7 @@ import {
 } from '../types/resume';
 import { useAuth } from '../hooks/useAuth';
 import { resumeService } from '../services/resumes/resumeService';
+import { activityService } from '../services/activity/activityService';
 
 interface ResumeContextValue {
   resume: ParsedResume | null;
@@ -109,6 +110,17 @@ export const ResumeProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         parsed,
         profile
       );
+
+      // 4. Log user activity strictly under this candidate's userId
+      await activityService.logActivity(user.id, {
+        activity_type: 'resume_uploaded',
+        title: 'Resume Analyzed & Profile Created',
+        description: `Analyzed "${file.name}" - ${profile.skills ? Object.values(profile.skills).flat().length : 0} skills detected.`,
+        metadata: {
+          fileName: file.name,
+          candidateName: profile.candidateName,
+        },
+      });
     } catch (err) {
       console.warn('Could not persist resume to Supabase:', err);
     }

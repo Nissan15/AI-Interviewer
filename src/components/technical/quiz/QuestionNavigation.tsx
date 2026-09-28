@@ -4,20 +4,27 @@ import './QuestionNavigation.css';
 interface QuestionNavigationProps {
   totalQuestions: number;
   currentIndex: number;
-  answers: Record<string, number>;
-  questionIds: string[];
-  markedForReview: string[];
-  onSelectQuestion: (index: number) => void;
+  answers?: Record<string, number>;
+  questionIds?: string[];
+  markedForReview?: string[];
+  onSelectQuestion?: (index: number) => void;
+  onNavigate?: (index: number) => void;
 }
 
 export const QuestionNavigation: React.FC<QuestionNavigationProps> = ({
   totalQuestions,
   currentIndex,
-  answers,
-  questionIds,
-  markedForReview,
+  answers = {},
+  questionIds = [],
+  markedForReview = [],
   onSelectQuestion,
+  onNavigate,
 }) => {
+  const handleSelect = (idx: number) => {
+    if (onSelectQuestion) onSelectQuestion(idx);
+    else if (onNavigate) onNavigate(idx);
+  };
+
   return (
     <div className="quiz-nav-sidebar">
       <div className="quiz-nav-header">
@@ -45,7 +52,7 @@ export const QuestionNavigation: React.FC<QuestionNavigationProps> = ({
 
       <div className="question-grid">
         {Array.from({ length: totalQuestions }).map((_, idx) => {
-          const qId = questionIds[idx];
+          const qId = questionIds?.[idx] || `q_${idx}`;
           const isCurrent = idx === currentIndex;
           const isAnswered = answers[qId] !== undefined;
           const isReview = markedForReview.includes(qId);
@@ -60,7 +67,7 @@ export const QuestionNavigation: React.FC<QuestionNavigationProps> = ({
               key={idx}
               type="button"
               className={`grid-num-btn btn-${statusClass}`}
-              onClick={() => onSelectQuestion(idx)}
+              onClick={() => handleSelect(idx)}
               aria-label={`Jump to question ${idx + 1}`}
             >
               {idx + 1}

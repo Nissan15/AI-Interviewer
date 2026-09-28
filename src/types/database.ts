@@ -220,6 +220,41 @@ export type LearningRecommendationRecord = {
   created_at: string;
 };
 
+export type UserActivity = {
+  id: string;
+  user_id: string;
+  activity_type:
+    | 'assessment_completed'
+    | 'quiz_completed'
+    | 'coding_submitted'
+    | 'interview_started'
+    | 'interview_completed'
+    | 'resume_uploaded'
+    | 'profile_updated';
+  title: string;
+  description: string;
+  metadata: Json | null;
+  created_at: string;
+};
+
+export type AssessmentReport = {
+  id: string;
+  user_id: string;
+  attempt_id: string | null;
+  assessment_type: 'aptitude' | 'technical' | 'coding' | 'interview';
+  title: string;
+  category: string;
+  score: number;
+  total_questions: number;
+  correct_answers: number;
+  incorrect_answers: number;
+  skipped_answers: number;
+  accuracy: number;
+  time_spent_seconds: number;
+  report_data: Json | null;
+  created_at: string;
+};
+
 export type Database = {
   public: {
     Tables: {
@@ -564,6 +599,58 @@ export type Database = {
         Insert: Partial<LearningRecommendationRecord> & { user_id: string; current_skill: string; weak_area: string; recommended_topic: string; practice_task: string; mock_test_focus: string; reassessment_criteria: string };
         Update: Partial<LearningRecommendationRecord>;
         Relationships: [];
+      };
+      user_activities: {
+        Row: UserActivity;
+        Insert: {
+          id?: string;
+          user_id: string;
+          activity_type: string;
+          title: string;
+          description: string;
+          metadata?: Json | null;
+          created_at?: string;
+        };
+        Update: Partial<UserActivity>;
+        Relationships: [
+          {
+            foreignKeyName: 'user_activities_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'users';
+            referencedColumns: ['id'];
+          }
+        ];
+      };
+      assessment_reports: {
+        Row: AssessmentReport;
+        Insert: {
+          id?: string;
+          user_id: string;
+          attempt_id?: string | null;
+          assessment_type: string;
+          title: string;
+          category: string;
+          score: number;
+          total_questions?: number;
+          correct_answers?: number;
+          incorrect_answers?: number;
+          skipped_answers?: number;
+          accuracy?: number;
+          time_spent_seconds?: number;
+          report_data?: Json | null;
+          created_at?: string;
+        };
+        Update: Partial<AssessmentReport>;
+        Relationships: [
+          {
+            foreignKeyName: 'assessment_reports_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'users';
+            referencedColumns: ['id'];
+          }
+        ];
       };
     };
     Views: Record<string, never>;

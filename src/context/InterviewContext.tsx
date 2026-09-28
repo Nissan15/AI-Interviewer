@@ -14,6 +14,8 @@ import { useResume } from './ResumeContext';
 import { useSettings } from './SettingsContext';
 import { useAuth } from '../hooks/useAuth';
 import { interviewService } from '../services/interviews/interviewService';
+import { assessmentService } from '../services/assessments/assessmentService';
+import { activityService } from '../services/activity/activityService';
 
 interface InterviewContextValue {
   session: InterviewSession | null;
@@ -371,6 +373,33 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           );
           setLearningPath((evaluation as any).learningPathSuggestions);
         }
+
+        // Persist unified assessment report for this candidate
+        await assessmentService.saveAssessmentReport(user.id, {
+          assessmentType: 'interview',
+          title: `AI Mock Interview (${(activeSession?.config?.type || 'General').toUpperCase()})`,
+          category: `${activeSession?.config?.type || 'General'} Round`,
+          score: evaluation.overallScore,
+          totalQuestions: exchangesRef.current.length || 1,
+          correctAnswers: exchangesRef.current.length || 1,
+          incorrectAnswers: 0,
+          accuracy: evaluation.overallScore,
+          timeSpentSeconds: durationSeconds,
+          reportData: {
+            sessionId: dbSessionIdRef.current || activeSession?.id,
+            interviewType: activeSession?.config?.type,
+            difficulty: activeSession?.config?.difficulty,
+            communicationScore: evaluation.communicationScore,
+            technicalScore: evaluation.technicalScore,
+            relevanceScore: evaluation.relevanceScore,
+            clarityScore: evaluation.clarityScore,
+            confidenceScore: evaluation.confidenceScore,
+            overallFeedback: evaluation.overallFeedback,
+            strengths: evaluation.strengths,
+            improvements: evaluation.improvements,
+            completedAt: new Date().toISOString(),
+          },
+        });
       }
 
       return evaluation;
