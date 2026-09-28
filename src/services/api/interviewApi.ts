@@ -37,7 +37,6 @@ export const interviewApi = {
   },
 
   getHistory: async (): Promise<InterviewSession[]> => {
-    // Zero sample data: returns empty array initially
     return ApiClient.get<InterviewSession[]>('/interview/history', []);
   },
 };

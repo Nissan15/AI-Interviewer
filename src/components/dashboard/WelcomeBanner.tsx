@@ -47,15 +47,6 @@ export const WelcomeBanner: React.FC = () => {
           </Link>
         </div>
       </div>
-      <div className="welcome-badge-col">
-        <div className="banner-metric-pill">
-          <ShieldCheck size={18} className="pill-icon" />
-          <div className="pill-text">
-            <span className="pill-title">Zero Sample Data Guarantee</span>
-            <span className="pill-desc">Real APIs & Speech Pipeline Ready</span>
-          </div>
-        </div>
-      </div>
     </div>
   );
 };

@@ -107,7 +107,7 @@ export const ResumeUploader: React.FC<ResumeUploaderProps> = ({ onSuccess }) => 
               ? 'Analyzing candidate resume with AI...'
               : isUploading
               ? 'Uploading resume document...'
-              : 'Upload your resume'}
+              : 'Upload your Resume / CV'}
           </h4>
 
           <p className="drop-description">

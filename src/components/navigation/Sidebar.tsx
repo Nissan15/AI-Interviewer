@@ -171,11 +171,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNavClick }) => {
         )}
 
         <div className="system-status-indicator">
-          <span className="status-dot-pulse" />
-          <div className="status-text-group">
-            <span className="status-label">System Architecture</span>
-            <span className="status-sub">Zero Sample Data Active</span>
-          </div>
         </div>
       </div>
     </aside>

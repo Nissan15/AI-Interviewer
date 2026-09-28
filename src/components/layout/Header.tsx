@@ -59,14 +59,6 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
           <Cpu size={13} className="pill-cyan-icon" />
           <span className="pill-text">Voice & AI Pipeline: Ready</span>
         </div>
-
-        {/* Zero Sample Data Mode pill */}
-        <div className="tech-status-pill pill-zero-data" title="Zero Hardcoded Mock Data Mode Active">
-          <ShieldCheck size={13} className="pill-green-icon" />
-          <span className="pill-text">Zero Sample Data Mode</span>
-        </div>
-
-        {/* User profile pill & Sign Out */}
         {user && (
           <div className="header-user-section">
             <div className="tech-status-pill pill-user" title={user.email || undefined}>

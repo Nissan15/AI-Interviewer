@@ -72,12 +72,6 @@ export const AuthBrandingPanel: React.FC = () => {
           </div>
         </div>
       </div>
-
-      {/* Bottom Security / Architecture Note */}
-      <div className="branding-footer-badge">
-        <ShieldCheck size={16} className="badge-shield-icon" />
-        <span>Strict Zero Sample Data Guarantee & Encrypted Sessions</span>
-      </div>
     </div>
   );
 };
