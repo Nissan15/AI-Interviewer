@@ -99,12 +99,6 @@ export const AssessmentReportsModal: React.FC<AssessmentReportsModalProps> = ({
           <div className="reports-modal-title-row">
             <Award size={20} className="text-accent" />
             <h3 className="reports-modal-title">My Assessment Reports</h3>
-            {user && (
-              <span className="reports-isolation-pill">
-                <ShieldCheck size={14} />
-                <span>Isolated to: {user.email}</span>
-              </span>
-            )}
           </div>
 
           <button

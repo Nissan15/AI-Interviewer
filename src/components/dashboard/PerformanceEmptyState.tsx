@@ -61,7 +61,7 @@ export const PerformanceEmptyState: React.FC = () => {
             </div>
             <span className="analytics-notice">
               {hasData ? (
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: '#10b981' }}>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: 'var(--success)' }}>
                   <ShieldCheck size={13} />
                   <span>{summary.totalAssessments} Reports Stored</span>
                 </span>
@@ -73,7 +73,7 @@ export const PerformanceEmptyState: React.FC = () => {
         }
       >
         {loading ? (
-          <div style={{ padding: '30px', textAlign: 'center', color: 'var(--color-text-muted)' }}>
+          <div style={{ padding: '30px', textAlign: 'center', color: 'var(--text-muted)' }}>
             <p style={{ fontSize: '0.85rem' }}>Loading candidate analytics...</p>
           </div>
         ) : !hasData ? (
@@ -93,13 +93,13 @@ export const PerformanceEmptyState: React.FC = () => {
               </div>
               <div className="perf-stat-box">
                 <span className="perf-stat-label">Avg Score</span>
-                <span className="perf-stat-num" style={{ color: '#818cf8' }}>
+                <span className="perf-stat-num perf-stat-avg">
                   {summary.averageScore}%
                 </span>
               </div>
               <div className="perf-stat-box">
                 <span className="perf-stat-label">Best Score</span>
-                <span className="perf-stat-num" style={{ color: '#10b981' }}>
+                <span className="perf-stat-num perf-stat-best">
                   {summary.highestScore}%
                 </span>
               </div>

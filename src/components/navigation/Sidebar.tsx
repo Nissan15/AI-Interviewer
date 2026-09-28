@@ -15,7 +15,6 @@ import {
 } from 'lucide-react';
 import { NAV_ITEMS, NavItemConfig } from '../../constants/navigation';
 import { useAuth } from '../../hooks/useAuth';
-import { ThemeToggle } from '../common/ThemeToggle/ThemeToggle';
 import './Sidebar.css';
 
 interface SidebarProps {
@@ -141,14 +140,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNavClick }) => {
         })}
       </nav>
 
-      {/* Candidate Profile, Theme Switcher & Sign Out Footer */}
+      {/* Candidate Profile & Sign Out Footer */}
       <div className="sidebar-footer">
-        {/* Quick Theme Toggle Row */}
-        <div className="sidebar-theme-row">
-          <span className="sidebar-theme-label">Appearance</span>
-          <ThemeToggle size="sm" variant="pill" />
-        </div>
-
         {user && (
           <div className="sidebar-user-card">
             <div className="sidebar-user-info">

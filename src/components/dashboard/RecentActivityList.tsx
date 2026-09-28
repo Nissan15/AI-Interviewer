@@ -99,16 +99,14 @@ export const RecentActivityList: React.FC = () => {
             <History size={18} className="header-icon" />
             <h3 className="section-title">Recent Activity</h3>
           </div>
-          <span className="analytics-notice">
-            {user ? (
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: '#10b981' }}>
+          {user && (
+            <span className="analytics-notice">
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: 'var(--success)' }}>
                 <ShieldCheck size={13} />
                 <span>Isolated: {user.email?.split('@')[0]}</span>
               </span>
-            ) : (
-              'Live Session Log'
-            )}
-          </span>
+            </span>
+          )}
         </div>
       }
     >
