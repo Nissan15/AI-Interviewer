@@ -121,7 +121,7 @@ export const RecentActivityList: React.FC = () => {
         <EmptyState
           icon={<Sparkles size={28} />}
           title="No activity yet"
-          description="Your test attempts, coding submissions, and interview sessions will be recorded here once you begin."
+          description="Your test attempts, quiz submissions, and interview sessions will be recorded here once you begin."
           className="activity-empty"
         />
       ) : (

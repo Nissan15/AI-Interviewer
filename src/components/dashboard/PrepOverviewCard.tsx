@@ -19,14 +19,14 @@ export const PrepOverviewCard: React.FC = () => {
   // STRICT ZERO SAMPLE DATA: attempts initially 0, lastScore initially null
   const prepModules: PrepCardConfig[] = [
     {
-      title: 'Technical Assessment',
-      category: 'Quiz & Coding',
+      title: 'Technical Quiz',
+      category: 'Core CS Quiz',
       icon: <Code2 size={24} className="module-icon technical" />,
       attemptCount: 0,
       lastScore: null,
-      linkTo: '/technical',
-      actionText: 'Start Test',
-      description: 'Computer science fundamentals MCQs and algorithm challenge sandbox.',
+      linkTo: '/technical/quiz',
+      actionText: 'Start Quiz',
+      description: 'Computer science fundamentals MCQs across Data Structures, Algorithms, DBMS, and OS.',
     },
     {
       title: 'Aptitude Assessment',

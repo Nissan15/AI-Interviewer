@@ -122,12 +122,6 @@ export const AssessmentReportsModal: React.FC<AssessmentReportsModalProps> = ({
             Technical ({reports.filter((r) => r.assessment_type === 'technical').length})
           </button>
           <button
-            className={`reports-tab-btn ${activeTab === 'coding' ? 'active' : ''}`}
-            onClick={() => setActiveTab('coding')}
-          >
-            Coding ({reports.filter((r) => r.assessment_type === 'coding').length})
-          </button>
-          <button
             className={`reports-tab-btn ${activeTab === 'interview' ? 'active' : ''}`}
             onClick={() => setActiveTab('interview')}
           >
@@ -149,7 +143,7 @@ export const AssessmentReportsModal: React.FC<AssessmentReportsModalProps> = ({
                 No assessment reports in this category
               </h4>
               <p style={{ fontSize: '0.85rem', maxWidth: '380px' }}>
-                Complete an aptitude test, technical quiz, coding challenge, or mock interview to have your detailed report stored here.
+                Complete an aptitude test, technical quiz, or mock interview to have your detailed report stored here.
               </p>
             </div>
           ) : (

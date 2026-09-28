@@ -27,7 +27,7 @@ export const WelcomeBanner: React.FC = () => {
         </div>
         <h2 className="welcome-title">{headingText}</h2>
         <p className="welcome-subtitle">
-          Practice technical quiz assessments, interactive coding challenges, aptitude tests, and
+          Practice technical quiz assessments, aptitude tests, and
           live AI-driven HR voice interviews in a realistic enterprise environment.
         </p>
         <div className="welcome-actions">
@@ -40,9 +40,9 @@ export const WelcomeBanner: React.FC = () => {
               Start AI HR Interview
             </Button>
           </Link>
-          <Link to="/technical">
+          <Link to="/technical/quiz">
             <Button variant="secondary" size="md">
-              Explore Technical Tests
+              Explore Technical Quiz
             </Button>
           </Link>
         </div>

@@ -139,19 +139,6 @@ export const PerformanceEmptyState: React.FC = () => {
 
               <div className="domain-bar-row">
                 <div className="domain-bar-header">
-                  <span className="domain-name">Coding Sandbox</span>
-                  <span className="domain-score">{summary.codingAverage || 0}%</span>
-                </div>
-                <div className="domain-bar-track">
-                  <div
-                    className="domain-bar-fill fill-coding"
-                    style={{ width: `${Math.min(100, summary.codingAverage || 0)}%` }}
-                  ></div>
-                </div>
-              </div>
-
-              <div className="domain-bar-row">
-                <div className="domain-bar-header">
                   <span className="domain-name">AI Mock Interview</span>
                   <span className="domain-score">{summary.interviewAverage || 0}%</span>
                 </div>

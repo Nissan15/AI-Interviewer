@@ -7,9 +7,7 @@ import { Signup } from '../pages/auth/Signup';
 import { ForgotPassword } from '../pages/auth/ForgotPassword';
 import { ResetPassword } from '../pages/auth/ResetPassword';
 import { DashboardPage } from '../pages/Dashboard/DashboardPage';
-import { TechnicalLandingPage } from '../pages/Technical/TechnicalLandingPage';
 import { TechnicalQuizPage } from '../pages/Technical/TechnicalQuizPage';
-import { CodingPage } from '../pages/Technical/CodingPage';
 import { AptitudePage } from '../pages/Aptitude/AptitudePage';
 import { HRRoundPage } from '../pages/HR/HRRoundPage';
 import { SettingsPage } from '../pages/Settings/SettingsPage';
@@ -49,9 +47,9 @@ export const AppRoutes: React.FC = () => {
         <Route element={<AppLayout />}>
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/technical" element={<TechnicalLandingPage />} />
+          <Route path="/technical" element={<Navigate to="/technical/quiz" replace />} />
           <Route path="/technical/quiz" element={<TechnicalQuizPage />} />
-          <Route path="/technical/coding" element={<CodingPage />} />
+          <Route path="/technical/coding" element={<Navigate to="/technical/quiz" replace />} />
           <Route path="/aptitude" element={<AptitudePage />} />
           <Route path="/hr" element={<HRRoundPage />} />
           <Route path="/settings" element={<SettingsPage />} />

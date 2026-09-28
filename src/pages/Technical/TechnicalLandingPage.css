@@ -29,6 +29,11 @@
   margin-bottom: var(--space-6);
 }
 
+.tech-options-grid.single-option {
+  grid-template-columns: 1fr;
+  max-width: 680px;
+}
+
 .tech-card {
   padding: var(--space-6);
   display: flex;

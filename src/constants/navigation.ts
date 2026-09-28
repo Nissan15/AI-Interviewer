@@ -17,21 +17,9 @@ export const NAV_ITEMS: NavItemConfig[] = [
     iconName: 'LayoutDashboard',
   },
   {
-    label: 'Technical Test',
-    path: '/technical',
+    label: 'Technical Quiz',
+    path: '/technical/quiz',
     iconName: 'Code2',
-    children: [
-      {
-        label: 'Technical Quiz',
-        path: '/technical/quiz',
-        description: 'MCQ assessment across core computer science subjects',
-      },
-      {
-        label: 'Coding Sandbox',
-        path: '/technical/coding',
-        description: 'Hands-on algorithm coding challenges with live runner',
-      },
-    ],
   },
   {
     label: 'Aptitude Test',
