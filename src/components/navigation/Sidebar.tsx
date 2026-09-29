@@ -25,9 +25,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNavClick }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, profile, logout } = useAuth();
-  const [technicalExpanded, setTechnicalExpanded] = useState<boolean>(
-    location.pathname.startsWith('/technical')
-  );
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({
+    '/technical': location.pathname.startsWith('/technical'),
+  });
+
+  const toggleGroup = (path: string) => {
+    setExpandedGroups((prev) => ({
+      ...prev,
+      [path]: !prev[path],
+    }));
+  };
 
   const handleLogout = async () => {
     await logout();
@@ -77,36 +84,29 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNavClick }) => {
         {NAV_ITEMS.map((item) => {
           if (item.children) {
             const isChildActive = location.pathname.startsWith(item.path);
+            const isExpanded = Boolean(expandedGroups[item.path]);
 
             return (
               <div key={item.path} className="nav-group">
                 <button
                   type="button"
                   className={`nav-item nav-parent-btn ${isChildActive ? 'parent-active' : ''}`}
-                  onClick={() => setTechnicalExpanded(!technicalExpanded)}
+                  onClick={() => toggleGroup(item.path)}
                 >
                   <span className="nav-icon">{renderIcon(item.iconName)}</span>
                   <span className="nav-label">{item.label}</span>
                   <span className="nav-arrow">
-                    {technicalExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                    {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
                   </span>
                 </button>
 
-                {technicalExpanded && (
+                {isExpanded && (
                   <div className="nav-sub-list">
-                    <NavLink
-                      to="/technical"
-                      end
-                      className={({ isActive }) => `nav-sub-item ${isActive ? 'sub-active' : ''}`}
-                      onClick={onNavClick}
-                    >
-                      <span className="sub-dot" />
-                      Overview
-                    </NavLink>
                     {item.children.map((subItem) => (
                       <NavLink
                         key={subItem.path}
                         to={subItem.path}
+                        end={subItem.path === item.path}
                         className={({ isActive }) => `nav-sub-item ${isActive ? 'sub-active' : ''}`}
                         onClick={onNavClick}
                       >

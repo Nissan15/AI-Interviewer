@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { History, Sparkles, Brain, Code2, Users, FileText, CheckCircle2, ShieldCheck } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { History, Sparkles, Brain, Code2, Users, FileText, CheckCircle2, ShieldCheck, ArrowRight } from 'lucide-react';
 import { Card } from '../common/Card/Card';
 import { EmptyState } from '../common/EmptyState/EmptyState';
 import { UserActivity } from '../../types/database';
@@ -8,6 +9,7 @@ import { useAuth } from '../../hooks/useAuth';
 import './PerformanceEmptyState.css';
 
 export const RecentActivityList: React.FC = () => {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [activities, setActivities] = useState<UserActivity[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -102,8 +104,6 @@ export const RecentActivityList: React.FC = () => {
           {user && (
             <span className="analytics-notice">
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: 'var(--success)' }}>
-                <ShieldCheck size={13} />
-                <span>Isolated: {user.email?.split('@')[0]}</span>
               </span>
             </span>
           )}
@@ -135,6 +135,28 @@ export const RecentActivityList: React.FC = () => {
                   <span className="activity-time">{formatTimeAgo(act.created_at)}</span>
                 </div>
                 <p className="activity-desc">{act.description}</p>
+                {act.activity_type.startsWith('interview') && (
+                  <button
+                    type="button"
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: 'var(--accent, #6366f1)',
+                      fontSize: '0.78rem',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      padding: 0,
+                      marginTop: '4px',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                    }}
+                    onClick={() => navigate('/hr/history')}
+                  >
+                    <span>View Interview History &amp; Reports</span>
+                    <ArrowRight size={12} />
+                  </button>
+                )}
               </div>
             </div>
           ))}

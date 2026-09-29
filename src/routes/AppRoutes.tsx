@@ -52,6 +52,8 @@ export const AppRoutes: React.FC = () => {
           <Route path="/technical/coding" element={<Navigate to="/technical/quiz" replace />} />
           <Route path="/aptitude" element={<AptitudePage />} />
           <Route path="/hr" element={<HRRoundPage />} />
+          <Route path="/hr/history" element={<HRRoundPage defaultTab="history" />} />
+          <Route path="/hr/reports" element={<Navigate to="/hr/history" replace />} />
           <Route path="/settings" element={<SettingsPage />} />
         </Route>
       </Route>

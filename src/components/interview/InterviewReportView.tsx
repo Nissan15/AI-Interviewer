@@ -5,6 +5,7 @@ import {
   TrendingUp,
   BookOpen,
   RotateCcw,
+  ArrowLeft,
 } from "lucide-react";
 import { InterviewEvaluation } from "../../types/evaluation";
 import { ProgressBar } from "../common/ProgressBar/ProgressBar";
@@ -14,11 +15,15 @@ import "./InterviewReportView.css";
 interface InterviewReportViewProps {
   evaluation: InterviewEvaluation;
   onRetake: () => void;
+  onBack?: () => void;
+  backButtonLabel?: string;
 }
 
 export const InterviewReportView: React.FC<InterviewReportViewProps> = ({
   evaluation,
   onRetake,
+  onBack,
+  backButtonLabel,
 }) => {
   const metrics = [
     {
@@ -55,6 +60,20 @@ export const InterviewReportView: React.FC<InterviewReportViewProps> = ({
 
   return (
     <div className="interview-report-view animate-fade-in">
+      {onBack && (
+        <div>
+          <button
+            type="button"
+            className="report-back-btn"
+            onClick={onBack}
+            aria-label="Back to previous screen"
+          >
+            <ArrowLeft size={14} />
+            <span>{backButtonLabel || "Back to Report History"}</span>
+          </button>
+        </div>
+      )}
+
       {/* Header Banner */}
       <div className="report-header-card">
         <div className="report-header-left">
@@ -185,6 +204,16 @@ export const InterviewReportView: React.FC<InterviewReportViewProps> = ({
 
       {/* Bottom Actions */}
       <div className="report-bottom-actions">
+        {onBack && (
+          <Button
+            variant="secondary"
+            size="lg"
+            leftIcon={<ArrowLeft size={16} />}
+            onClick={onBack}
+          >
+            {backButtonLabel || "Back to Report History"}
+          </Button>
+        )}
         <Button
           variant="primary"
           size="lg"

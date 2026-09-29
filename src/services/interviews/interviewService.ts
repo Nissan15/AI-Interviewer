@@ -4,6 +4,12 @@ import type {
   InterviewMessage,
   InterviewEvaluation,
 } from '../../types/database';
+import type { InterviewHistoryItem } from '../../types/interview';
+import { assessmentService } from '../assessments/assessmentService';
+
+// User-partitioned storage key generator to strictly isolate localStorage per candidate
+const getIsolatedInterviewHistoryKey = (userId: string): string => `ai_interview_history_${userId}`;
+
 
 export const interviewService = {
   /**
@@ -192,4 +198,205 @@ export const interviewService = {
       return { data: null, error: 'Failed to save interview message.' };
     }
   },
+
+  /**
+   * Strictly partitions interview history storage by userId in local storage
+   */
+  async saveInterviewHistoryItem(
+    userId: string,
+    item: InterviewHistoryItem
+  ): Promise<void> {
+    if (!userId) return;
+    try {
+      const storageKey = getIsolatedInterviewHistoryKey(userId);
+      const existingRaw = localStorage.getItem(storageKey);
+      const existing: InterviewHistoryItem[] = existingRaw ? JSON.parse(existingRaw) : [];
+      const updated = [
+        item,
+        ...existing.filter((i) => i.id !== item.id && i.sessionId !== item.sessionId),
+      ].slice(0, 100);
+      localStorage.setItem(storageKey, JSON.stringify(updated));
+    } catch (e) {
+      console.warn('[InterviewService] Local history item store warning:', e);
+    }
+  },
+
+  /**
+   * Retrieve all interview history items for a specific authenticated user.
+   * Strictly filters by user_id = userId, guaranteeing data is only visible to this particular user.
+   */
+  async getUserInterviewHistory(
+    userId: string
+  ): Promise<{ data: InterviewHistoryItem[]; error: string | null }> {
+    if (!userId) {
+      return { data: [], error: 'User ID is required to fetch interview history.' };
+    }
+
+    const itemsMap = new Map<string, InterviewHistoryItem>();
+
+    // 1. Fetch unified interview reports stored in assessment_reports
+    try {
+      const { data: reports } = await assessmentService.getUserReports(userId, 'interview');
+      for (const r of reports) {
+        if (r.user_id !== userId) continue; // Strict User Isolation
+        const rd = (r.report_data || {}) as Record<string, any>;
+        const item: InterviewHistoryItem = {
+          id: r.id,
+          sessionId: rd.sessionId || r.attempt_id || r.id,
+          userId: r.user_id,
+          interviewType:
+            rd.interviewType ||
+            (r.category ? r.category.replace(' Round', '').toLowerCase() : 'general_hr'),
+          difficulty: rd.difficulty || 'intermediate',
+          durationSeconds: rd.durationSeconds || r.time_spent_seconds || 300,
+          overallScore: Number(rd.overallScore ?? r.score ?? 0),
+          communicationScore: Number(rd.communicationScore ?? r.score ?? 70),
+          technicalScore: Number(rd.technicalScore ?? r.score ?? 70),
+          confidenceScore: Number(rd.confidenceScore ?? 75),
+          relevanceScore: Number(rd.relevanceScore ?? 75),
+          problemSolvingScore: Number(rd.problemSolvingScore ?? 75),
+          clarityScore: Number(rd.clarityScore ?? 75),
+          overallFeedback:
+            rd.overallFeedback ||
+            `Interview assessment completed with score ${r.score}%.`,
+          strengths:
+            Array.isArray(rd.strengths) && rd.strengths.length > 0
+              ? rd.strengths
+              : ['Demonstrated clear articulation and professional structure'],
+          improvements:
+            Array.isArray(rd.improvements) && rd.improvements.length > 0
+              ? rd.improvements
+              : ['Support key arguments with specific technical or project metrics'],
+          recommendedPreparationAreas: Array.isArray(rd.recommendedPreparationAreas)
+            ? rd.recommendedPreparationAreas
+            : [],
+          questionAssessments: Array.isArray(rd.questionAssessments)
+            ? rd.questionAssessments
+            : [],
+          exchanges: Array.isArray(rd.exchanges) ? rd.exchanges : [],
+          createdAt: rd.completedAt || r.created_at,
+          reportData: rd,
+        };
+        itemsMap.set(item.id, item);
+        if (item.sessionId) itemsMap.set(item.sessionId, item);
+      }
+    } catch (e) {
+      console.warn('[InterviewService] assessmentService query note:', e);
+    }
+
+    // 2. Fetch from Supabase interview_sessions & interview_evaluations if configured
+    if (isSupabaseConfigured()) {
+      try {
+        const { data: sessions } = await supabase
+          .from('interview_sessions')
+          .select('*, interview_evaluations(*)')
+          .eq('user_id', userId)
+          .order('started_at', { ascending: false });
+
+        if (sessions) {
+          for (const s of sessions) {
+            if (s.user_id !== userId) continue; // Strict User Isolation
+            const ev = Array.isArray(s.interview_evaluations)
+              ? s.interview_evaluations[0]
+              : s.interview_evaluations;
+
+            const existing = itemsMap.get(s.id);
+            if (!existing && ev) {
+              const item: InterviewHistoryItem = {
+                id: ev.id || s.id,
+                sessionId: s.id,
+                userId: s.user_id,
+                interviewType: s.interview_type,
+                difficulty: s.difficulty,
+                durationSeconds: (s.duration || 15) * 60,
+                overallScore: Number(ev.overall_score || 0),
+                communicationScore: Number(ev.communication_score || 70),
+                technicalScore: Number(ev.technical_score || 70),
+                confidenceScore: Number(ev.confidence_score || 70),
+                relevanceScore: Number(ev.relevance_score || 70),
+                problemSolvingScore: Number(ev.problem_solving_score || 75),
+                clarityScore: Number(ev.clarity_score || 75),
+                overallFeedback: ev.feedback || 'Completed mock interview evaluation.',
+                strengths: Array.isArray(ev.strengths) ? ev.strengths : [],
+                improvements: Array.isArray(ev.improvements) ? ev.improvements : [],
+                recommendedPreparationAreas: [],
+                createdAt: ev.created_at || s.started_at,
+              };
+              itemsMap.set(item.id, item);
+              itemsMap.set(s.id, item);
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('[InterviewService] Supabase interview history query note:', err);
+      }
+    }
+
+    // 3. Check user-isolated local history partition
+    try {
+      const storageKey = getIsolatedInterviewHistoryKey(userId);
+      const raw = localStorage.getItem(storageKey);
+      if (raw) {
+        const localItems: InterviewHistoryItem[] = JSON.parse(raw);
+        for (const item of localItems) {
+          if (item.userId === userId) {
+            // Strict User Isolation check
+            if (!itemsMap.has(item.id) && !itemsMap.has(item.sessionId)) {
+              itemsMap.set(item.id, item);
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('[InterviewService] Local history query warning:', e);
+    }
+
+    // Deduplicate by unique id / sessionId
+    const uniqueList: InterviewHistoryItem[] = [];
+    const seenIds = new Set<string>();
+
+    for (const item of itemsMap.values()) {
+      if (!seenIds.has(item.id)) {
+        seenIds.add(item.id);
+        if (item.sessionId) seenIds.add(item.sessionId);
+        // Final privacy safeguard: Strictly ensure item belongs to this particular user
+        if (item.userId === userId) {
+          uniqueList.push(item);
+        }
+      }
+    }
+
+    uniqueList.sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+
+    return { data: uniqueList, error: null };
+  },
+
+  /**
+   * Retrieve single interview report by ID, verifying user ownership
+   */
+  async getInterviewReportById(
+    userId: string,
+    reportId: string
+  ): Promise<{ data: InterviewHistoryItem | null; error: string | null }> {
+    if (!userId || !reportId) {
+      return { data: null, error: 'User ID and Report ID required.' };
+    }
+
+    const { data: history } = await this.getUserInterviewHistory(userId);
+    const found = history.find(
+      (h) => (h.id === reportId || h.sessionId === reportId) && h.userId === userId
+    );
+
+    if (!found) {
+      return {
+        data: null,
+        error: 'Interview report not found or does not belong to this user.',
+      };
+    }
+
+    return { data: found, error: null };
+  },
 };
+

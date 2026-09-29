@@ -25,6 +25,7 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
     if (path === '/technical' || path === '/technical/quiz') return 'Technical Quiz Assessment';
     if (path === '/aptitude') return 'Aptitude & Reasoning Assessment';
     if (path === '/hr') return 'AI HR Live Interview';
+    if (path.startsWith('/hr/history')) return 'Interview Report History';
     if (path.startsWith('/hr/interview')) return 'Live AI Interview Session';
     if (path.startsWith('/hr/report')) return 'Interview Assessment Report';
     if (path === '/settings') return 'Platform & Provider Settings';

@@ -37,3 +37,29 @@ export interface InterviewSession {
   isMuted: boolean;
   timeRemainingSeconds: number;
 }
+
+export interface InterviewHistoryItem {
+  id: string;
+  sessionId: string;
+  userId: string;
+  interviewType: string;
+  difficulty: string;
+  durationSeconds: number;
+  overallScore: number;
+  communicationScore: number;
+  technicalScore: number;
+  confidenceScore: number;
+  relevanceScore: number;
+  problemSolvingScore: number;
+  clarityScore: number;
+  overallFeedback: string;
+  strengths: string[];
+  improvements: string[];
+  recommendedPreparationAreas: string[];
+  questionAssessments?: any[];
+  exchanges?: InterviewExchange[];
+  createdAt: string;
+  roleTarget?: string;
+  reportData?: Record<string, any>;
+}
+

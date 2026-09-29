@@ -366,59 +366,115 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({
       setLatestEvaluation(evaluation);
       setIsProcessing(false);
 
-      // Save evaluation and learning recommendations to Supabase
-      if (user && dbSessionIdRef.current) {
-        await interviewService.saveEvaluation({
-          session_id: dbSessionIdRef.current,
-          user_id: user.id,
-          communication_score: evaluation.communicationScore,
-          technical_score: evaluation.technicalScore,
-          relevance_score: evaluation.relevanceScore,
-          clarity_score: evaluation.clarityScore,
-          confidence_score: evaluation.confidenceScore,
-          depth_score: (evaluation as any).depthScore || 75,
-          problem_solving_score: (evaluation as any).problemSolvingScore || 75,
-          overall_score: evaluation.overallScore,
-          strengths: evaluation.strengths,
-          improvements: evaluation.improvements,
-          feedback: evaluation.overallFeedback,
-        });
+      // Save evaluation and learning recommendations
+      if (user) {
+        const sessionId = dbSessionIdRef.current || activeSession?.id || `sess_${Date.now()}`;
 
-        if ((evaluation as any).learningPathSuggestions) {
-          await interviewService.saveLearningRecommendations(
-            user.id,
-            dbSessionIdRef.current,
-            (evaluation as any).learningPathSuggestions,
-          );
-          setLearningPath((evaluation as any).learningPathSuggestions);
+        if (dbSessionIdRef.current) {
+          try {
+            await interviewService.saveEvaluation({
+              session_id: dbSessionIdRef.current,
+              user_id: user.id,
+              communication_score: evaluation.communicationScore,
+              technical_score: evaluation.technicalScore,
+              relevance_score: evaluation.relevanceScore,
+              clarity_score: evaluation.clarityScore,
+              confidence_score: evaluation.confidenceScore,
+              depth_score: (evaluation as any).depthScore || 75,
+              problem_solving_score: evaluation.problemSolvingScore || 75,
+              overall_score: evaluation.overallScore,
+              strengths: evaluation.strengths,
+              improvements: evaluation.improvements,
+              feedback: evaluation.overallFeedback,
+            });
+          } catch (evErr) {
+            console.warn('[InterviewContext] Save evaluation warning:', evErr);
+          }
+
+          if ((evaluation as any).learningPathSuggestions) {
+            try {
+              await interviewService.saveLearningRecommendations(
+                user.id,
+                dbSessionIdRef.current,
+                (evaluation as any).learningPathSuggestions,
+              );
+              setLearningPath((evaluation as any).learningPathSuggestions);
+            } catch (lrErr) {
+              console.warn('[InterviewContext] Save learning recommendations warning:', lrErr);
+            }
+          }
         }
 
-        // Persist unified assessment report for this candidate
-        await assessmentService.saveAssessmentReport(user.id, {
-          assessmentType: "interview",
-          title: `AI Mock Interview (${(activeSession?.config?.type || "General").toUpperCase()})`,
-          category: `${activeSession?.config?.type || "General"} Round`,
-          score: evaluation.overallScore,
-          totalQuestions: exchangesRef.current.length || 1,
-          correctAnswers: exchangesRef.current.length || 1,
-          incorrectAnswers: 0,
-          accuracy: evaluation.overallScore,
-          timeSpentSeconds: durationSeconds,
-          reportData: {
-            sessionId: dbSessionIdRef.current || activeSession?.id,
-            interviewType: activeSession?.config?.type,
-            difficulty: activeSession?.config?.difficulty,
+        const reportData = {
+          sessionId,
+          interviewType: activeSession?.config?.type || 'general_hr',
+          difficulty: activeSession?.config?.difficulty || 'intermediate',
+          roleTarget: activeSession?.config?.roleTarget,
+          communicationScore: evaluation.communicationScore,
+          technicalScore: evaluation.technicalScore,
+          relevanceScore: evaluation.relevanceScore,
+          clarityScore: evaluation.clarityScore,
+          confidenceScore: evaluation.confidenceScore,
+          problemSolvingScore: evaluation.problemSolvingScore || 75,
+          overallScore: evaluation.overallScore,
+          overallFeedback: evaluation.overallFeedback,
+          strengths: evaluation.strengths,
+          improvements: evaluation.improvements,
+          recommendedPreparationAreas: evaluation.recommendedPreparationAreas || [],
+          questionAssessments: evaluation.questionAssessments || [],
+          exchanges: exchangesRef.current || [],
+          durationSeconds,
+          completedAt: new Date().toISOString(),
+          learningPathSuggestions: (evaluation as any).learningPathSuggestions,
+        };
+
+        // Persist unified assessment report strictly partitioned by user.id
+        try {
+          await assessmentService.saveAssessmentReport(user.id, {
+            assessmentType: 'interview',
+            title: `AI Mock Interview (${(activeSession?.config?.type || 'General').toUpperCase()})`,
+            category: `${activeSession?.config?.type || 'General'} Round`,
+            score: evaluation.overallScore,
+            totalQuestions: exchangesRef.current.length || 1,
+            correctAnswers: exchangesRef.current.length || 1,
+            incorrectAnswers: 0,
+            accuracy: evaluation.overallScore,
+            timeSpentSeconds: durationSeconds,
+            reportData,
+          });
+        } catch (repErr) {
+          console.warn('[InterviewContext] Save assessment report warning:', repErr);
+        }
+
+        // Also save to user-isolated interview history partition
+        try {
+          await interviewService.saveInterviewHistoryItem(user.id, {
+            id: `int_rep_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+            sessionId,
+            userId: user.id,
+            interviewType: activeSession?.config?.type || 'general_hr',
+            difficulty: activeSession?.config?.difficulty || 'intermediate',
+            durationSeconds,
+            overallScore: evaluation.overallScore,
             communicationScore: evaluation.communicationScore,
             technicalScore: evaluation.technicalScore,
-            relevanceScore: evaluation.relevanceScore,
-            clarityScore: evaluation.clarityScore,
             confidenceScore: evaluation.confidenceScore,
+            relevanceScore: evaluation.relevanceScore,
+            problemSolvingScore: evaluation.problemSolvingScore || 75,
+            clarityScore: evaluation.clarityScore,
             overallFeedback: evaluation.overallFeedback,
             strengths: evaluation.strengths,
             improvements: evaluation.improvements,
-            completedAt: new Date().toISOString(),
-          },
-        });
+            recommendedPreparationAreas: evaluation.recommendedPreparationAreas || [],
+            questionAssessments: evaluation.questionAssessments || [],
+            exchanges: exchangesRef.current || [],
+            createdAt: new Date().toISOString(),
+            roleTarget: activeSession?.config?.roleTarget,
+            reportData,
+          });
+        } catch (histErr) {
+          console.warn('[InterviewContext] Save interview history warning:', histErr);
+        }
       }
 
       return evaluation;

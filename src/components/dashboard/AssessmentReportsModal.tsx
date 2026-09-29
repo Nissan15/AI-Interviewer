@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   X,
   ShieldCheck,
@@ -7,6 +8,7 @@ import {
   ChevronDown,
   ChevronUp,
   Sparkles,
+  ArrowRight,
 } from "lucide-react";
 import { AssessmentReport } from "../../types/database";
 import { assessmentService } from "../../services/assessments/assessmentService";
@@ -22,6 +24,7 @@ export const AssessmentReportsModal: React.FC<AssessmentReportsModalProps> = ({
   isOpen,
   onClose,
 }) => {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [reports, setReports] = useState<AssessmentReport[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -293,16 +296,58 @@ export const AssessmentReportsModal: React.FC<AssessmentReportsModalProps> = ({
                         </div>
 
                         {report.report_data && (
-                          <div>
-                            <strong
-                              style={{ fontSize: "0.82rem", color: "#f8fafc" }}
-                            >
-                              Detailed Session Data:
-                            </strong>
-                            <pre>
-                              {JSON.stringify(report.report_data, null, 2)}
-                            </pre>
-                          </div>
+                          report.assessment_type === "interview" ? (
+                            <div className="interview-modal-preview">
+                              <div className="modal-rubric-mini-grid">
+                                <div className="rubric-mini-pill">
+                                  <span>Communication:</span>
+                                  <strong>{((report.report_data as any).communicationScore ?? report.score)}%</strong>
+                                </div>
+                                <div className="rubric-mini-pill">
+                                  <span>Technical Depth:</span>
+                                  <strong>{((report.report_data as any).technicalScore ?? report.score)}%</strong>
+                                </div>
+                                <div className="rubric-mini-pill">
+                                  <span>Confidence:</span>
+                                  <strong>{((report.report_data as any).confidenceScore ?? 75)}%</strong>
+                                </div>
+                                <div className="rubric-mini-pill">
+                                  <span>Problem Solving:</span>
+                                  <strong>{((report.report_data as any).problemSolvingScore ?? 75)}%</strong>
+                                </div>
+                              </div>
+
+                              {(report.report_data as any).overallFeedback && (
+                                <p className="modal-feedback-quote">
+                                  "{(report.report_data as any).overallFeedback}"
+                                </p>
+                              )}
+
+                              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "4px" }}>
+                                <button
+                                  type="button"
+                                  className="modal-view-full-btn"
+                                  onClick={() => {
+                                    onClose();
+                                    navigate("/hr/history");
+                                  }}
+                                >
+                                  Open in Interview History &amp; Full Report &rarr;
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div>
+                              <strong
+                                style={{ fontSize: "0.82rem", color: "#f8fafc" }}
+                              >
+                                Detailed Session Data:
+                              </strong>
+                              <pre>
+                                {JSON.stringify(report.report_data, null, 2)}
+                              </pre>
+                            </div>
+                          )
                         )}
                       </div>
                     )}
