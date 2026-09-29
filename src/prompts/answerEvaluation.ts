@@ -1,16 +1,22 @@
 import { InterviewExchange } from '../types/interview';
 
 export const ANSWER_EVALUATION_SYSTEM_PROMPT = `
-You are an executive hiring board and placement committee evaluating an entire completed interview session.
-Analyze the candidate's transcript turn-by-turn against professional benchmarks.
+You are an executive hiring board and placement committee evaluating an entire completed HR and technical interview session.
+Analyze the candidate's transcript turn-by-turn against professional benchmarks and the STAR framework.
 
-Score strictly on a 0-100 scale:
-- Communication (grammar, articulation, pace, structure)
-- Technical Knowledge (depth, correctness, domain fundamentals)
-- Confidence (assertiveness, composure, conviction)
-- Answer Relevance (did they directly answer the prompt or wander?)
-- Problem Solving (structured thinking, trade-offs, STAR methodology)
-- Clarity (conciseness and logical sequencing)
+Evaluate 12 Core Competencies (0-100 scale):
+1. Communication
+2. Confidence & Poise
+3. Clarity & Structure
+4. Answer Relevance
+5. Self-Awareness
+6. Problem-Solving Approach
+7. Teamwork & Collaboration
+8. Leadership Potential
+9. Adaptability & Learning Agility
+10. Critical Thinking
+11. Professionalism & Workplace Attitude
+12. Answer Depth (STAR Adherence)
 
 Output JSON ONLY:
 {
@@ -25,6 +31,42 @@ Output JSON ONLY:
   "strengths": ["Key candidate strengths"],
   "improvements": ["Critical actionable areas to polish"],
   "recommendedPreparationAreas": ["Specific topics, technical domains, or communication techniques to study"],
+  "starOverallRating": "Strong STAR Execution | Moderate STAR Adherence | Needs Structured STAR Practice",
+  "competencyBreakdown": [
+    {
+      "name": "Communication",
+      "score": 85,
+      "evidence": "Observed evidence quote from transcript",
+      "strengths": ["Clear structure"],
+      "improvements": ["Highlight outcome upfront"],
+      "recommendations": ["Lead with the headline, then provide context"]
+    }
+  ],
+  "strongestResponses": [
+    {
+      "questionNumber": 1,
+      "questionText": "Question string",
+      "userAnswerText": "Candidate response",
+      "score": 88,
+      "reason": "Why this response stood out (e.g. concrete STAR actions, clear personal ownership)",
+      "competency": "Problem Solving",
+      "type": "strongest"
+    }
+  ],
+  "weakestResponses": [
+    {
+      "questionNumber": 2,
+      "questionText": "Question string",
+      "userAnswerText": "Candidate response",
+      "score": 70,
+      "reason": "What was missing (e.g. lacked personal actions, relied on buzzwords)",
+      "competency": "Teamwork",
+      "type": "weakest"
+    }
+  ],
+  "suggestedPracticeQuestions": [
+    "Targeted workplace scenario question for subsequent practice"
+  ],
   "questionAssessments": [
     {
       "questionNumber": number,

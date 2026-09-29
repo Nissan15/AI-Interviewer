@@ -727,20 +727,119 @@ function synthesizeProjectAnalysis(prompt: string): string {
   });
 }
 
+const HR_QUALITATIVE_SCENARIOS = [
+  {
+    category: 'situational',
+    topic: 'Conflict Management & Peer Disagreement',
+    competencyEvaluated: 'Conflict Management',
+    difficulty: 'medium',
+    questionText: 'Tell me about a situation where you had a strong technical disagreement with a teammate or peer. How did you present your viewpoint, and how was the dispute resolved?',
+    expectedKeyPoints: ['Depersonalizing friction', 'Focusing on objective data and user impact', 'Constructive compromise or commit']
+  },
+  {
+    category: 'situational',
+    topic: 'Deadline Pressure & Team Member Accountability',
+    competencyEvaluated: 'Teamwork & Accountability',
+    difficulty: 'hard',
+    questionText: 'Suppose your team is approaching a critical release deadline and one team member is falling behind or not completing their assigned module. How would you handle this situation?',
+    expectedKeyPoints: ['Proactive unblocking', 'Private communication without blame', 'Balancing peer support with stakeholder transparency']
+  },
+  {
+    category: 'self_awareness',
+    topic: 'Accountability & Learning from Mistakes',
+    competencyEvaluated: 'Self-Awareness & Accountability',
+    difficulty: 'medium',
+    questionText: 'Tell me about a time you made a genuine mistake in a codebase or project environment. What did you do immediately after realizing it, and what systems did you put in place to prevent recurrence?',
+    expectedKeyPoints: ['Immediate ownership without deflection', 'Swift containment and remediation', 'Blameless post-mortem learning']
+  },
+  {
+    category: 'situational',
+    topic: 'Ambiguous Requirements Under Urgent Timelines',
+    competencyEvaluated: 'Problem-Solving & Adaptability',
+    difficulty: 'hard',
+    questionText: 'If your engineering lead gives you a task with unclear, ambiguous requirements and a very short deadline, walk me through how you would prioritize and approach it.',
+    expectedKeyPoints: ['Clarifying scope and assumptions', 'Iterative milestone check-ins', 'Delivering MVP with clear trade-offs']
+  },
+  {
+    category: 'behavioral',
+    topic: 'Receiving Tough Feedback & Professional Growth',
+    competencyEvaluated: 'Emotional Intelligence & Professional Attitude',
+    difficulty: 'medium',
+    questionText: 'Describe an occasion where you received constructive criticism or critical pushback on your work. How did you respond emotionally in the moment, and what concrete adjustments did you make?',
+    expectedKeyPoints: ['Receptivity over defensiveness', 'Active listening and seeking clarification', 'Demonstrated behavioral growth']
+  },
+  {
+    category: 'pressure_decision',
+    topic: 'Constructive Disagreement with Management',
+    competencyEvaluated: 'Critical Thinking & Decision Making',
+    difficulty: 'hard',
+    questionText: 'If you strongly disagree with a technical or architecture decision made by your manager or lead, how do you handle it? When do you push back, and when do you disagree and commit?',
+    expectedKeyPoints: ['Presenting data-driven alternatives', 'Understanding higher-level business context', 'Professional commitment once decided']
+  },
+  {
+    category: 'behavioral',
+    topic: 'Rapid Learning Agility',
+    competencyEvaluated: 'Learning Ability & Adaptability',
+    difficulty: 'medium',
+    questionText: 'Describe a situation where you had to master an entirely unfamiliar framework, API, or methodology on a very tight timeline. How did you structure your learning process?',
+    expectedKeyPoints: ['Structured self-learning', 'Targeted documentation and proof-of-concept', 'Unblocking project deliverables quickly']
+  },
+  {
+    category: 'career_growth',
+    topic: 'Career Vision & Self-Development',
+    competencyEvaluated: 'Career Motivation & Self-Awareness',
+    difficulty: 'medium',
+    questionText: 'Reflecting on your professional trajectory, what is one technical area and one interpersonal capability you are actively focused on improving, and how do you track your growth?',
+    expectedKeyPoints: ['Honest self-assessment', 'Deliberate practice habits', 'Long-term engineering ambition']
+  }
+];
+
 function synthesizeQuestion(prompt: string): string {
-  const isHr = prompt.toLowerCase().includes('hr') || prompt.toLowerCase().includes('behavioral');
+  const p = prompt.toLowerCase();
+  const isHr = p.includes('hr') || p.includes('behavioral') || p.includes('general_hr') || p.includes('resume_based') || p.includes('mixed');
 
   if (isHr) {
+    // Check if prompt has candidate projects
+    const projMatch = prompt.match(/Key Projects:\s*(\[[\s\S]*?\])/i) || prompt.match(/Projects:\s*(\[[\s\S]*?\])/i);
+    let projectName = '';
+    let projectTech = '';
+    if (projMatch && projMatch[1]) {
+      try {
+        const projs = JSON.parse(projMatch[1]);
+        if (Array.isArray(projs) && projs.length > 0 && projs[0].name) {
+          projectName = projs[0].name;
+          if (Array.isArray(projs[0].tech) && projs[0].tech.length > 0) {
+            projectTech = ` utilizing ${projs[0].tech.slice(0, 2).join(' and ')}`;
+          }
+        }
+      } catch {}
+    }
+
+    if (projectName) {
+      return JSON.stringify({
+        questionText: `Looking at your background, I noticed you developed "${projectName}"${projectTech}. To start off, what was the single most difficult decision or unexpected obstacle you had to navigate while building it, and why did you choose that approach?`,
+        category: 'project_grounded',
+        topic: 'Project Ownership & Decision Making',
+        difficulty: 'medium',
+        competencyEvaluated: 'Problem Solving & Decision Making',
+        expectedKeyPoints: [
+          'Clear context of project challenge using STAR methodology',
+          'Specific personal decision and trade-offs considered',
+          'Measurable outcome or lesson learned'
+        ]
+      });
+    }
+
     return JSON.stringify({
-      questionText: 'Could you walk me through a challenging problem you faced while building one of your projects, and how you worked through the solution?',
-      category: 'hr',
-      topic: 'Problem Solving & Resilience',
+      questionText: 'To start off our conversation, looking back at your journey into software engineering, what originally drew you to this discipline, and what kind of team dynamics allow you to produce your best work?',
+      category: 'introduction_motivation',
+      topic: 'Career Motivation & Team Fit',
       difficulty: 'medium',
+      competencyEvaluated: 'Communication & Motivation',
       expectedKeyPoints: [
-        'Clear problem statement using STAR methodology',
-        'Specific technical or organizational obstacle',
-        'Concrete steps taken to resolve it',
-        'Quantifiable outcome or key lesson learned'
+        'Authentic personal motivation',
+        'Understanding of collaborative engineering culture',
+        'Articulate professional communication'
       ]
     });
   }
@@ -760,14 +859,195 @@ function synthesizeQuestion(prompt: string): string {
 
 function synthesizeTurn(prompt: string): string {
   const p = prompt.toLowerCase();
-  const answerLength = prompt.split('Candidate Answer:')[1]?.trim().length || 0;
-  const isShort = answerLength < 40;
+  const isHr = p.includes('round type: general_hr') || p.includes('round type: technical_hr') || p.includes('round type: resume_based') || p.includes('round type: mixed') || p.includes('hr') || p.includes('star');
 
+  // Extract candidate answer
+  let candidateAnswer = '';
+  const matchAnswer = prompt.match(/Candidate Answer:\s*"([\s\S]*?)"/i);
+  if (matchAnswer && matchAnswer[1]) {
+    candidateAnswer = matchAnswer[1].trim();
+  }
+
+  // Count past turns
+  const turnMatches = prompt.match(/Turn \d+:/g) || [];
+  const turnIndex = turnMatches.length;
+
+  if (isHr) {
+    const ansLower = candidateAnswer.toLowerCase();
+    const isVeryShort = candidateAnswer.length < 50;
+    const usesWeExclusively = (ansLower.includes('we did') || ansLower.includes('our team') || ansLower.includes('we decided')) && !ansLower.includes('i ');
+    const claimsLeadership = ansLower.includes('led') || ansLower.includes('lead') || ansLower.includes('spearheaded') || ansLower.includes('took charge') || ansLower.includes('in charge');
+    const mentionsRoadblock = ansLower.includes('delay') || ansLower.includes('failed') || ansLower.includes('mistake') || ansLower.includes('disagree') || ansLower.includes('conflict') || ansLower.includes('bug') || ansLower.includes('issue') || ansLower.includes('obstacle');
+
+    // 1. Follow-up: Vague or very short answer
+    if (isVeryShort) {
+      return JSON.stringify({
+        isFollowUp: true,
+        followUpReason: 'Candidate gave a concise answer; probing for specific real-world actions using STAR methodology',
+        quickFeedback: 'Answer was high-level; needs specific individual actions and concrete examples.',
+        acknowledgementText: 'I appreciate that overview.',
+        nextQuestionText: 'Can you walk me through a specific real-world example of what you personally did in that situation, and what the final outcome was?',
+        category: 'behavioral',
+        topic: 'Individual Contribution & STAR Evidence',
+        difficulty: 'medium',
+        competencyEvaluated: 'Communication & Problem Solving',
+        starEvaluation: {
+          situation: true,
+          task: false,
+          action: false,
+          result: false,
+          missingElements: ['Specific Task', 'Personal Action', 'Measurable Result']
+        },
+        evaluation: {
+          technicalAccuracy: 72,
+          communication: 74,
+          clarity: 76,
+          depth: 62,
+          problemSolving: 68,
+          confidence: 72
+        }
+      });
+    }
+
+    // 2. Follow-up: Candidate claims "we" without defining personal role
+    if (usesWeExclusively && turnIndex % 2 === 1) {
+      return JSON.stringify({
+        isFollowUp: true,
+        followUpReason: 'Candidate described group efforts ("we"); probing for their specific individual contribution',
+        quickFeedback: 'Good collaborative context, but individual ownership needs to be clarified.',
+        acknowledgementText: 'That provides helpful team context.',
+        nextQuestionText: 'You mentioned that your team worked through this together. What was your specific individual role in that initiative, and what actions did you personally take?',
+        category: 'behavioral',
+        topic: 'Individual Ownership & Accountability',
+        difficulty: 'medium',
+        competencyEvaluated: 'Accountability & Leadership',
+        starEvaluation: {
+          situation: true,
+          task: true,
+          action: false,
+          result: true,
+          missingElements: ['Direct Personal Actions']
+        },
+        evaluation: {
+          technicalAccuracy: 80,
+          communication: 82,
+          clarity: 80,
+          depth: 72,
+          problemSolving: 78,
+          confidence: 80
+        }
+      });
+    }
+
+    // 3. Follow-up: Candidate mentions delay/friction/roadblock
+    if (mentionsRoadblock && turnIndex % 3 === 0) {
+      return JSON.stringify({
+        isFollowUp: true,
+        followUpReason: 'Candidate highlighted an unexpected roadblock or friction; exploring root cause analysis and resolution',
+        quickFeedback: 'Interesting challenge identified; probing for corrective actions and lessons learned.',
+        acknowledgementText: 'Handling unexpected setbacks is a critical part of engineering.',
+        nextQuestionText: 'You noted that there was an obstacle during that phase. What was the root cause of that problem, and what specific steps did you take to resolve it and keep the project moving?',
+        category: 'situational',
+        topic: 'Obstacle Remediation & Root Cause',
+        difficulty: 'hard',
+        competencyEvaluated: 'Problem-Solving & Resilience',
+        starEvaluation: {
+          situation: true,
+          task: true,
+          action: true,
+          result: false,
+          missingElements: ['Quantifiable Result and Long-Term Prevention']
+        },
+        evaluation: {
+          technicalAccuracy: 84,
+          communication: 82,
+          clarity: 82,
+          depth: 80,
+          problemSolving: 84,
+          confidence: 82
+        }
+      });
+    }
+
+    // 4. Follow-up: Candidate claims leadership
+    if (claimsLeadership && turnIndex % 2 === 0) {
+      return JSON.stringify({
+        isFollowUp: true,
+        followUpReason: 'Candidate described leadership initiative; probing for differentiation and peer alignment',
+        quickFeedback: 'Strong claim of leadership; testing specifics of their approach.',
+        acknowledgementText: 'Taking initiative in that circumstance is commendable.',
+        nextQuestionText: 'You mentioned that you took the lead on that project. What specific actions did you take that differentiated your approach from other team members?',
+        category: 'behavioral',
+        topic: 'Leadership Differentiation & Team Influence',
+        difficulty: 'hard',
+        competencyEvaluated: 'Leadership Potential',
+        starEvaluation: {
+          situation: true,
+          task: true,
+          action: true,
+          result: true,
+          missingElements: []
+        },
+        evaluation: {
+          technicalAccuracy: 88,
+          communication: 86,
+          clarity: 85,
+          depth: 84,
+          problemSolving: 85,
+          confidence: 88
+        }
+      });
+    }
+
+    // 5. Complete answer -> Smooth conversational transition to next qualitative scenario
+    const scenarioIdx = turnIndex % HR_QUALITATIVE_SCENARIOS.length;
+    const nextScenario = HR_QUALITATIVE_SCENARIOS[scenarioIdx];
+
+    const acknowledgements = [
+      'That makes a lot of sense. It sounds like you balanced the technical constraints and team priorities thoughtfully.',
+      'I appreciate that breakdown; handling interpersonal friction with peers requires that level of directness.',
+      'That gives me a very clear picture of how you approach deadline pressure.',
+      'Thank you for walking me through that experience. Taking accountability early is a sign of engineering maturity.',
+      'That is a very practical approach to dealing with ambiguous specifications.'
+    ];
+    const ack = acknowledgements[turnIndex % acknowledgements.length];
+
+    return JSON.stringify({
+      isFollowUp: false,
+      followUpReason: null,
+      quickFeedback: 'Well-structured response with sound behavioral maturity and clear action points.',
+      acknowledgementText: ack,
+      nextQuestionText: `${ack} Transitioning to another scenario: ${nextScenario.questionText}`,
+      category: nextScenario.category,
+      topic: nextScenario.topic,
+      difficulty: nextScenario.difficulty,
+      competencyEvaluated: nextScenario.competencyEvaluated,
+      starEvaluation: {
+        situation: true,
+        task: true,
+        action: true,
+        result: true,
+        missingElements: []
+      },
+      evaluation: {
+        technicalAccuracy: 86,
+        communication: 85,
+        clarity: 86,
+        depth: 82,
+        problemSolving: 85,
+        confidence: 86
+      }
+    });
+  }
+
+  // Technical turn fallback
+  const isShort = candidateAnswer.length < 40;
   if (isShort) {
     return JSON.stringify({
       isFollowUp: true,
       followUpReason: 'Candidate gave a concise answer; probing for deeper implementation details',
       quickFeedback: 'Answer was on the right track but lacks specific architectural examples.',
+      acknowledgementText: 'Understood.',
       nextQuestionText: 'Could you elaborate with a concrete example from your implementation? Specifically, how did you handle edge cases or potential failures in that scenario?',
       category: 'project_deep_dive',
       topic: 'Edge Case Handling',
@@ -787,7 +1067,8 @@ function synthesizeTurn(prompt: string): string {
     isFollowUp: false,
     followUpReason: null,
     quickFeedback: 'Strong, articulate answer with sound technical grounding.',
-    nextQuestionText: 'That makes sense. Transitioning to database design, how did you structure your data models to optimize query efficiency and maintain data integrity under concurrent user access?',
+    acknowledgementText: 'That makes sense.',
+    nextQuestionText: 'Transitioning to database design, how did you structure your data models to optimize query efficiency and maintain data integrity under concurrent user access?',
     category: 'technical',
     topic: 'Database Optimization',
     difficulty: 'hard',
@@ -803,6 +1084,214 @@ function synthesizeTurn(prompt: string): string {
 }
 
 function synthesizeEvaluation(prompt: string): string {
+  const p = prompt.toLowerCase();
+  const isHr = p.includes('round type: general_hr') || p.includes('round type: technical_hr') || p.includes('round type: resume_based') || p.includes('round type: mixed') || p.includes('hr') || p.includes('qualitative');
+
+  if (isHr) {
+    // Extract candidate responses from transcript text
+    const turnBlocks = prompt.split(/\[Q\d+\]/).filter((b) => b.includes('[Answer]:'));
+    const parsedAssessments: any[] = [];
+    const quotedAnswers: string[] = [];
+
+    turnBlocks.forEach((block, idx) => {
+      const qTextMatch = block.match(/\): ([\s\S]*?)(?=\n\[Answer\]:)/);
+      const aTextMatch = block.match(/\[Answer\]:\s*([\s\S]*?)(?=$|\n\n)/);
+      const qText = qTextMatch ? qTextMatch[1].trim() : `Interview Question ${idx + 1}`;
+      const aText = aTextMatch ? aTextMatch[1].trim() : 'Candidate provided verbal response.';
+      quotedAnswers.push(aText);
+
+      parsedAssessments.push({
+        questionNumber: idx + 1,
+        questionText: qText,
+        userAnswerText: aText,
+        score: aText.length > 50 ? 84 : 72,
+        strengths: [
+          aText.length > 50 ? 'Structured response demonstrating clear personal ownership' : 'Addressed the question promptly'
+        ],
+        improvements: [
+          aText.length > 50 ? 'Quantify the outcome or business metric more prominently' : 'Expand on individual actions using the STAR method'
+        ],
+        sampleModelAnswer: 'In that scenario, I prioritized aligning with stakeholders on critical acceptance criteria. I took personal ownership of our modular testing pipeline, which enabled us to ship two days ahead of schedule while zero critical bugs were reported in production.'
+      });
+    });
+
+    const sampleQuote = quotedAnswers[0] || 'Candidate discussed problem solving and teamwork';
+
+    const competencyBreakdown = [
+      {
+        name: 'Communication',
+        score: 86,
+        evidence: `Expressed ideas with clarity and composure throughout the session (e.g., "${sampleQuote.slice(0, 60)}...").`,
+        strengths: ['Clear articulate cadence', 'Organized thought flow and active listening'],
+        improvements: ['State the measurable conclusion upfront'],
+        recommendations: ['Practice executive soundbites: Lead with the headline, then provide the supporting STAR context.']
+      },
+      {
+        name: 'Confidence & Poise',
+        score: 85,
+        evidence: 'Maintained steady composure and answered without defensive hesitation when asked follow-up questions.',
+        strengths: ['Unshaken when challenged on decisions', 'Direct eye-level professional delivery'],
+        improvements: ['Avoid softening statements like "I guess" or "we kind of did"'],
+        recommendations: ['Use assertive action verbs: "I architected", "I initiated", "I resolved".']
+      },
+      {
+        name: 'Clarity & Structure',
+        score: 84,
+        evidence: 'Answers followed a logical progression without rambling or losing the core thread.',
+        strengths: ['Well-sequenced narrative', 'Clear transition between context and actions'],
+        improvements: ['Ensure the final resolution connects back directly to the opening problem'],
+        recommendations: ['Conclude each behavioral answer with a 1-sentence retrospective lesson learned.']
+      },
+      {
+        name: 'Answer Relevance',
+        score: 88,
+        evidence: 'Directly addressed the prompt scenarios rather than pivoting to rehearsed textbook talking points.',
+        strengths: ['High relevance to engineering teamwork', 'Addressed the heart of the conflict scenarios'],
+        improvements: ['Deepen specific examples when questions probe mistakes'],
+        recommendations: ['Address vulnerable topics (e.g. past mistakes) with transparency and immediate remediation steps.']
+      },
+      {
+        name: 'Self-Awareness',
+        score: 83,
+        evidence: 'Acknowledged areas where they had to learn new tools quickly and adapt to changing team expectations.',
+        strengths: ['Reflective on past experiences', 'Willingness to seek guidance when blocked'],
+        improvements: ['Be more specific about personal blind spots and how they are proactively managed'],
+        recommendations: ['Develop a concrete 30-60-90 day personal learning roadmap to share in interviews.']
+      },
+      {
+        name: 'Problem-Solving Approach',
+        score: 85,
+        evidence: 'Demonstrated methodical deconstruction of complex scenarios into actionable milestones.',
+        strengths: ['Root cause analysis mindset', 'Balanced speed of delivery against code quality'],
+        improvements: ['Highlight trade-off analysis explicitly during technical decisions'],
+        recommendations: ['Frame problem-solving through: Context -> Constraints -> Options Considered -> Chosen Solution.']
+      },
+      {
+        name: 'Teamwork & Collaboration',
+        score: 87,
+        evidence: 'Exhibited strong collaborative instincts and respect for cross-functional peers and team deliverables.',
+        strengths: ['Empathy for struggling teammates', 'Proactive communication to prevent bottlenecks'],
+        improvements: ['Differentiate your personal contributions clearly from collective team accomplishments'],
+        recommendations: ['Use "We" for vision/credit and "I" for your specific hands-on execution.']
+      },
+      {
+        name: 'Leadership Potential',
+        score: 82,
+        evidence: 'Took initiative to propose solutions and unblock peers during project roadblocks.',
+        strengths: ['Natural inclination to step up during uncertainty', 'Constructive influence without authority'],
+        improvements: ['Articulate how you mentor and elevate junior peers on the team'],
+        recommendations: ['Emphasize instances where you documented best practices or automated toil for the whole team.']
+      },
+      {
+        name: 'Adaptability & Learning Agility',
+        score: 86,
+        evidence: 'Described picking up unfamiliar tools and handling changing requirements with resilience.',
+        strengths: ['Comfort with ambiguity', 'Fast ramp-up cadence on new technologies'],
+        improvements: ['Discuss how you validate assumptions when specifications are shifting'],
+        recommendations: ['Ask clarifying questions proactively when handed open-ended problem statements.']
+      },
+      {
+        name: 'Conflict Management',
+        score: 84,
+        evidence: 'Approached peer disagreements by depersonalizing the conflict and relying on shared user outcomes.',
+        strengths: ['Focus on technical merits rather than ego', 'Willingness to disagree and commit'],
+        improvements: ['Describe how you follow up with colleagues after a high-tension discussion to preserve rapport'],
+        recommendations: ['Practice the "Interest-Based Relational" approach to resolving team friction.']
+      },
+      {
+        name: 'Decision-Making Under Pressure',
+        score: 83,
+        evidence: 'Demonstrated prioritization skills when confronting tight deadlines and competing demands.',
+        strengths: ['Decisiveness without paralysis', 'Clear triage of P0 vs P1 requirements'],
+        improvements: ['Communicate trade-offs to non-technical stakeholders earlier in the cycle'],
+        recommendations: ['Use frameworks like the Eisenhower Matrix or MoSCoW prioritization when explaining trade-offs.']
+      },
+      {
+        name: 'Answer Depth (STAR Framework)',
+        score: 82,
+        evidence: 'Incorporated Situation, Task, Action, and Result across behavioral responses with solid detail.',
+        strengths: ['Detailed situational context', 'Specific personal actions highlighted'],
+        improvements: ['Include more quantifiable results (% improvements, hours saved, user adoption)'],
+        recommendations: ['Quantify outcomes whenever possible: "This reduced onboarding time by 30% and eliminated duplicate tickets."']
+      }
+    ];
+
+    const strongestResponses = [
+      {
+        questionNumber: 1,
+        questionText: parsedAssessments[0]?.questionText || 'Handling Project Challenges & Decisions',
+        userAnswerText: parsedAssessments[0]?.userAnswerText || sampleQuote,
+        score: 88,
+        reason: 'Strong articulation of individual ownership, thoughtful decision rationale, and grounded technical context.',
+        competency: 'Problem-Solving & Decision Making',
+        type: 'strongest' as const
+      }
+    ];
+
+    const weakestResponses = [
+      {
+        questionNumber: parsedAssessments.length > 1 ? 2 : 1,
+        questionText: parsedAssessments[1]?.questionText || 'Conflict Resolution & Peer Disagreement',
+        userAnswerText: parsedAssessments[1]?.userAnswerText || 'Answer was concise.',
+        score: 72,
+        reason: 'Lacked concrete personal actions and specific metrics. Relied on generalized statements rather than a step-by-step STAR narrative.',
+        competency: 'Conflict Management & STAR Depth',
+        type: 'weakest' as const
+      }
+    ];
+
+    const suggestedPracticeQuestions = [
+      'Tell me about a time you strongly disagreed with a manager or lead\'s technical direction. How did you advocate for your alternative, and what was the outcome?',
+      'Suppose you are leading a sprint release and discover a critical security vulnerability 2 hours before deploy. Walk me through your triage and stakeholder communication.',
+      'Describe a situation where a teammate was consistently missing commitments. How did you address the issue directly with them before escalating?',
+      'Can you share an experience where you had to make a high-stakes engineering decision with incomplete data? What was your framework for risk mitigation?'
+    ];
+
+    return JSON.stringify({
+      overallScore: 84,
+      communicationScore: 86,
+      technicalScore: 83,
+      confidenceScore: 85,
+      relevanceScore: 88,
+      problemSolvingScore: 85,
+      clarityScore: 84,
+      overallFeedback: 'The candidate delivered a polished, qualitative HR interview performance. They communicated with composure, demonstrated genuine team empathy, and structured their responses using sound situational context. Their strongest areas were collaborative alignment and practical problem-solving. To achieve top-percentile hiring ratings, they should consistently quantify the business impact of their actions and expand on long-term preventative measures following mistakes.',
+      strengths: [
+        'Articulate and composed communication style without defensive posturing',
+        'Strong cross-functional teamwork orientation and peer unblocking instincts',
+        'Methodical deconstruction of workplace pressure and competing deadlines',
+        'Clear personal accountability when discussing project challenges'
+      ],
+      improvements: [
+        'Consistently anchor the Result portion of STAR with quantifiable metrics (% speedup, hours saved, error rate reduction)',
+        'Differentiate individual execution ("I") from collective team efforts ("We") more crisply',
+        'Explicitly state post-mortem learnings and systemic prevention mechanisms when discussing setbacks'
+      ],
+      recommendedPreparationAreas: [
+        'STAR Framework Quantifiable Metrics',
+        'Constructive Conflict De-escalation Techniques',
+        'Stakeholder Expectation Management Under Ambiguity',
+        'Executive Communication & Headline-First Structuring'
+      ],
+      starOverallRating: 'Strong STAR Execution',
+      competencyBreakdown,
+      strongestResponses,
+      weakestResponses,
+      suggestedPracticeQuestions,
+      questionAssessments: parsedAssessments.length > 0 ? parsedAssessments : [
+        {
+          questionNumber: 1,
+          questionText: 'Tell me about a challenging situation you handled with a teammate.',
+          userAnswerText: 'Walked through conflict resolution and objective data alignment.',
+          score: 85,
+          strengths: ['Direct response', 'Professional de-escalation'],
+          improvements: ['Mention long-term working relationship follow-up'],
+          sampleModelAnswer: 'When my peer and I disagreed on whether to use GraphQL or REST, we created a shared matrix comparing latency and client caching needs. By testing against actual query patterns, we agreed on REST with sub-50ms responses, preserving our deadline and team trust.'
+        }
+      ]
+    });
+  }
+
   return JSON.stringify({
     overallScore: 84,
     technicalScore: 86,
@@ -836,15 +1325,6 @@ function synthesizeEvaluation(prompt: string): string {
         strengths: ['Direct response', 'Clear architectural breakdown'],
         improvements: ['Could include network latency considerations'],
         sampleModelAnswer: 'In our system, we decoupled the presentation layer from the central API. Sensitive operations are routed strictly through authenticated server endpoints to isolate secrets, ensuring sub-100ms response times.'
-      },
-      {
-        questionNumber: 2,
-        questionText: 'Data Modeling & Query Optimization',
-        userAnswerText: 'Discussed database design and foreign key relations.',
-        score: 83,
-        strengths: ['Demonstrated understanding of relational constraints'],
-        improvements: ['Mention composite indexing and B-tree internals'],
-        sampleModelAnswer: 'We designed third-normal-form relational tables indexed on foreign keys and user IDs, enforcing Row Level Security at the database layer to guarantee multi-tenant tenant isolation.'
       }
     ],
     learningPathSuggestions: [
@@ -856,15 +1336,6 @@ function synthesizeEvaluation(prompt: string): string {
         mockTestFocus: 'Backend Caching & Scalability Assessment',
         reassessmentCriteria: 'Demonstrates sub-10ms cache hits and handles cache miss gracefully',
         priority: 'critical'
-      },
-      {
-        currentSkill: 'Database Optimization',
-        weakArea: 'Query performance profiling and EXPLAIN ANALYZE',
-        recommendedTopic: 'PostgreSQL Index Types & Query Planning',
-        practiceTask: 'Profile a slow query on 100,000 rows and optimize it using a compound index',
-        mockTestFocus: 'Database Indexing & Normalization MCQ',
-        reassessmentCriteria: 'Explains query execution plan improvements and avoids sequential scans',
-        priority: 'high'
       }
     ]
   });

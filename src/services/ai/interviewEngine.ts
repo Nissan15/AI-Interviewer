@@ -1,5 +1,5 @@
 import { aiService, AiTurnResult, GeneratedQuestionResult } from './aiService';
-import { InterviewConfig } from '../../types/interview';
+import { InterviewConfig, HRInterviewState } from '../../types/interview';
 import { CandidateAiProfile } from '../../types/resume';
 
 export const processInterviewTurn = async (
@@ -7,14 +7,16 @@ export const processInterviewTurn = async (
   userAnswer: string,
   conversationHistory: Array<{ question: string; answer: string }>,
   candidateProfile: CandidateAiProfile | null = null,
-  roundType: string = 'technical'
+  roundType: string = 'general_hr',
+  hrState?: HRInterviewState | null
 ): Promise<AiTurnResult> => {
   return aiService.processTurn(
     currentQuestion,
     userAnswer,
     conversationHistory,
     candidateProfile,
-    roundType
+    roundType,
+    hrState
   );
 };
 
@@ -22,7 +24,8 @@ export const generateInterviewQuestion = async (
   config: InterviewConfig,
   candidateProfile: CandidateAiProfile | null,
   questionNumber: number,
-  previousQuestions: string[]
+  previousQuestions: string[],
+  hrState?: HRInterviewState | null
 ): Promise<GeneratedQuestionResult> => {
-  return aiService.generateQuestion(config, candidateProfile, questionNumber, previousQuestions);
+  return aiService.generateQuestion(config, candidateProfile, questionNumber, previousQuestions, hrState);
 };

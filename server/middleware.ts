@@ -276,12 +276,13 @@ export async function aiServerMiddleware(
 
     // 4. Initial/Progressive Interview Question: /api/ai/interview-question
     if (url === '/api/ai/interview-question') {
-      const { config, candidateProfile, questionNumber, previousQuestions } = body;
+      const { config, candidateProfile, questionNumber, previousQuestions, hrState } = body;
       const question = await generateInitialQuestion(
-        config || { type: 'technical', difficulty: 'medium', durationMinutes: 15 },
+        config || { type: 'general_hr', difficulty: 'intermediate', durationMinutes: 15 },
         candidateProfile,
         questionNumber || 1,
-        previousQuestions || []
+        previousQuestions || [],
+        hrState
       );
       return sendJson(res, 200, { success: true, data: question });
     }
@@ -292,26 +293,30 @@ export async function aiServerMiddleware(
       const candidateAnswer = body.candidateAnswer || body.userAnswer || '';
       const conversationHistory = body.conversationHistory || body.history || [];
       const candidateProfile = body.candidateProfile || null;
-      const roundType = body.roundType || 'technical';
+      const roundType = body.roundType || 'general_hr';
+      const hrState = body.hrState || null;
 
       const turnResult = await processInterviewTurn(
         currentQuestion,
         candidateAnswer,
         conversationHistory,
         candidateProfile,
-        roundType
+        roundType,
+        hrState
       );
       return sendJson(res, 200, { success: true, data: turnResult });
     }
 
     // 6. Comprehensive Session Evaluation: /api/ai/interview-evaluate
     if (url === '/api/ai/interview-evaluate') {
-      const { sessionId, durationSeconds, exchanges, candidateProfile } = body;
+      const { sessionId, durationSeconds, exchanges, candidateProfile, hrState, roundType } = body;
       const evaluation = await evaluateSession(
         sessionId || `session_${Date.now()}`,
         durationSeconds || 300,
         exchanges || [],
-        candidateProfile
+        candidateProfile,
+        hrState,
+        roundType || 'general_hr'
       );
       return sendJson(res, 200, { success: true, data: evaluation });
     }

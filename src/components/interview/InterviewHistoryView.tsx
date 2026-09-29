@@ -169,6 +169,12 @@ export const InterviewHistoryView: React.FC<InterviewHistoryViewProps> = ({
         [],
       questionAssessments:
         item.questionAssessments || rd.questionAssessments || [],
+      competencyBreakdown: rd.competencyBreakdown || (item as any).competencyBreakdown,
+      strongestResponses: rd.strongestResponses || (item as any).strongestResponses,
+      weakestResponses: rd.weakestResponses || (item as any).weakestResponses,
+      suggestedPracticeQuestions: rd.suggestedPracticeQuestions || (item as any).suggestedPracticeQuestions,
+      starOverallRating: rd.starOverallRating || (item as any).starOverallRating,
+      executiveSummary: rd.executiveSummary || (item as any).executiveSummary,
     };
   };
 

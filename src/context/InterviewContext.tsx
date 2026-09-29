@@ -10,6 +10,7 @@ import {
   InterviewConfig,
   InterviewExchange,
   InterviewStatus,
+  HRInterviewState,
 } from "../types/interview";
 import { InterviewEvaluation } from "../types/evaluation";
 import { textToSpeechService } from "../services/speech/textToSpeech";
@@ -80,6 +81,7 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({
   const transcriptRef = useRef<string>("");
   const currentQuestionIdRef = useRef<string | null>(null);
   const dbSessionIdRef = useRef<string | null>(null);
+  const hrStateRef = useRef<HRInterviewState | null>(null);
 
   // Keep transcriptRef synchronized
   useEffect(() => {
@@ -286,6 +288,30 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({
       dbSessionIdRef.current = sessionId;
     }
 
+    const initialHrState: HRInterviewState = {
+      questionsAsked: [],
+      competenciesEvaluated: [],
+      candidateClaims: [],
+      importantDetails: [],
+      followUpOpportunities: [],
+      pendingCompetencies: [
+        'Communication',
+        'Teamwork & Collaboration',
+        'Conflict Management',
+        'Problem-Solving & STAR',
+        'Adaptability & Learning Agility',
+        'Accountability & Mistake Handling',
+        'Decision-Making Under Pressure',
+        'Self-Awareness & Feedback',
+        'Career Motivation & Alignment',
+        'Leadership & Initiative'
+      ],
+      questionCount: 1,
+      targetQuestions: 10,
+      currentPhase: 'introduction'
+    };
+    hrStateRef.current = initialHrState;
+
     try {
       setIsProcessing(true);
       const firstQ = await generateInterviewQuestion(
@@ -293,8 +319,16 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({
         candidateProfile,
         1,
         [],
+        hrStateRef.current
       );
       setIsProcessing(false);
+
+      if (hrStateRef.current) {
+        hrStateRef.current.questionsAsked.push(firstQ.questionText);
+        if (firstQ.competencyEvaluated) {
+          hrStateRef.current.competenciesEvaluated.push(firstQ.competencyEvaluated);
+        }
+      }
 
       setCurrentQuestion(firstQ.questionText);
       setStatus("speaking");
@@ -358,12 +392,32 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({
         answerToProcess,
         historyForTurn,
         candidateProfile,
-        session?.config?.type || "technical",
+        session?.config?.type || "general_hr",
+        hrStateRef.current
       );
 
       newExchange.isFollowUp = turnResult.isFollowUp;
       newExchange.followUpReason = turnResult.followUpReason;
       newExchange.aiQuickFeedback = turnResult.quickFeedback;
+      newExchange.category = turnResult.category;
+      newExchange.topic = turnResult.topic;
+      newExchange.competencyEvaluated = turnResult.competencyEvaluated;
+      newExchange.acknowledgementText = turnResult.acknowledgementText;
+      newExchange.starScore = turnResult.starScore;
+
+      // Update internal interview state
+      if (turnResult.updatedHrState) {
+        hrStateRef.current = turnResult.updatedHrState;
+      } else if (hrStateRef.current) {
+        hrStateRef.current.questionsAsked.push(turnResult.nextQuestionText);
+        if (
+          turnResult.competencyEvaluated &&
+          !hrStateRef.current.competenciesEvaluated.includes(turnResult.competencyEvaluated)
+        ) {
+          hrStateRef.current.competenciesEvaluated.push(turnResult.competencyEvaluated);
+        }
+        hrStateRef.current.questionCount = currentQuestionNumber + 1;
+      }
 
       // Save answer to Supabase if authenticated
       if (user && dbSessionIdRef.current && currentQuestionIdRef.current) {
@@ -435,6 +489,8 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({
         durationSeconds,
         exchangesRef.current,
         candidateProfile,
+        hrStateRef.current,
+        activeSession?.config?.type || 'general_hr'
       );
 
       setLatestEvaluation(evaluation);
@@ -500,6 +556,12 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({
           durationSeconds,
           completedAt: new Date().toISOString(),
           learningPathSuggestions: (evaluation as any).learningPathSuggestions,
+          competencyBreakdown: evaluation.competencyBreakdown || [],
+          strongestResponses: evaluation.strongestResponses || [],
+          weakestResponses: evaluation.weakestResponses || [],
+          suggestedPracticeQuestions: evaluation.suggestedPracticeQuestions || [],
+          starOverallRating: evaluation.starOverallRating,
+          executiveSummary: evaluation.executiveSummary || evaluation.overallFeedback,
         };
 
         // Persist unified assessment report strictly partitioned by user.id
@@ -583,6 +645,7 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({
     setCurrentTranscript("");
     setCurrentQuestionNumber(1);
     exchangesRef.current = [];
+    hrStateRef.current = null;
     setError(null);
     setLatestEvaluation(null);
   };

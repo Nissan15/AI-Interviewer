@@ -6,17 +6,26 @@
  */
 
 import { ParsedResume, CandidateAiProfile, SkillAnalysisResult, ProjectAnalysisItem, LearningPathItem } from '../../types/resume';
-import { InterviewExchange, InterviewConfig } from '../../types/interview';
+import { InterviewExchange, InterviewConfig, HRInterviewState } from '../../types/interview';
 import { InterviewEvaluation } from '../../types/evaluation';
 
 export interface AiTurnResult {
   isFollowUp: boolean;
   followUpReason?: string;
   quickFeedback?: string;
+  acknowledgementText?: string;
   nextQuestionText: string;
   category?: string;
   topic?: string;
   difficulty?: string;
+  competencyEvaluated?: string;
+  updatedHrState?: HRInterviewState;
+  starScore?: {
+    situation: boolean;
+    task: boolean;
+    action: boolean;
+    result: boolean;
+  };
   evaluation?: {
     technicalAccuracy?: number;
     communication?: number;
@@ -32,6 +41,8 @@ export interface GeneratedQuestionResult {
   category: string;
   topic?: string;
   difficulty?: string;
+  competencyEvaluated?: string;
+  acknowledgementText?: string;
   expectedKeyPoints?: string[];
 }
 
@@ -121,16 +132,24 @@ class AiService {
     config: InterviewConfig,
     candidateProfile: CandidateAiProfile | null,
     questionNumber: number,
-    previousQuestions: string[]
+    previousQuestions: string[],
+    hrState?: HRInterviewState | null
   ): Promise<GeneratedQuestionResult> {
     return this.post<
-      { config: InterviewConfig; candidateProfile: CandidateAiProfile | null; questionNumber: number; previousQuestions: string[] },
+      {
+        config: InterviewConfig;
+        candidateProfile: CandidateAiProfile | null;
+        questionNumber: number;
+        previousQuestions: string[];
+        hrState?: HRInterviewState | null;
+      },
       GeneratedQuestionResult
     >('/interview-question', {
       config,
       candidateProfile,
       questionNumber,
       previousQuestions,
+      hrState,
     });
   }
 
@@ -142,7 +161,8 @@ class AiService {
     candidateAnswer: string,
     conversationHistory: Array<{ question: string; answer: string }>,
     candidateProfile: CandidateAiProfile | null,
-    roundType: string = 'technical'
+    roundType: string = 'general_hr',
+    hrState?: HRInterviewState | null
   ): Promise<AiTurnResult> {
     return this.post<
       {
@@ -151,6 +171,7 @@ class AiService {
         conversationHistory: Array<{ question: string; answer: string }>;
         candidateProfile: CandidateAiProfile | null;
         roundType: string;
+        hrState?: HRInterviewState | null;
       },
       AiTurnResult
     >('/interview-turn', {
@@ -159,6 +180,7 @@ class AiService {
       conversationHistory,
       candidateProfile,
       roundType,
+      hrState,
     });
   }
 
@@ -169,7 +191,9 @@ class AiService {
     sessionId: string,
     durationSeconds: number,
     exchanges: InterviewExchange[],
-    candidateProfile: CandidateAiProfile | null
+    candidateProfile: CandidateAiProfile | null,
+    hrState?: HRInterviewState | null,
+    roundType: string = 'general_hr'
   ): Promise<InterviewEvaluation> {
     return this.post<
       {
@@ -177,6 +201,8 @@ class AiService {
         durationSeconds: number;
         exchanges: InterviewExchange[];
         candidateProfile: CandidateAiProfile | null;
+        hrState?: HRInterviewState | null;
+        roundType: string;
       },
       InterviewEvaluation
     >('/interview-evaluate', {
@@ -184,6 +210,8 @@ class AiService {
       durationSeconds,
       exchanges,
       candidateProfile,
+      hrState,
+      roundType,
     });
   }
 

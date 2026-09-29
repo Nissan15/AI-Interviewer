@@ -67,6 +67,11 @@ export const LiveInterviewRoom: React.FC<LiveInterviewRoomProps> = ({
     return "Ready • Tap mic to speak";
   };
 
+  const lastExchange =
+    session?.exchanges && session.exchanges.length > 0
+      ? session.exchanges[session.exchanges.length - 1]
+      : null;
+
   return (
     <div className="live-interview-room animate-fade-in">
       {/* Top Session Bar */}
@@ -129,6 +134,9 @@ export const LiveInterviewRoom: React.FC<LiveInterviewRoomProps> = ({
           questionNumber={currentQuestionNumber}
           questionText={currentQuestion}
           isAiSpeaking={isAiSpeaking}
+          isFollowUp={lastExchange?.isFollowUp}
+          category={lastExchange?.category}
+          competency={lastExchange?.competencyEvaluated}
           onRepeatQuestion={repeatQuestion}
         />
 

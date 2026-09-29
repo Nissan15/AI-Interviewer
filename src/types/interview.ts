@@ -10,6 +10,18 @@ export interface InterviewConfig {
   roleTarget?: string;
 }
 
+export interface HRInterviewState {
+  questionsAsked: string[];
+  competenciesEvaluated: string[];
+  candidateClaims: string[];
+  importantDetails: string[];
+  followUpOpportunities: string[];
+  pendingCompetencies: string[];
+  questionCount: number;
+  targetQuestions: number;
+  currentPhase: 'introduction' | 'background' | 'behavioral' | 'situational' | 'deep_dive' | 'career_goals' | 'closing';
+}
+
 export interface InterviewExchange {
   id: string;
   questionNumber: number;
@@ -21,6 +33,17 @@ export interface InterviewExchange {
   isFollowUp?: boolean;
   followUpReason?: string;
   aiQuickFeedback?: string;
+  // Qualitative HR additions
+  category?: string;
+  topic?: string;
+  competencyEvaluated?: string;
+  acknowledgementText?: string;
+  starScore?: {
+    situation: boolean;
+    task: boolean;
+    action: boolean;
+    result: boolean;
+  };
 }
 
 export interface InterviewSession {

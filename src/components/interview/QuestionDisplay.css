@@ -49,6 +49,32 @@
   border-radius: var(--radius-xs);
 }
 
+.q-category-pill {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-family-display);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background-color: var(--surface-elevated);
+  border: 1px solid var(--border);
+  padding: 2px 8px;
+  border-radius: var(--radius-xs);
+}
+
+.q-competency-pill {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-family-display);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent);
+  background-color: var(--accent-subtle);
+  border: 1px solid var(--accent-border);
+  padding: 2px 8px;
+  border-radius: var(--radius-xs);
+}
+
 .q-speech-box {
   padding: 4px 0;
 }
