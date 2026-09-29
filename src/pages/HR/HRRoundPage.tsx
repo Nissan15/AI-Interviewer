@@ -109,7 +109,9 @@ export const HRRoundPage: React.FC<HRRoundPageProps> = ({ defaultTab }) => {
     status === "speaking" ||
     status === "listening" ||
     status === "evaluating" ||
-    status === "connecting"
+    status === "connecting" ||
+    status === "ready" ||
+    (session !== null && status !== "completed" && status !== "idle")
   ) {
     return (
       <div className="hr-round-page active-session-view">

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Mic, MicOff, PhoneOff, AlertTriangle } from "lucide-react";
 import { useInterview } from "../../context/InterviewContext";
 import { AudioVisualizer } from "./AudioVisualizer";
@@ -17,6 +17,7 @@ export const LiveInterviewRoom: React.FC<LiveInterviewRoomProps> = ({
 }) => {
   const {
     session,
+    status,
     currentQuestion,
     currentQuestionNumber,
     currentTranscript,
@@ -26,10 +27,32 @@ export const LiveInterviewRoom: React.FC<LiveInterviewRoomProps> = ({
     isMuted,
     timeRemainingSeconds,
     error,
+    handleMicTap,
+    repeatQuestion,
     submitAnswer,
     endInterview,
     toggleMute,
   } = useInterview();
+
+  // Spacebar push-to-talk convenience shortcut when not typing in textarea/input
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.code === "Space") {
+        const activeEl = document.activeElement;
+        const isInput =
+          activeEl &&
+          (activeEl.tagName === "INPUT" ||
+            activeEl.tagName === "TEXTAREA" ||
+            (activeEl as HTMLElement).isContentEditable);
+        if (!isInput && !isProcessing) {
+          e.preventDefault();
+          handleMicTap();
+        }
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleMicTap, isProcessing]);
 
   const handleEndSession = async () => {
     await endInterview();
@@ -37,11 +60,11 @@ export const LiveInterviewRoom: React.FC<LiveInterviewRoomProps> = ({
   };
 
   const getStatusText = () => {
-    if (isProcessing) return "AI Processing Answer...";
-    if (isAiSpeaking) return "AI Interviewer Speaking...";
-    if (isMuted) return "Microphone Muted";
-    if (isListening) return "Listening to Candidate...";
-    return "Ready";
+    if (isProcessing) return "AI Analysing Speech & Formulating Follow-up...";
+    if (isAiSpeaking) return "AI Interviewer Speaking (tap mic to answer early)...";
+    if (isListening) return "Listening to Candidate • Tap mic to finish & analyse";
+    if (status === "ready") return "AI Ready • Tap mic to start speaking";
+    return "Ready • Tap mic to speak";
   };
 
   return (
@@ -54,6 +77,11 @@ export const LiveInterviewRoom: React.FC<LiveInterviewRoomProps> = ({
             {session?.config.type.replace("_", " ").toUpperCase()} •{" "}
             {session?.config.difficulty.toUpperCase()}
           </span>
+          {isListening && (
+            <span className="room-mic-status recording">
+              <span className="pulse-red-dot" /> Mic Recording
+            </span>
+          )}
         </div>
 
         <div className="room-controls-right">
@@ -86,11 +114,14 @@ export const LiveInterviewRoom: React.FC<LiveInterviewRoomProps> = ({
 
       {/* Main Interview Stage */}
       <div className="room-stage">
-        {/* Center Audio Visualizer */}
+        {/* Center Audio Visualizer with Tap-to-Talk Orb */}
         <AudioVisualizer
           isAiSpeaking={isAiSpeaking}
           isCandidateSpeaking={Boolean(isListening && currentTranscript)}
+          isListening={isListening}
+          isProcessing={isProcessing}
           statusText={getStatusText()}
+          onMicTap={handleMicTap}
         />
 
         {/* Question Display */}
@@ -98,6 +129,7 @@ export const LiveInterviewRoom: React.FC<LiveInterviewRoomProps> = ({
           questionNumber={currentQuestionNumber}
           questionText={currentQuestion}
           isAiSpeaking={isAiSpeaking}
+          onRepeatQuestion={repeatQuestion}
         />
 
         {/* Live Transcript & Candidate Interaction */}
@@ -105,6 +137,8 @@ export const LiveInterviewRoom: React.FC<LiveInterviewRoomProps> = ({
           currentTranscript={currentTranscript}
           isListening={isListening && !isMuted}
           isProcessing={isProcessing}
+          isAiSpeaking={isAiSpeaking}
+          onMicTap={handleMicTap}
           onSubmitAnswer={submitAnswer}
           exchanges={session?.exchanges || []}
         />

@@ -22,12 +22,35 @@
   animation: pulseCyanListening 2.4s infinite ease-in-out;
 }
 
+.visualizer-aura.aura-breathing {
+  animation: auraBreathing 3s infinite ease-in-out;
+}
+
+@keyframes auraBreathing {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.35;
+  }
+  50% {
+    transform: scale(1.18);
+    opacity: 0.85;
+  }
+}
+
 .ai-active .visualizer-aura {
-  background: radial-gradient(circle, rgba(36, 222, 251, 0.2) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(36, 222, 251, 0.25) 0%, transparent 70%);
 }
 
 .mic-active .visualizer-aura {
-  background: radial-gradient(circle, rgba(57, 217, 138, 0.2) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(239, 68, 68, 0.28) 0%, transparent 70%);
+}
+
+.ready-active .visualizer-aura {
+  background: radial-gradient(circle, rgba(36, 222, 251, 0.2) 0%, transparent 70%);
+}
+
+.processing-active .visualizer-aura {
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.28) 0%, transparent 70%);
 }
 
 .visualizer-center-orb {
@@ -35,7 +58,7 @@
   height: 76px;
   border-radius: var(--radius-full);
   background: var(--surface-elevated);
-  border: 1px solid var(--border);
+  border: 1.5px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -43,16 +66,82 @@
   position: relative;
   z-index: 2;
   transition: all var(--transition-normal);
+  padding: 0;
+  outline: none;
+}
+
+.visualizer-center-orb.orb-interactive {
+  cursor: pointer;
+}
+
+.visualizer-center-orb.orb-interactive:hover:not(:disabled) {
+  transform: scale(1.06);
+  box-shadow: 0 0 20px rgba(36, 222, 251, 0.35);
+}
+
+.visualizer-center-orb.orb-interactive:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.visualizer-center-orb:disabled {
+  cursor: not-allowed;
 }
 
 .ai-active .visualizer-center-orb {
   border-color: var(--accent);
-  box-shadow: 0 0 14px rgba(36, 222, 251, 0.2);
+  box-shadow: 0 0 16px rgba(36, 222, 251, 0.25);
+}
+
+.ready-active .visualizer-center-orb {
+  border-color: var(--accent);
+  box-shadow: 0 0 14px rgba(36, 222, 251, 0.22);
 }
 
 .mic-active .visualizer-center-orb {
-  border-color: var(--success);
-  box-shadow: 0 0 14px rgba(57, 217, 138, 0.2);
+  border-color: #ef4444;
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+  animation: micOrbPulse 1.8s infinite ease-in-out;
+}
+
+@keyframes micOrbPulse {
+  0%, 100% {
+    box-shadow: 0 0 14px rgba(239, 68, 68, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 24px rgba(239, 68, 68, 0.6);
+  }
+}
+
+.processing-active .visualizer-center-orb {
+  border-color: #a855f7;
+  box-shadow: 0 0 18px rgba(168, 85, 247, 0.4);
+}
+
+.orb-rec-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.orb-rec-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ef4444;
+  box-shadow: 0 0 6px #ef4444;
+  animation: recDotPing 1.2s infinite ease-in-out;
+}
+
+@keyframes recDotPing {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.3); opacity: 0.6; }
 }
 
 .orb-icon {
@@ -61,7 +150,17 @@
 
 .bot-idle-icon { color: var(--text-muted); }
 .ai-voice-icon { color: var(--accent); }
-.candidate-mic-icon { color: var(--success); }
+.ready-mic-icon { color: var(--accent); }
+.candidate-mic-icon { color: #ef4444; }
+.processing-icon {
+  color: #c084fc;
+  animation: spinSlow 3s linear infinite;
+}
+
+@keyframes spinSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
 
 /* Waveform Bars */
 .waveform-bars-cluster {
@@ -91,7 +190,11 @@
 }
 
 .mic-active .bars-animating .wave-bar {
-  background-color: var(--success);
+  background-color: #ef4444;
+}
+
+.processing-active .bars-animating .wave-bar {
+  background-color: #c084fc;
 }
 
 .bar-1 { animation-delay: 0.1s; }
@@ -131,7 +234,18 @@
   box-shadow: 0 0 6px var(--success);
 }
 
+.status-led.led-processing {
+  background-color: #c084fc;
+  box-shadow: 0 0 6px #c084fc;
+  animation: recDotPing 1.2s infinite ease-in-out;
+}
+
 .ai-active .status-led.led-live {
   background-color: var(--accent);
   box-shadow: 0 0 6px var(--accent);
+}
+
+.mic-active .status-led.led-live {
+  background-color: #ef4444;
+  box-shadow: 0 0 6px #ef4444;
 }

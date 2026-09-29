@@ -41,6 +41,10 @@ interface InterviewContextValue {
   latestEvaluation: InterviewEvaluation | null;
   startInterview: (config: InterviewConfig) => Promise<void>;
   submitAnswer: (customAnswer?: string) => Promise<void>;
+  handleMicTap: () => Promise<void>;
+  startListeningToCandidate: () => void;
+  stopListeningAndAnalyse: () => Promise<void>;
+  repeatQuestion: () => void;
   endInterview: () => Promise<InterviewEvaluation | null>;
   toggleMute: () => void;
   clearSession: () => void;
@@ -87,7 +91,8 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({
     if (
       status === "speaking" ||
       status === "listening" ||
-      status === "evaluating"
+      status === "evaluating" ||
+      status === "ready"
     ) {
       timerRef.current = setInterval(() => {
         setTimeRemainingSeconds((prev) => {
@@ -116,13 +121,17 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const speakCurrentQuestion = (text: string) => {
     if (!text || !autoSpeakQuestions || !textToSpeechService.isSupported()) {
-      startListeningToCandidate();
+      setIsAiSpeaking(false);
+      setStatus("ready");
+      speechToTextService.stopListening();
+      setIsListening(false);
       return;
     }
 
     setIsAiSpeaking(true);
     setStatus("speaking");
     speechToTextService.stopListening();
+    setIsListening(false);
 
     textToSpeechService.speak(text, {
       rate: speechRate,
@@ -132,43 +141,107 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({
       },
       onEnd: () => {
         setIsAiSpeaking(false);
-        startListeningToCandidate();
+        // Question asked: candidate turn starts in ready state (tap mic to speak)
+        setStatus("ready");
       },
       onError: (err) => {
         console.warn("TTS Error:", err);
         setIsAiSpeaking(false);
-        startListeningToCandidate();
+        setStatus("ready");
       },
     });
   };
 
   const startListeningToCandidate = () => {
-    if (isMuted) return;
+    setError(null);
+    if (isMuted) {
+      setIsMuted(false);
+    }
 
     if (!speechToTextService.isSupported()) {
-      setStatus("listening");
+      setError(
+        "Speech recognition is not supported in this browser. Please use Chrome or Edge, or switch to Type mode."
+      );
+      setStatus("ready");
       return;
     }
+
+    // Cancel any AI speech if user interrupts
+    textToSpeechService.cancel();
+    setIsAiSpeaking(false);
 
     setStatus("listening");
     setIsListening(true);
     setCurrentTranscript("");
+    transcriptRef.current = "";
 
     speechToTextService.startListening({
       onStart: () => {
         setIsListening(true);
+        setStatus("listening");
       },
       onResult: (transcript) => {
         setCurrentTranscript(transcript);
+        transcriptRef.current = transcript;
       },
       onError: (err) => {
         console.warn("STT Error:", err);
+        setError(err);
         setIsListening(false);
+        setStatus("ready");
       },
       onEnd: () => {
-        setIsListening(false);
+        if (!isProcessing) {
+          setIsListening(false);
+        }
       },
     });
+  };
+
+  const stopListeningAndAnalyse = async () => {
+    speechToTextService.stopListening();
+    setIsListening(false);
+
+    const speechText = (transcriptRef.current || currentTranscript).trim();
+
+    if (!speechText) {
+      setError(
+        "No speech detected. Please tap the mic and speak your answer clearly, or use Type / Refine mode."
+      );
+      setStatus("ready");
+      return;
+    }
+
+    setError(null);
+    // User tapped the mic again -> AI starts analysing the speech!
+    await submitAnswer(speechText);
+  };
+
+  const handleMicTap = async () => {
+    if (isProcessing) return;
+
+    // If candidate taps while AI is speaking, allow them to interrupt and speak early
+    if (isAiSpeaking) {
+      textToSpeechService.cancel();
+      setIsAiSpeaking(false);
+      startListeningToCandidate();
+      return;
+    }
+
+    if (!isListening) {
+      // First tap -> start speaking
+      startListeningToCandidate();
+    } else {
+      // Second tap -> stop speaking & AI starts analysing speech
+      await stopListeningAndAnalyse();
+    }
+  };
+
+  const repeatQuestion = () => {
+    if (isProcessing || !currentQuestion) return;
+    speechToTextService.stopListening();
+    setIsListening(false);
+    speakCurrentQuestion(currentQuestion);
   };
 
   const startInterview = async (config: InterviewConfig) => {
@@ -313,6 +386,7 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({
       setCurrentQuestion(turnResult.nextQuestionText);
       setCurrentQuestionNumber(nextQNumber);
       setCurrentTranscript("");
+      transcriptRef.current = "";
       setIsProcessing(false);
 
       // Record next question to Supabase
@@ -336,7 +410,7 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({
     } catch (err: any) {
       setIsProcessing(false);
       setError(err.message || "Error processing response.");
-      setStatus("listening");
+      setStatus("ready");
     }
   };
 
@@ -530,6 +604,10 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({
         latestEvaluation,
         startInterview,
         submitAnswer,
+        handleMicTap,
+        startListeningToCandidate,
+        stopListeningAndAnalyse,
+        repeatQuestion,
         endInterview,
         toggleMute,
         clearSession,

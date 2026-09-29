@@ -1,6 +1,6 @@
 export type InterviewType = 'general_hr' | 'technical_hr' | 'resume_based' | 'mixed';
 export type InterviewDifficulty = 'beginner' | 'intermediate' | 'advanced';
-export type InterviewStatus = 'idle' | 'configuring' | 'connecting' | 'speaking' | 'listening' | 'evaluating' | 'completed' | 'error';
+export type InterviewStatus = 'idle' | 'configuring' | 'connecting' | 'speaking' | 'ready' | 'listening' | 'evaluating' | 'completed' | 'error';
 
 export interface InterviewConfig {
   type: InterviewType;

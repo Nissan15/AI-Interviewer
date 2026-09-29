@@ -9,7 +9,10 @@ interface IWindowWithSpeech extends Window {
 class WebSpeechRecognitionService implements ISpeechToTextService {
   private recognition: any = null;
   private listening: boolean = false;
+  private isDesiredListening: boolean = false;
   private callbacks: SpeechToTextCallbacks | null = null;
+  private accumulatedFinalTranscript: string = '';
+  private currentSessionFinalTranscript: string = '';
 
   constructor() {
     if (typeof window !== 'undefined') {
@@ -35,30 +38,41 @@ class WebSpeechRecognitionService implements ISpeechToTextService {
     };
 
     this.recognition.onresult = (event: any) => {
-      let interimTranscript = '';
-      let finalTranscript = '';
+      let sessionFinal = '';
+      let sessionInterim = '';
 
-      for (let i = event.resultIndex; i < event.results.length; ++i) {
+      for (let i = 0; i < event.results.length; ++i) {
         const result = event.results[i];
         if (result.isFinal) {
-          finalTranscript += result[0].transcript;
+          sessionFinal += result[0].transcript + ' ';
         } else {
-          interimTranscript += result[0].transcript;
+          sessionInterim += result[0].transcript;
         }
       }
 
-      const activeText = finalTranscript || interimTranscript;
-      if (activeText.trim()) {
-        this.callbacks?.onResult(activeText.trim(), Boolean(finalTranscript));
+      this.currentSessionFinalTranscript = sessionFinal;
+      const combined = (this.accumulatedFinalTranscript + ' ' + sessionFinal + ' ' + sessionInterim)
+        .replace(/\s+/g, ' ')
+        .trim();
+
+      if (combined) {
+        this.callbacks?.onResult(combined, Boolean(sessionFinal));
       }
     };
 
     this.recognition.onerror = (event: any) => {
+      if (event.error === 'no-speech') {
+        // Normal pause from speaker; do not terminate or treat as fatal failure
+        return;
+      }
+      if (event.error === 'aborted') {
+        // Recognition was aborted on stop
+        return;
+      }
+
       let friendlyError = 'Speech recognition encountered an issue.';
       if (event.error === 'not-allowed' || event.error === 'permission-denied') {
         friendlyError = 'Microphone permission denied. Please allow microphone access in your browser.';
-      } else if (event.error === 'no-speech') {
-        friendlyError = 'No speech detected. Please speak into your microphone.';
       } else if (event.error === 'network') {
         friendlyError = 'Network error during speech recognition.';
       }
@@ -67,6 +81,21 @@ class WebSpeechRecognitionService implements ISpeechToTextService {
 
     this.recognition.onend = () => {
       this.listening = false;
+      if (this.isDesiredListening) {
+        // Candidate is still speaking (has not tapped mic to stop). Chrome ended due to a pause.
+        // Save current session text so far and restart listening seamlessly.
+        this.accumulatedFinalTranscript = (this.accumulatedFinalTranscript + ' ' + this.currentSessionFinalTranscript)
+          .replace(/\s+/g, ' ')
+          .trim();
+        this.currentSessionFinalTranscript = '';
+
+        try {
+          this.recognition.start();
+          return;
+        } catch {
+          this.isDesiredListening = false;
+        }
+      }
       this.callbacks?.onEnd();
     };
   }
@@ -82,6 +111,10 @@ class WebSpeechRecognitionService implements ISpeechToTextService {
     }
 
     this.callbacks = callbacks;
+    this.isDesiredListening = true;
+    this.accumulatedFinalTranscript = '';
+    this.currentSessionFinalTranscript = '';
+
     try {
       this.recognition.start();
     } catch (e: any) {
@@ -93,7 +126,8 @@ class WebSpeechRecognitionService implements ISpeechToTextService {
   }
 
   stopListening(): void {
-    if (this.recognition && this.listening) {
+    this.isDesiredListening = false;
+    if (this.recognition) {
       try {
         this.recognition.stop();
       } catch (e) {
