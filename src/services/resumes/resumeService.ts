@@ -253,6 +253,11 @@ export const resumeService = {
 
       return {
         id: data.id,
+        personalInfo: {
+          fullName: data.candidate_name || '',
+          email: data.email || '',
+          phone: data.phone || '',
+        },
         candidateName: data.candidate_name || 'Candidate',
         headline: data.summary,
         summary: data.summary,

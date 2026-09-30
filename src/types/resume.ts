@@ -108,6 +108,7 @@ export interface ProjectAnalysisItem {
 }
 
 export interface CandidateAiProfile {
+  personalInfo: any;
   id?: string;
   candidateName: string;
   headline?: string;

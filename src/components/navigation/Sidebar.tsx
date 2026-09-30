@@ -12,6 +12,9 @@ import {
   Sparkles,
   LogOut,
   User as UserIcon,
+  ShieldCheck,
+  Layers,
+  FileCheck,
 } from 'lucide-react';
 import { NAV_ITEMS, NavItemConfig } from '../../constants/navigation';
 import { useAuth } from '../../hooks/useAuth';
@@ -24,7 +27,7 @@ interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({ onNavClick }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, profile, logout } = useAuth();
+  const { user, profile, role, isAdmin, switchRole, logout } = useAuth();
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({
     '/technical': location.pathname.startsWith('/technical'),
   });
@@ -138,6 +141,44 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNavClick }) => {
             </NavLink>
           );
         })}
+
+        {/* Admin Section (Displayed for Admin users) */}
+        {isAdmin && (
+          <div className="admin-sidebar-section">
+            <div className="nav-section-title admin-section-title">
+              <span>Admin Management</span>
+              <span className="admin-chip-mini">PORTAL</span>
+            </div>
+
+            <NavLink
+              to="/admin"
+              end
+              className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+              onClick={onNavClick}
+            >
+              <span className="nav-icon"><ShieldCheck size={18} /></span>
+              <span className="nav-label">Admin Overview</span>
+            </NavLink>
+
+            <NavLink
+              to="/admin/questions"
+              className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+              onClick={onNavClick}
+            >
+              <span className="nav-icon"><Layers size={18} /></span>
+              <span className="nav-label">Question Bank</span>
+            </NavLink>
+
+            <NavLink
+              to="/admin/tests"
+              className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+              onClick={onNavClick}
+            >
+              <span className="nav-icon"><FileCheck size={18} /></span>
+              <span className="nav-label">Test Management</span>
+            </NavLink>
+          </div>
+        )}
       </nav>
 
       {/* Candidate Profile & Sign Out Footer */}
@@ -149,9 +190,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNavClick }) => {
                 <UserIcon size={16} />
               </div>
               <div className="sidebar-user-text">
-                <span className="sidebar-user-name" title={displayName}>
-                  {displayName}
-                </span>
+                <div className="user-name-role-row">
+                  <span className="sidebar-user-name" title={displayName}>
+                    {displayName}
+                  </span>
+                  <span
+                    className={`user-role-pill ${isAdmin ? 'role-pill-admin' : 'role-pill-student'}`}
+                    onClick={() => switchRole && switchRole(isAdmin ? 'student' : 'admin')}
+                    title="Click to toggle role (Demo mode)"
+                  >
+                    {isAdmin ? 'ADMIN' : 'STUDENT'}
+                  </span>
+                </div>
                 <span className="sidebar-user-email" title={user.email || ''}>
                   {user.email}
                 </span>

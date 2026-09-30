@@ -65,7 +65,7 @@ export const profileService = {
    */
   async updateProfile(
     userId: string,
-    updates: Partial<Pick<Profile, 'full_name' | 'avatar_url'>>
+    updates: Partial<Pick<Profile, 'full_name' | 'avatar_url' | 'role'>>
   ): Promise<{ data: Profile | null; error: string | null }> {
     if (!isSupabaseConfigured()) {
       return { data: null, error: 'Database is not configured.' };

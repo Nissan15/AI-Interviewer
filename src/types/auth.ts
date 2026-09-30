@@ -25,12 +25,15 @@ export interface AuthContextType {
   loading: boolean;
   isAuthenticated: boolean;
   isConfigured: boolean;
+  role: 'student' | 'admin';
+  isAdmin: boolean;
   login: (credentials: AuthCredentials) => Promise<{ error: string | null }>;
   signup: (data: SignUpData) => Promise<{ error: string | null; needsEmailVerification?: boolean }>;
   logout: () => Promise<{ error: string | null }>;
   resetPassword: (email: string) => Promise<{ error: string | null }>;
   updatePassword: (password: string) => Promise<{ error: string | null }>;
   refreshProfile: () => Promise<void>;
+  switchRole?: (newRole: 'student' | 'admin') => Promise<void>;
 }
 
 export type { User, Session, AuthError };

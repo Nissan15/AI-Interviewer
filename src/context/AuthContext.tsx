@@ -16,6 +16,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [role, setRoleState] = useState<'student' | 'admin'>('student');
   const [loading, setLoading] = useState<boolean>(true);
   const isConfigured = isSupabaseConfigured();
 
@@ -24,6 +25,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const { data } = await profileService.getProfile(userId);
       setProfile(data);
+      if (data?.role) {
+        setRoleState(data.role);
+      }
     } catch {
       setProfile(null);
     }
@@ -34,6 +38,38 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await fetchProfile(user.id);
     }
   }, [user, fetchProfile]);
+
+  useEffect(() => {
+    const savedOverride = localStorage.getItem('ai_user_role_override') as 'student' | 'admin' | null;
+    if (savedOverride === 'admin' || savedOverride === 'student') {
+      setRoleState(savedOverride);
+      return;
+    }
+    if (profile?.role) {
+      setRoleState(profile.role);
+    } else if (
+      user?.user_metadata?.role === 'admin' ||
+      user?.app_metadata?.role === 'admin' ||
+      user?.email?.toLowerCase().includes('admin')
+    ) {
+      setRoleState('admin');
+    } else {
+      setRoleState('student');
+    }
+  }, [profile, user]);
+
+  const switchRole = async (newRole: 'student' | 'admin') => {
+    setRoleState(newRole);
+    localStorage.setItem('ai_user_role_override', newRole);
+    if (user?.id && isConfigured) {
+      try {
+        await profileService.updateProfile(user.id, { role: newRole });
+        await refreshProfile();
+      } catch (e) {
+        console.warn('Could not update role in DB:', e);
+      }
+    }
+  };
 
   useEffect(() => {
     let mounted = true;
@@ -162,12 +198,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     loading,
     isAuthenticated: Boolean(session && user),
     isConfigured,
+    role,
+    isAdmin: role === 'admin',
     login,
     signup,
     logout,
     resetPassword,
     updatePassword,
     refreshProfile,
+    switchRole,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -352,3 +352,68 @@
   font-size: 10px;
   color: var(--text-muted);
 }
+
+/* Admin Section in Sidebar */
+.admin-sidebar-section {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.admin-section-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.admin-chip-mini {
+  font-size: 9px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: rgba(36, 222, 251, 0.15);
+  color: var(--accent);
+  border: 1px solid var(--accent-border);
+  letter-spacing: 0.05em;
+  font-weight: 700;
+}
+
+.user-name-role-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.user-role-pill {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 3px;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.role-pill-admin {
+  background: rgba(36, 222, 251, 0.15);
+  color: var(--accent);
+  border: 1px solid var(--accent-border);
+}
+
+.role-pill-admin:hover {
+  background: var(--accent);
+  color: var(--text-inverse);
+}
+
+.role-pill-student {
+  background: var(--surface);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+
+.role-pill-student:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}

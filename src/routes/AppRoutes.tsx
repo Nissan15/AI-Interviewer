@@ -11,6 +11,11 @@ import { TechnicalQuizPage } from '../pages/Technical/TechnicalQuizPage';
 import { AptitudePage } from '../pages/Aptitude/AptitudePage';
 import { HRRoundPage } from '../pages/HR/HRRoundPage';
 import { SettingsPage } from '../pages/Settings/SettingsPage';
+import { AdminRoute } from './AdminRoute';
+import { AdminLayout } from '../components/admin/AdminLayout';
+import { AdminOverviewPage } from '../pages/Admin/AdminOverviewPage';
+import { QuestionBankPage } from '../pages/Admin/QuestionBankPage';
+import { TestManagementPage } from '../pages/Admin/TestManagementPage';
 
 export const AppRoutes: React.FC = () => {
   return (
@@ -55,6 +60,15 @@ export const AppRoutes: React.FC = () => {
           <Route path="/hr/history" element={<HRRoundPage defaultTab="history" />} />
           <Route path="/hr/reports" element={<Navigate to="/hr/history" replace />} />
           <Route path="/settings" element={<SettingsPage />} />
+
+          {/* Admin Assessment Management System */}
+          <Route path="/admin" element={<AdminRoute />}>
+            <Route element={<AdminLayout />}>
+              <Route index element={<AdminOverviewPage />} />
+              <Route path="questions" element={<QuestionBankPage />} />
+              <Route path="tests" element={<TestManagementPage />} />
+            </Route>
+          </Route>
         </Route>
       </Route>
 

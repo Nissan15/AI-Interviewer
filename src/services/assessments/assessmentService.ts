@@ -308,7 +308,7 @@ export const assessmentService = {
           .order('created_at', { ascending: false });
 
         if (typeFilter) {
-          query = query.eq('assessment_type', typeFilter);
+          query = query.eq('assessment_type', typeFilter as any);
         }
 
         const { data, error } = await query;

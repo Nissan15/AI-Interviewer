@@ -12,7 +12,7 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, profile, logout } = useAuth();
+  const { user, profile, isAdmin, logout } = useAuth();
 
   const handleLogout = async () => {
     await logout();
@@ -29,6 +29,9 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
     if (path.startsWith('/hr/interview')) return 'Live AI Interview Session';
     if (path.startsWith('/hr/report')) return 'Interview Assessment Report';
     if (path === '/settings') return 'Platform & Provider Settings';
+    if (path === '/admin') return 'Admin Overview - Assessment Management';
+    if (path.startsWith('/admin/questions')) return 'Admin Question Bank Management';
+    if (path.startsWith('/admin/tests')) return 'Admin Test Authoring & Management';
     return 'AI Mock Interviewer';
   };
 
@@ -61,6 +64,31 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
         
         {/* Light / Dark Mode Toggle Button */}
         <ThemeToggle size="md" />
+
+        {isAdmin && (
+          <button
+            type="button"
+            className="tech-status-pill pill-admin-link"
+            onClick={() => navigate(location.pathname.startsWith('/admin') ? '/dashboard' : '/admin')}
+            title="Switch between Admin Panel and Candidate Dashboard"
+            style={{
+              cursor: 'pointer',
+              background: 'rgba(36, 222, 251, 0.12)',
+              border: '1px solid var(--accent-border)',
+              color: 'var(--accent)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '4px 10px',
+              borderRadius: '9999px',
+              fontSize: '0.75rem',
+              fontWeight: 600,
+            }}
+          >
+            <ShieldCheck size={14} />
+            <span>{location.pathname.startsWith('/admin') ? 'Candidate Portal' : 'Admin Panel'}</span>
+          </button>
+        )}
 
         {user && (
           <div className="header-user-section">

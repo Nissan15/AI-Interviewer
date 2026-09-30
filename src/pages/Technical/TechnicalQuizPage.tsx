@@ -275,12 +275,17 @@ export const TechnicalQuizPage: React.FC = () => {
             {questions[currentIndex] && (
               <QuizQuestionCard
                 question={questions[currentIndex]}
-                questionIndex={currentIndex}
+                questionNumber={currentIndex + 1}
                 totalQuestions={questions.length}
                 selectedOption={answers[questions[currentIndex].id]}
                 isMarkedForReview={markedForReview.includes(questions[currentIndex].id)}
                 onSelectOption={handleSelectOption}
                 onToggleReview={handleToggleReview}
+                onPrevious={() => setCurrentIndex((prev) => Math.max(0, prev - 1))}
+                onNext={() => setCurrentIndex((prev) => Math.min(questions.length - 1, prev + 1))}
+                hasPrevious={currentIndex > 0}
+                hasNext={currentIndex < questions.length - 1}
+                onSubmit={handleSubmit}
               />
             )}
 

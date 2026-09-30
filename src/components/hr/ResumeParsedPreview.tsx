@@ -317,7 +317,7 @@ export const ResumeParsedPreview: React.FC<ResumeParsedPreviewProps> = ({ resume
                   </div>
                   <div className="skill-badges-flow">
                     {categorizedSkills.backend.map((s, idx) => (
-                      <Badge key={idx} variant="accent" size="sm">
+                      <Badge key={idx} variant="primary" size="sm">
                         {s}
                       </Badge>
                     ))}
@@ -347,7 +347,7 @@ export const ResumeParsedPreview: React.FC<ResumeParsedPreviewProps> = ({ resume
                   </div>
                   <div className="skill-badges-flow">
                     {categorizedSkills.cloud.map((s, idx) => (
-                      <Badge key={idx} variant="neutral" size="sm">
+                      <Badge key={idx} variant="secondary" size="sm">
                         {s}
                       </Badge>
                     ))}
@@ -377,7 +377,7 @@ export const ResumeParsedPreview: React.FC<ResumeParsedPreviewProps> = ({ resume
                   </div>
                   <div className="skill-badges-flow">
                     {categorizedSkills.tools.map((s, idx) => (
-                      <Badge key={idx} variant="outline" size="sm">
+                      <Badge key={idx} variant="secondary" size="sm">
                         {s}
                       </Badge>
                     ))}
@@ -392,7 +392,7 @@ export const ResumeParsedPreview: React.FC<ResumeParsedPreviewProps> = ({ resume
                   </div>
                   <div className="skill-badges-flow">
                     {categorizedSkills.otherTechnologies.map((s, idx) => (
-                      <Badge key={idx} variant="outline" size="sm">
+                      <Badge key={idx} variant="secondary" size="sm">
                         {s}
                       </Badge>
                     ))}

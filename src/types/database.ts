@@ -11,6 +11,7 @@ export type Profile = {
   user_id: string;
   full_name: string | null;
   avatar_url: string | null;
+  role?: 'student' | 'admin';
   created_at: string;
   updated_at: string;
 };
@@ -265,6 +266,7 @@ export type Database = {
           user_id: string;
           full_name?: string | null;
           avatar_url?: string | null;
+          role?: 'student' | 'admin';
           created_at?: string;
           updated_at?: string;
         };
@@ -273,6 +275,7 @@ export type Database = {
           user_id?: string;
           full_name?: string | null;
           avatar_url?: string | null;
+          role?: 'student' | 'admin';
           created_at?: string;
           updated_at?: string;
         };
@@ -648,6 +651,202 @@ export type Database = {
             columns: ['user_id'];
             isOneToOne: false;
             referencedRelation: 'users';
+            referencedColumns: ['id'];
+          }
+        ];
+      };
+      questions: {
+        Row: {
+          id: string;
+          type: 'aptitude' | 'technical';
+          question: string;
+          option_a: string;
+          option_b: string;
+          option_c: string;
+          option_d: string;
+          options: Json;
+          correct_answer: string;
+          explanation: string | null;
+          category: string;
+          topic: string;
+          technology: string | null;
+          difficulty: 'easy' | 'medium' | 'hard';
+          marks: number;
+          time_limit: number;
+          active: boolean;
+          created_by: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          type: 'aptitude' | 'technical';
+          question: string;
+          option_a: string;
+          option_b: string;
+          option_c: string;
+          option_d: string;
+          options?: Json;
+          correct_answer: string;
+          explanation?: string | null;
+          category: string;
+          topic: string;
+          technology?: string | null;
+          difficulty: 'easy' | 'medium' | 'hard';
+          marks?: number;
+          time_limit?: number;
+          active?: boolean;
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<{
+          type: 'aptitude' | 'technical';
+          question: string;
+          option_a: string;
+          option_b: string;
+          option_c: string;
+          option_d: string;
+          options: Json;
+          correct_answer: string;
+          explanation: string | null;
+          category: string;
+          topic: string;
+          technology: string | null;
+          difficulty: 'easy' | 'medium' | 'hard';
+          marks: number;
+          time_limit: number;
+          active: boolean;
+          created_by: string | null;
+          created_at: string;
+          updated_at: string;
+        }>;
+        Relationships: [];
+      };
+      categories: {
+        Row: {
+          id: string;
+          name: string;
+          type: 'aptitude' | 'technical';
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          type: 'aptitude' | 'technical';
+          created_at?: string;
+        };
+        Update: Partial<{
+          name: string;
+          type: 'aptitude' | 'technical';
+        }>;
+        Relationships: [];
+      };
+      topics: {
+        Row: {
+          id: string;
+          category_name: string;
+          name: string;
+          type: 'aptitude' | 'technical';
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          category_name: string;
+          name: string;
+          type: 'aptitude' | 'technical';
+          created_at?: string;
+        };
+        Update: Partial<{
+          category_name: string;
+          name: string;
+          type: 'aptitude' | 'technical';
+        }>;
+        Relationships: [];
+      };
+      tests: {
+        Row: {
+          id: string;
+          title: string;
+          description: string | null;
+          type: 'aptitude' | 'technical';
+          duration_minutes: number;
+          total_questions: number;
+          total_marks: number;
+          difficulty_distribution: Json;
+          categories: Json;
+          topics: Json;
+          status: 'draft' | 'published' | 'unpublished';
+          created_by: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          title: string;
+          description?: string | null;
+          type: 'aptitude' | 'technical';
+          duration_minutes?: number;
+          total_questions?: number;
+          total_marks?: number;
+          difficulty_distribution?: Json;
+          categories?: Json;
+          topics?: Json;
+          status?: 'draft' | 'published' | 'unpublished';
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<{
+          title: string;
+          description: string | null;
+          type: 'aptitude' | 'technical';
+          duration_minutes: number;
+          total_questions: number;
+          total_marks: number;
+          difficulty_distribution: Json;
+          categories: Json;
+          topics: Json;
+          status: 'draft' | 'published' | 'unpublished';
+          created_by: string | null;
+          updated_at: string;
+        }>;
+        Relationships: [];
+      };
+      test_questions: {
+        Row: {
+          id: string;
+          test_id: string;
+          question_id: string;
+          order_index: number;
+          marks: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          test_id: string;
+          question_id: string;
+          order_index?: number;
+          marks?: number;
+          created_at?: string;
+        };
+        Update: Partial<{
+          order_index: number;
+          marks: number;
+        }>;
+        Relationships: [
+          {
+            foreignKeyName: 'test_questions_test_id_fkey';
+            columns: ['test_id'];
+            isOneToOne: false;
+            referencedRelation: 'tests';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'test_questions_question_id_fkey';
+            columns: ['question_id'];
+            isOneToOne: false;
+            referencedRelation: 'questions';
             referencedColumns: ['id'];
           }
         ];

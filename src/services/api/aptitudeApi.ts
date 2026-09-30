@@ -1,45 +1,62 @@
 import { AptitudeQuestion, AptitudeSubmission, AptitudeResult, AptitudeCategory } from '../../types/aptitude';
-import { assessmentService } from '../assessments/assessmentService';
+import { questionService } from '../admin/questionService';
 import { DEFAULT_APTITUDE_QUESTIONS } from '../../data/questionBanks';
 
 export const aptitudeApi = {
+  /**
+   * Fetch active aptitude questions from Supabase repository
+   */
   getQuestions: async (category?: string): Promise<AptitudeQuestion[]> => {
     try {
-      // 1. Check Supabase database first
-      const { data } = await assessmentService.getAptitudeQuestions(category);
+      const { data } = await questionService.getQuestions({
+        type: 'aptitude',
+        active: 'active',
+        category: category && category !== 'all' ? category : undefined,
+      });
+
       if (data && data.length > 0) {
         return data.map((q) => {
-          let opts: string[] = [];
-          if (Array.isArray(q.options)) {
-            opts = q.options as string[];
-          } else if (typeof q.options === 'string') {
-            try {
-              opts = JSON.parse(q.options);
-            } catch {
-              opts = [q.options];
-            }
+          const opts = Array.isArray(q.options) && q.options.length > 0
+            ? q.options
+            : [q.option_a, q.option_b, q.option_c, q.option_d];
+
+          // Determine correct answer index
+          let correctIdx = opts.findIndex(
+            (o) => o?.trim().toLowerCase() === q.correct_answer?.trim().toLowerCase()
+          );
+          if (correctIdx === -1) {
+            // Check if correct_answer was saved as "A", "Option A", etc.
+            const lower = q.correct_answer?.trim().toLowerCase() || '';
+            if (lower === 'a' || lower === 'option a') correctIdx = 0;
+            else if (lower === 'b' || lower === 'option b') correctIdx = 1;
+            else if (lower === 'c' || lower === 'option c') correctIdx = 2;
+            else if (lower === 'd' || lower === 'option d') correctIdx = 3;
+            else correctIdx = 0;
           }
-          const correctIdx = opts.indexOf(q.correct_answer);
+
           return {
             id: q.id,
             category: q.category as AptitudeCategory,
             question: q.question,
             options: opts,
-            correctOptionIndex: correctIdx >= 0 ? correctIdx : 0,
+            correctOptionIndex: correctIdx,
             explanation: q.explanation || '',
             difficulty: (q.difficulty as any) || 'medium',
           };
         });
       }
-    } catch {
-      // Fallback
+    } catch (err) {
+      console.warn('Aptitude dynamic repository note, using curated fallback:', err);
     }
 
-    // 2. Return curated category bank
+    // Curated category fallback
     const catKey = (category as AptitudeCategory) || 'Quantitative Aptitude';
     return DEFAULT_APTITUDE_QUESTIONS[catKey] || [];
   },
 
+  /**
+   * Submit completed aptitude assessment and calculate score
+   */
   submitTest: async (
     submission: AptitudeSubmission,
     questionsList?: AptitudeQuestion[]
